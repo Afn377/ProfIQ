@@ -24,7 +24,8 @@ class Professor(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["name", "institution"], name="unique_professor_name_institution")
+            models.UniqueConstraint(fields=["name", "institution"], name="unique_professor_name_institution"),
+            models.UniqueConstraint(fields=["external_ref"], name="unique_professor_external_ref"),
         ]
 
     def __str__(self):
