@@ -22,6 +22,11 @@ class Professor(models.Model):
     source_num_ratings = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["name", "institution"], name="unique_professor_name_institution")
+        ]
+
     def __str__(self):
         return self.name
 
