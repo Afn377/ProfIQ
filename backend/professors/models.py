@@ -24,7 +24,9 @@ class Professor(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["name", "institution"], name="unique_professor_name_institution"),
+            # ensure that (name, institution) is unique when external_ref is blank
+            models.UniqueConstraint(fields=["name", "institution"], name="unique_professor_name_institution", condition=models.Q(external_ref="")),
+            # ensure that external_ref is unique when it is not blank
             models.UniqueConstraint(fields=["external_ref"], name="unique_professor_external_ref", condition=~models.Q(external_ref="")),
         ]
 
