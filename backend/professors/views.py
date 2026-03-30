@@ -1,7 +1,15 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from rest_framework import generics
 
-# Create your views here.
+from .models import Professor
+from .serializers import ProfessorListSerializer
 
-def hi(request):
-    return HttpResponse("hi")
+
+class ProfessorListView(generics.ListAPIView):
+    # GET /api/professors/ — paginated list of professors.
+
+    serializer_class = ProfessorListSerializer
+
+    def get_queryset(self):
+        qs = Professor.objects.all().order_by("name")
+        # TODO(you): search (?q=), filters (?department=, ?institution=), sorting (?sort=)
+        return qs
