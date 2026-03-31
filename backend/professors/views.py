@@ -16,10 +16,15 @@ class ProfessorListView(generics.ListAPIView):
         # serializer doesn't fire one extra lookup per professor (N+1).
         qs = Professor.objects.select_related("department", "stats")
 
-        # ?q= free-text search across name, institution, and department name
+        # ?q= free-text search across name, institution, department name, and course code
         q = self.request.query_params.get("q", "").strip()
         if q:
-            qs = qs.filter(Q(name__icontains=q) | Q(institution__icontains=q) | Q(department__name__icontains=q))
+            qs = qs.filter(
+                Q(name__icontains=q)
+                | Q(institution__icontains=q)
+                | Q(department__name__icontains=q)
+                | Q(courses__code__icontains=q)
+            )
 
         # ?department=<id> exact department
         department = self.request.query_params.get("department", "").strip()
