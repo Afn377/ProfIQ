@@ -23,7 +23,7 @@ class ProfessorListView(generics.ListAPIView):
         department = self.request.query_params.get("department", "").strip()
         if department:
             if not department.isdigit():
-                raise ValidationError("Invalid department ID")
+                raise ValidationError({"department": "Must be a number."})
             qs = qs.filter(department_id=department)
 
         # ?institution= exact school name, case-insensitive
