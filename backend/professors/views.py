@@ -12,7 +12,9 @@ class ProfessorListView(generics.ListAPIView):
     serializer_class = ProfessorListSerializer
 
     def get_queryset(self):
-        qs = Professor.objects.all()
+        # select_related JOINs department and stats into the same query, so the
+        # serializer doesn't fire one extra lookup per professor (N+1).
+        qs = Professor.objects.select_related("department", "stats")
 
         # ?q= free-text search across name, institution, and department name
         q = self.request.query_params.get("q", "").strip()
