@@ -2,6 +2,7 @@ from rest_framework import generics
 from django.db.models import Q
 from .models import Professor
 from .serializers import ProfessorListSerializer
+from rest_framework.exceptions import ValidationError
 
 
 class ProfessorListView(generics.ListAPIView):
@@ -21,6 +22,8 @@ class ProfessorListView(generics.ListAPIView):
         # ?department=<id> exact department
         department = self.request.query_params.get("department", "").strip()
         if department:
+            if not department.isdigit():
+                raise ValidationError("Invalid department ID")
             qs = qs.filter(department_id=department)
 
         # ?institution= exact school name, case-insensitive
