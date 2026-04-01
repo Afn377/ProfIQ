@@ -112,7 +112,12 @@ class DepartmentListView(generics.ListAPIView):
 def compare_professors(request):
     # GET /api/compare/?ids=1,2,3 — compact rows for several professors at once.
     raw = request.query_params.get("ids", "")
-    ids = [int(x) for x in raw.split(",") if x.strip()]
+    try:
+        ids = [int(x) for x in raw.split(",") if x.strip()]
+    except ValueError:
+        raise ValidationError({"ids": "Must be comma-separated integers."})
+    if not ids:
+        raise ValidationError({"ids": "Provide at least one id."})
 
     profs = Professor.objects.select_related("department", "stats").filter(id__in=ids)
     data = ProfessorListSerializer(profs, many=True).data

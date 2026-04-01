@@ -34,3 +34,21 @@ class ProfessorSearchTests(TestCase):
 
         names = [row["name"] for row in response.json()["results"]]
         self.assertEqual(names, ["Ann Lee"])
+
+
+class CompareTests(TestCase):
+    def test_non_numeric_id_returns_400(self):
+        response = self.client.get("/api/compare/?ids=1,abc")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("ids", response.json())
+
+    def test_empty_ids_returns_400(self):
+        response = self.client.get("/api/compare/")
+        self.assertEqual(response.status_code, 400)
+
+    def test_returns_theme_counts_per_professor(self):
+        prof = Professor.objects.create(name="Ann Lee", institution="Rutgers")
+        ProfessorStats.objects.create(professor=prof, theme_counts={"clarity": 3})
+        response = self.client.get(f"/api/compare/?ids={prof.id}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()[0]["theme_counts"], {"clarity": 3})
