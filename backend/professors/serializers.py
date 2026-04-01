@@ -21,3 +21,12 @@ class ProfessorListSerializer(serializers.ModelSerializer):
             "recommendation_score", "review_count",
             "source_avg_rating", "source_num_ratings", "external_ref",
         ]
+
+
+class ProfessorCreateSerializer(serializers.ModelSerializer):
+    """Input for POST /api/professors/ — naive first version."""
+
+    class Meta:
+        model = Professor
+        fields = ["id", "name", "institution", "department"]
+        read_only_fields = ["id"]

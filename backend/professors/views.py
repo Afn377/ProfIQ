@@ -1,15 +1,18 @@
 from rest_framework import generics
 from django.db.models import Q
 from .models import Professor
-from .serializers import ProfessorListSerializer
+from .serializers import ProfessorCreateSerializer, ProfessorListSerializer
 from rest_framework.exceptions import ValidationError
 
 
-class ProfessorListView(generics.ListAPIView):
-    # GET /api/professors/ — paginated list of professors.
-    # Optional query params: q, department, institution, sort
+class ProfessorListView(generics.ListCreateAPIView):
+    # GET  /api/professors/ — paginated list (query params: q, department, institution, sort)
+    # POST /api/professors/ — create one professor
 
-    serializer_class = ProfessorListSerializer
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return ProfessorCreateSerializer
+        return ProfessorListSerializer
 
     def get_queryset(self):
         # select_related JOINs department and stats into the same query, so the
