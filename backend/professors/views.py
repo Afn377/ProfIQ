@@ -1,4 +1,5 @@
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.response import Response
 from django.db.models import Q
 from .models import Professor
 from .serializers import ProfessorCreateSerializer, ProfessorListSerializer
@@ -13,6 +14,22 @@ class ProfessorListView(generics.ListCreateAPIView):
         if self.request.method == "POST":
             return ProfessorCreateSerializer
         return ProfessorListSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Duplicate: hand back the existing professor rather than a 400.
+        existing = serializer.existing_instance
+        if existing is not None:
+            payload = ProfessorListSerializer(existing).data
+            payload["created"] = False
+            return Response(payload, status=status.HTTP_200_OK)
+
+        instance = serializer.save()
+        payload = ProfessorListSerializer(instance).data
+        payload["created"] = True
+        return Response(payload, status=status.HTTP_201_CREATED)
 
     def get_queryset(self):
         # select_related JOINs department and stats into the same query, so the
