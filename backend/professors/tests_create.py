@@ -77,3 +77,11 @@ class ProfessorCreateTests(TestCase):
         self.assertEqual(second.status_code, 200)
         self.assertEqual(second.json()["id"], first.json()["id"])
         self.assertEqual(Professor.objects.count(), 1)
+
+
+class ProfessorThrottleTests(TestCase):
+    def test_reads_are_not_rate_limited(self):
+        # A user browsing the catalog should never be told to slow down.
+        for _ in range(25):
+            response = self.client.get("/api/professors/")
+            self.assertEqual(response.status_code, 200)

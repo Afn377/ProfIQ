@@ -10,6 +10,9 @@ class ProfessorListView(generics.ListCreateAPIView):
     # GET  /api/professors/ — paginated list (query params: q, department, institution, sort)
     # POST /api/professors/ — create one professor
 
+    # Rate-limit: 20 requests/hour per client (see REST_FRAMEWORK in settings).
+    throttle_scope = "professor_create"
+
     def get_serializer_class(self):
         if self.request.method == "POST":
             return ProfessorCreateSerializer
