@@ -24,7 +24,7 @@ class ProfessorListView(generics.ListAPIView):
                 | Q(institution__icontains=q)
                 | Q(department__name__icontains=q)
                 | Q(courses__code__icontains=q)
-            )
+            ).distinct()  # the join to courses yields one row per matching course
 
         # ?department=<id> exact department
         department = self.request.query_params.get("department", "").strip()
