@@ -1,9 +1,15 @@
 from rest_framework import generics, status
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
-from django.db.models import Q
-from .models import Professor
-from .serializers import ProfessorCreateSerializer, ProfessorListSerializer
+from django.db.models import Count, Prefetch, Q
+from .models import Department, Professor, Review
+from .serializers import (
+    DepartmentSerializer,
+    ProfessorCreateSerializer,
+    ProfessorDetailSerializer,
+    ProfessorListSerializer,
+)
 from rest_framework.exceptions import ValidationError
 
 
@@ -76,3 +82,63 @@ class ProfessorListView(generics.ListCreateAPIView):
             qs = qs.order_by("-stats__recommendation_score", "name")
 
         return qs
+
+
+class ProfessorDetailView(generics.RetrieveAPIView):
+    # GET /api/professors/<id>/ — one professor with courses, stats, reviews.
+
+    serializer_class = ProfessorDetailSerializer
+
+    def get_queryset(self):
+        return Professor.objects.select_related("department", "stats").prefetch_related(
+            "courses",
+            Prefetch(
+                "reviews",
+                queryset=Review.objects.select_related("source", "course")
+                .order_by("-posted_at", "-id"),
+            ),
+        )
+
+
+class DepartmentListView(generics.ListAPIView):
+    # GET /api/departments/ — every department, unpaginated (it feeds a dropdown).
+
+    queryset = Department.objects.all().order_by("name")
+    serializer_class = DepartmentSerializer
+    pagination_class = None
+
+
+@api_view(["GET"])
+def compare_professors(request):
+    # GET /api/compare/?ids=1,2,3 — compact rows for several professors at once.
+    raw = request.query_params.get("ids", "")
+    ids = [int(x) for x in raw.split(",") if x.strip()]
+
+    profs = Professor.objects.select_related("department", "stats").filter(id__in=ids)
+    data = ProfessorListSerializer(profs, many=True).data
+    theme_by_id = {p.id: (p.stats.theme_counts if hasattr(p, "stats") else {}) for p in profs}
+    for row in data:
+        row["theme_counts"] = theme_by_id.get(row["id"], {})
+    return Response(data)
+
+
+@api_view(["GET"])
+def platform_summary(request):
+    # GET /api/summary/ — landing-page numbers.
+    analyzed = Professor.objects.filter(stats__review_count__gte=3)
+    top = (
+        analyzed.select_related("department", "stats")
+        .order_by("-stats__recommendation_score")[:5]
+    )
+    departments = (
+        Department.objects.annotate(count=Count("professors"))
+        .order_by("-count")[:8]
+    )
+    return Response({
+        "professor_count": Professor.objects.count(),
+        "analyzed_count": analyzed.count(),
+        "top_professors": ProfessorListSerializer(top, many=True).data,
+        "departments": [
+            {"id": d.id, "name": d.name, "professor_count": d.count} for d in departments
+        ],
+    })
