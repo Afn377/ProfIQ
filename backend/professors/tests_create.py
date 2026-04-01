@@ -85,3 +85,17 @@ class ProfessorThrottleTests(TestCase):
         for _ in range(25):
             response = self.client.get("/api/professors/")
             self.assertEqual(response.status_code, 200)
+
+    def test_creates_are_rate_limited(self):
+        for i in range(20):
+            self.client.post(
+                "/api/professors/",
+                {"name": f"Prof {i}", "institution": "Rutgers"},
+                content_type="application/json",
+            )
+        response = self.client.post(
+            "/api/professors/",
+            {"name": "One Too Many", "institution": "Rutgers"},
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 429)

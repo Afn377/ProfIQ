@@ -1,5 +1,6 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from django.db.models import Q
 from .models import Professor
 from .serializers import ProfessorCreateSerializer, ProfessorListSerializer
@@ -10,8 +11,14 @@ class ProfessorListView(generics.ListCreateAPIView):
     # GET  /api/professors/ — paginated list (query params: q, department, institution, sort)
     # POST /api/professors/ — create one professor
 
-    # Rate-limit: 20 requests/hour per client (see REST_FRAMEWORK in settings).
+    # Rate-limit creates to 20/hour per client (see REST_FRAMEWORK in settings).
     throttle_scope = "professor_create"
+
+    def get_throttles(self):
+        # Only writes are throttled; browsing the catalog is never limited.
+        if self.request.method == "POST":
+            return [ScopedRateThrottle()]
+        return []
 
     def get_serializer_class(self):
         if self.request.method == "POST":
