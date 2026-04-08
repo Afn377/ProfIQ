@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 function bucket(score) {
   if (score === null || score === undefined) return "none";
   if (score >= 65) return "good";
@@ -7,9 +5,9 @@ function bucket(score) {
   return "bad";
 }
 
-export default function ProfessorCard({ prof, selectable = false }) {
-  // Naive: each card remembers its own "selected" flag.
-  const [selected, setSelected] = useState(false);
+// `selected` is decided by the parent (a set of ids), never by the card:
+// state about *which* items are chosen must be tied to an identity, not a slot.
+export default function ProfessorCard({ prof, selected = false, onToggle }) {
   const score = prof.recommendation_score;
   return (
     <div className={`card${selected ? " selected" : ""}`}>
@@ -21,8 +19,8 @@ export default function ProfessorCard({ prof, selectable = false }) {
         {score === null ? "Not analyzed" : `${score.toFixed(1)} / 100`}
         {prof.review_count > 0 && ` · ${prof.review_count} reviews`}
       </div>
-      {selectable && (
-        <button className="btn" onClick={() => setSelected((v) => !v)}>
+      {onToggle && (
+        <button className="btn" onClick={onToggle}>
           {selected ? "✓ Selected" : "Select to compare"}
         </button>
       )}

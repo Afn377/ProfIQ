@@ -8,6 +8,7 @@ export default function Search() {
   const [department, setDepartment] = useState("");
   const [sort, setSort] = useState("score");
 
+  const [selected, setSelected] = useState(new Set());
   const [departments, setDepartments] = useState([]);
   const [results, setResults] = useState([]);
   const [count, setCount] = useState(0);
@@ -24,6 +25,13 @@ export default function Search() {
     });
   }, [q, department, sort]);
 
+  const toggle = (id) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+
   return (
     <div className="container">
       <h2>Browse professors</h2>
@@ -36,7 +44,7 @@ export default function Search() {
         <select value={department} onChange={(e) => setDepartment(e.target.value)}>
           <option value="">All departments</option>
           {departments.map((d) => (
-            <option value={d.id}>{d.name}</option>
+            <option key={d.id} value={d.id}>{d.name}</option>
           ))}
         </select>
         <select value={sort} onChange={(e) => setSort(e.target.value)}>
@@ -47,7 +55,7 @@ export default function Search() {
       <p className="sub">{count} professors</p>
       <div className="grid">
         {results.map((p) => (
-          <ProfessorCard prof={p} selectable />
+          <ProfessorCard key={p.id} prof={p} selected={selected.has(p.id)} onToggle={() => toggle(p.id)} />
         ))}
       </div>
     </div>
