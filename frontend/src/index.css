@@ -33,3 +33,11 @@ a { color: inherit; text-decoration: none; }
 .score.none { color: var(--muted); }
 .spinner { color: var(--muted); padding: 32px 0; }
 .error { color: var(--bad); padding: 32px 0; }
+.nav { display: flex; gap: 20px; padding: 16px; align-items: center; }
+.nav .brand { font-weight: 800; color: var(--accent); margin-right: auto; }
+.filters { display: flex; gap: 12px; margin: 12px 0; }
+.filters input, .filters select { background: var(--card); color: var(--text); border: 1px solid #2a2f3d; border-radius: 8px; padding: 10px 12px; }
+.filters input { flex: 1; }
+.sub { color: var(--muted); }
+.card.selected { outline: 2px solid var(--accent); }
+.btn { margin-top: 10px; background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: 8px; padding: 6px 10px; cursor: pointer; }

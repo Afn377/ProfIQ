@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 function bucket(score) {
   if (score === null || score === undefined) return "none";
   if (score >= 65) return "good";
@@ -5,10 +7,12 @@ function bucket(score) {
   return "bad";
 }
 
-export default function ProfessorCard({ prof }) {
+export default function ProfessorCard({ prof, selectable = false }) {
+  // Naive: each card remembers its own "selected" flag.
+  const [selected, setSelected] = useState(false);
   const score = prof.recommendation_score;
   return (
-    <div className="card">
+    <div className={`card${selected ? " selected" : ""}`}>
       <h3>{prof.name}</h3>
       <div className="sub">
         {prof.department ?? "No department"} · {prof.institution}
@@ -17,6 +21,11 @@ export default function ProfessorCard({ prof }) {
         {score === null ? "Not analyzed" : `${score.toFixed(1)} / 100`}
         {prof.review_count > 0 && ` · ${prof.review_count} reviews`}
       </div>
+      {selectable && (
+        <button className="btn" onClick={() => setSelected((v) => !v)}>
+          {selected ? "✓ Selected" : "Select to compare"}
+        </button>
+      )}
     </div>
   );
 }
