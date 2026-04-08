@@ -1,12 +1,20 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { api } from "../lib/api.js";
 import ProfessorCard from "../components/ProfessorCard.jsx";
 
 export default function Search() {
-  // Naive: filters live in component state.
-  const [q, setQ] = useState("");
-  const [department, setDepartment] = useState("");
-  const [sort, setSort] = useState("score");
+  // Filters live in the URL, so Back/refresh/share all keep them.
+  const [params, setParams] = useSearchParams();
+  const q = params.get("q") || "";
+  const department = params.get("department") || "";
+  const sort = params.get("sort") || "score";
+
+  const updateParam = (key, value) => {
+    const next = new URLSearchParams(params);
+    value ? next.set(key, value) : next.delete(key);
+    setParams(next, { replace: true });
+  };
 
   const [selected, setSelected] = useState(new Set());
   const [departments, setDepartments] = useState([]);
@@ -17,12 +25,17 @@ export default function Search() {
     api.departments().then(setDepartments).catch(() => {});
   }, []);
 
-  // Naive: fire a request on every change, keep whatever comes back last.
   useEffect(() => {
+    // Two requests can be in flight at once (type "d", then "a"). If the
+    // older one arrives last it must not overwrite the newer results, so
+    // each run marks itself stale in its cleanup and ignores its response.
+    let current = true;
     api.searchProfessors({ q, department, sort }).then((data) => {
+      if (!current) return;
       setResults(data.results);
       setCount(data.count);
     });
+    return () => { current = false; };
   }, [q, department, sort]);
 
   const toggle = (id) =>
@@ -39,15 +52,15 @@ export default function Search() {
         <input
           placeholder="Search professor, course, or department…"
           value={q}
-          onChange={(e) => setQ(e.target.value)}
+          onChange={(e) => updateParam("q", e.target.value)}
         />
-        <select value={department} onChange={(e) => setDepartment(e.target.value)}>
+        <select value={department} onChange={(e) => updateParam("department", e.target.value)}>
           <option value="">All departments</option>
           {departments.map((d) => (
             <option key={d.id} value={d.id}>{d.name}</option>
           ))}
         </select>
-        <select value={sort} onChange={(e) => setSort(e.target.value)}>
+        <select value={sort} onChange={(e) => updateParam("sort", e.target.value)}>
           <option value="score">Best score</option>
           <option value="name">Name A–Z</option>
         </select>
