@@ -16,6 +16,15 @@ export default function Search() {
     setParams(next, { replace: true });
   };
 
+  // The input updates on every keystroke; the URL (and so the request) only
+  // updates after a 300 ms pause. Typing "lee" sends one request, not three.
+  const [draft, setDraft] = useState(q);
+  useEffect(() => {
+    if (draft === q) return;
+    const handle = setTimeout(() => updateParam("q", draft), 300);
+    return () => clearTimeout(handle);
+  }, [draft]);
+
   const [selected, setSelected] = useState(new Set());
   const [departments, setDepartments] = useState([]);
   const [results, setResults] = useState([]);
@@ -51,8 +60,8 @@ export default function Search() {
       <div className="filters">
         <input
           placeholder="Search professor, course, or department…"
-          value={q}
-          onChange={(e) => updateParam("q", e.target.value)}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
         />
         <select value={department} onChange={(e) => updateParam("department", e.target.value)}>
           <option value="">All departments</option>
