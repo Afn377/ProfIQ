@@ -1,13 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProfessorCard from "../components/ProfessorCard.jsx";
 
 export default function Home() {
   const [summary, setSummary] = useState(null);
+  const [error, setError] = useState(null);
 
-  // Naive: fetch straight from the backend, right here in the component body.
-  fetch("http://127.0.0.1:8000/api/summary/")
-    .then((res) => res.json())
-    .then(setSummary);
+  // Runs once, after the first render — not on every render.
+  useEffect(() => {
+    fetch("/api/summary/")
+      .then((res) => res.json())
+      .then(setSummary)
+      .catch((e) => setError(e.message));
+  }, []);
+
+  if (error) return <div className="container error">{error}</div>;
+  if (!summary) return <div className="container spinner">Loading…</div>;
 
   return (
     <div className="container">
