@@ -95,3 +95,27 @@ class RMPClientRetryTests(unittest.TestCase):
             with self.assertRaises(requests.HTTPError):
                 RMPClient(throttle_seconds=0, max_retries=4)._post("q", {})
         self.assertEqual(post.call_count, 5)
+
+
+class IterRatingsTests(unittest.TestCase):
+    def _page(self, ids, has_next, cursor):
+        return {"node": {"ratings": {
+            "edges": [{"node": {"legacyId": i, "comment": f"review {i}"}} for i in ids],
+            "pageInfo": {"hasNextPage": has_next, "endCursor": cursor},
+        }}}
+
+    def test_follows_cursor_across_pages(self):
+        from scrapers.rmp import RMPClient
+        pages = [self._page([1, 2], True, "c1"), self._page([3], False, None)]
+        with patch.object(RMPClient, "_post", side_effect=pages) as post:
+            got = [r["legacyId"] for r in RMPClient().iter_ratings("gid")]
+        self.assertEqual(got, [1, 2, 3])
+        # second call must carry the cursor from the first page
+        self.assertEqual(post.call_args_list[1].args[1]["cursor"], "c1")
+
+    def test_max_reviews_stops_early(self):
+        from scrapers.rmp import RMPClient
+        pages = [self._page([1, 2, 3], True, "c1")]
+        with patch.object(RMPClient, "_post", side_effect=pages):
+            got = list(RMPClient().iter_ratings("gid", max_reviews=2))
+        self.assertEqual(len(got), 2)

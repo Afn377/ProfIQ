@@ -117,3 +117,27 @@ class RMPClient:
             if e["node"]["name"].casefold() == school_name.casefold():
                 return e["node"]["id"]
         return edges[0]["node"]["id"]
+
+    def iter_ratings(self, teacher_gid: str, page_size: int = 20, max_reviews: int | None = None):
+        """Yield one rating dict at a time, fetching pages as needed.
+
+        Follows RMP's cursor: each page says whether there is a next one and
+        where it starts. The caller just iterates; the paging is invisible.
+        """
+        cursor = None
+        fetched = 0
+        while True:
+            data = self._post(RATINGS_QUERY, {"id": teacher_gid, "count": page_size, "cursor": cursor})
+            ratings = (data.get("node") or {}).get("ratings") or {}
+            edges = ratings.get("edges") or []
+            if not edges:
+                return
+            for e in edges:
+                yield e.get("node") or {}
+                fetched += 1
+                if max_reviews and fetched >= max_reviews:
+                    return
+            page_info = ratings.get("pageInfo") or {}
+            if not page_info.get("hasNextPage"):
+                return
+            cursor = page_info.get("endCursor")
