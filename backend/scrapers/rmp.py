@@ -2,10 +2,14 @@
 from __future__ import annotations
 
 import base64
+import logging
+import time
 
 import requests
 
 from .base import Throttle
+
+logger = logging.getLogger(__name__)
 
 GRAPHQL_URL = "https://www.ratemyprofessors.com/graphql"
 
@@ -61,20 +65,48 @@ query ($id: ID!, $count: Int!, $cursor: String) {
 class RMPClient:
     """Thin GraphQL client with throttling and one reused session."""
 
-    def __init__(self, throttle_seconds: float = 1.0, timeout: int = 20) -> None:
+    # Worth retrying: the server might answer differently in a moment.
+    _TRANSIENT = frozenset({429, 500, 502, 503, 504})
+
+    def __init__(self, throttle_seconds: float = 1.0, timeout: int = 20, max_retries: int = 4) -> None:
         self._session = requests.Session()
         self._session.headers.update(DEFAULT_HEADERS)
         self._throttle = Throttle(throttle_seconds)
         self._timeout = timeout
+        self._max_retries = max_retries
 
     def _post(self, query: str, variables: dict) -> dict:
-        # Naive: one attempt, any non-2xx blows up.
-        self._throttle.wait()
-        resp = self._session.post(
-            GRAPHQL_URL, json={"query": query, "variables": variables}, timeout=self._timeout,
-        )
-        resp.raise_for_status()
-        return resp.json().get("data", {}) or {}
+        """POST a query, retrying transient failures with exponential backoff.
+
+        Connection errors, timeouts and 429/5xx get retried with waits of
+        0.5s, 1s, 2s, 4s. Anything else (400, 403, 404...) raises at once.
+        """
+        attempts = self._max_retries + 1
+        for attempt in range(attempts):
+            self._throttle.wait()
+            try:
+                resp = self._session.post(
+                    GRAPHQL_URL,
+                    json={"query": query, "variables": variables},
+                    timeout=self._timeout,
+                )
+            except (requests.ConnectionError, requests.Timeout) as exc:
+                if attempt == attempts - 1:
+                    raise
+                delay = 0.5 * (2 ** attempt)
+                logger.info("RMP %s, retrying in %.1fs", type(exc).__name__, delay)
+                time.sleep(delay)
+                continue
+
+            if resp.status_code in self._TRANSIENT and attempt < attempts - 1:
+                delay = 0.5 * (2 ** attempt)
+                logger.info("RMP HTTP %d, retrying in %.1fs", resp.status_code, delay)
+                time.sleep(delay)
+                continue
+
+            resp.raise_for_status()
+            return resp.json().get("data", {}) or {}
+        raise RuntimeError("unreachable")
 
     def find_school_id(self, school_name: str) -> str | None:
         data = self._post(SCHOOL_SEARCH_QUERY, {"query": {"text": school_name}})

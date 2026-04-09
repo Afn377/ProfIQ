@@ -77,3 +77,21 @@ class RMPClientRetryTests(unittest.TestCase):
         with self.assertRaises(requests.HTTPError):
             client._post("q", {})
         self.assertEqual(post.call_count, 1)
+
+    def test_backoff_doubles_each_retry(self):
+        from scrapers.rmp import RMPClient
+        responses = [_resp(503), _resp(503), _resp(503), _resp(200, {"data": {}})]
+        with patch("scrapers.rmp.requests.Session.post", side_effect=responses), \
+             patch("time.sleep") as sleep:
+            RMPClient(throttle_seconds=0)._post("q", {})
+        self.assertEqual([c.args[0] for c in sleep.call_args_list], [0.5, 1.0, 2.0])
+
+    def test_gives_up_after_max_retries(self):
+        from scrapers.rmp import RMPClient
+        import requests
+        responses = [_resp(503)] * 5
+        with patch("scrapers.rmp.requests.Session.post", side_effect=responses) as post, \
+             patch("time.sleep"):
+            with self.assertRaises(requests.HTTPError):
+                RMPClient(throttle_seconds=0, max_retries=4)._post("q", {})
+        self.assertEqual(post.call_count, 5)
