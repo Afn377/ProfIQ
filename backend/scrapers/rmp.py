@@ -46,6 +46,17 @@ query ($query: SchoolSearchQuery!) {
 }
 """
 
+TEACHERS_QUERY = """
+query ($query: TeacherSearchQuery!, $count: Int, $cursor: String) {
+  newSearch {
+    teachers(query: $query, first: $count, after: $cursor) {
+      edges { node { id legacyId firstName lastName department school { name } avgRating numRatings } }
+      pageInfo { hasNextPage endCursor }
+    }
+  }
+}
+"""
+
 RATINGS_QUERY = """
 query ($id: ID!, $count: Int!, $cursor: String) {
   node(id: $id) {
@@ -138,6 +149,37 @@ class RMPClient:
                 if max_reviews and fetched >= max_reviews:
                     return
             page_info = ratings.get("pageInfo") or {}
+            if not page_info.get("hasNextPage"):
+                return
+            cursor = page_info.get("endCursor")
+
+    def iter_teachers(self, school_id: str, page_size: int = 100, max_teachers: int | None = None):
+        """Yield every teacher at a school, paging with the cursor."""
+        cursor = None
+        fetched = 0
+        while True:
+            data = self._post(TEACHERS_QUERY, {"query": {"text": "", "schoolID": school_id}, "count": page_size, "cursor": cursor})
+            teachers = (data.get("newSearch") or {}).get("teachers") or {}
+            edges = teachers.get("edges") or []
+            if not edges:
+                return
+            for e in edges:
+                n = e.get("node") or {}
+                first = (n.get("firstName") or "").strip()
+                if not any(c.isalnum() for c in first):
+                    first = ""   # rmp sometimes stores "." as a placeholder first name
+                yield {
+                    "legacy_id": n.get("legacyId") or 0,
+                    "name": f"{first} {(n.get('lastName') or '').strip()}".strip(),
+                    "department": (n.get("department") or "").strip(),
+                    "school": (n.get("school") or {}).get("name", ""),
+                    "avg_rating": n.get("avgRating"),
+                    "num_ratings": n.get("numRatings") or 0,
+                }
+                fetched += 1
+                if max_teachers and fetched >= max_teachers:
+                    return
+            page_info = teachers.get("pageInfo") or {}
             if not page_info.get("hasNextPage"):
                 return
             cursor = page_info.get("endCursor")
