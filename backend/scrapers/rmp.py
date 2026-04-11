@@ -153,9 +153,15 @@ class RMPClient:
                 return
             cursor = page_info.get("endCursor")
 
-    def iter_teachers(self, school_id: str, page_size: int = 100, max_teachers: int | None = None):
-        """Yield every teacher at a school, paging with the cursor."""
-        cursor = None
+    def iter_teachers(self, school_id: str, page_size: int = 100, max_teachers: int | None = None,
+                      start_cursor: str | None = None, on_page=None):
+        """Yield every teacher at a school, paging with the cursor.
+
+        ``start_cursor`` resumes from a saved position. ``on_page(cursor)`` is
+        called after each page with the cursor that a later run should resume
+        from, so the caller can checkpoint.
+        """
+        cursor = start_cursor
         fetched = 0
         while True:
             data = self._post(TEACHERS_QUERY, {"query": {"text": "", "schoolID": school_id}, "count": page_size, "cursor": cursor})
@@ -181,5 +187,9 @@ class RMPClient:
                     return
             page_info = teachers.get("pageInfo") or {}
             if not page_info.get("hasNextPage"):
+                if on_page:
+                    on_page(None)   # done: nothing to resume from
                 return
             cursor = page_info.get("endCursor")
+            if on_page:
+                on_page(cursor)

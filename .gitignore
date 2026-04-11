@@ -8,3 +8,6 @@ db.sqlite3
 
 # macOS
 .DS_Store
+
+# crawler state
+backend/data/*_checkpoint.json
