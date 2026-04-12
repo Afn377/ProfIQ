@@ -501,3 +501,245 @@ def professor_live_reviews(request, pk: int):
     return Response(payload)
 
 
+def _quality_rating(rating: dict) -> float | None:
+    """Average RMP helpfulness and clarity ratings."""
+    helpful = rating.get("helpfulRating")
+    clarity = rating.get("clarityRating")
+    vals = [v for v in (helpful, clarity) if isinstance(v, (int, float))]
+    if not vals:
+        return None
+    return round(sum(vals) / len(vals), 2)
+
+
+@api_view(["GET"])
+def similar_professors(request, pk: int):
+    """Return embedding-based similar professors."""
+    prof = get_object_or_404(Professor, pk=pk)
+    try:
+        k = max(1, min(20, int(request.query_params.get("k", 5))))
+    except ValueError:
+        k = 5
+
+    scope = (request.query_params.get("scope") or "department").lower()
+    if scope not in ("department", "institution", "global"):
+        scope = "department"
+
+    if not ml_recommender.is_available():
+        return Response({
+            "available": False, "results": [],
+            "scope": scope, "match_level": scope,
+        })
+
+    if not prof.external_ref:
+        return Response({
+            "available": True, "results": [],
+            "scope": scope, "match_level": scope, "warmed": False,
+        })
+
+    # Build a temporary embedding for professors outside the saved index.
+    warmed = False
+    want_warm = request.query_params.get("warm", "1") not in ("0", "false", "no")
+    if want_warm and not ml_recommender.is_indexed(prof.external_ref):
+        warmed = _warm_up_recommender(prof)
+
+    if not ml_recommender.is_indexed(prof.external_ref):
+        return Response({
+            "available": True, "results": [],
+            "scope": scope, "match_level": scope, "warmed": warmed,
+        })
+
+    # Fetch extra neighbors before applying DB-level filters.
+    candidate_k = max(50, min(ml_recommender.num_indexed() - 1, 300))
+    raw = ml_recommender.similar_by_external_ref(prof.external_ref, k=candidate_k) or []
+    if not raw:
+        return Response({
+            "available": True, "results": [],
+            "scope": scope, "match_level": scope, "warmed": warmed,
+        })
+
+    # Load candidate rows in one query.
+    refs = [n.external_ref for n in raw]
+    by_ref = {
+        p.external_ref: p
+        for p in Professor.objects
+            .select_related("department", "stats")
+            .filter(external_ref__in=refs)
+    }
+
+    same_inst = (prof.institution or "").strip().lower()
+    same_dept_id = prof.department_id
+
+    def _filter(want_inst: bool, want_dept: bool):
+        out = []
+        for n in raw:
+            p = by_ref.get(n.external_ref)
+            if p is None:
+                continue
+            if want_inst and (p.institution or "").strip().lower() != same_inst:
+                continue
+            if want_dept and p.department_id != same_dept_id:
+                continue
+            out.append((n, p))
+            if len(out) >= k:
+                break
+        return out
+
+    # Try the requested scope, then widen if needed.
+    match_level = scope
+    if scope == "department":
+        filtered = _filter(want_inst=bool(same_inst), want_dept=bool(same_dept_id))
+        if not filtered and same_inst:
+            match_level = "institution"
+            filtered = _filter(want_inst=True, want_dept=False)
+        if not filtered:
+            match_level = "global"
+            filtered = _filter(want_inst=False, want_dept=False)
+    elif scope == "institution":
+        filtered = _filter(want_inst=bool(same_inst), want_dept=False) if same_inst else []
+        if not filtered:
+            match_level = "global"
+            filtered = _filter(want_inst=False, want_dept=False)
+    else:
+        filtered = _filter(want_inst=False, want_dept=False)
+
+    out = []
+    for n, p in filtered:
+        out.append({
+            "id": p.id,
+            "external_ref": p.external_ref,
+            "name": p.name,
+            "department": p.department.name if p.department else None,
+            "institution": p.institution,
+            "score": round(n.score, 4),
+            "recommendation_score": (
+                p.stats.recommendation_score if hasattr(p, "stats") else None
+            ),
+            "review_count": (
+                p.stats.review_count if hasattr(p, "stats") else 0
+            ),
+        })
+
+    return Response({
+        "available": True,
+        "results": out,
+        "model": "all-MiniLM-L6-v2",
+        "warmed": warmed,
+        "scope": scope,
+        "match_level": match_level,
+        "source": {
+            "institution": prof.institution or None,
+            "department": prof.department.name if prof.department else None,
+        },
+    })
+
+
+# On-demand embedding for professors missing from the saved index.
+
+_WARM_MAX_CONCURRENT = 2
+_WARM_REVIEW_CAP = 30
+_WARM_DOC_MAX_CHARS = 4000
+
+_warm_in_progress: set[str] = set()
+_warm_in_progress_lock = Lock()
+_warm_semaphore = Semaphore(_WARM_MAX_CONCURRENT)
+
+
+def _warm_up_recommender(prof: Professor) -> bool:
+    """Add one professor to the live recommender index."""
+    if not prof.external_ref:
+        return False
+    if not ml_recommender.encoder_available():
+        return False
+
+    legacy_id = _legacy_id_from_ref(prof.external_ref)
+    if legacy_id is None:
+        return False
+
+    with _warm_in_progress_lock:
+        if prof.external_ref in _warm_in_progress:
+            # Wait briefly for the other request to finish.
+            for _ in range(20):
+                if ml_recommender.is_indexed(prof.external_ref):
+                    return True
+                time.sleep(0.1)
+            return ml_recommender.is_indexed(prof.external_ref)
+        _warm_in_progress.add(prof.external_ref)
+
+    acquired = _warm_semaphore.acquire(timeout=5.0)
+    if not acquired:
+        with _warm_in_progress_lock:
+            _warm_in_progress.discard(prof.external_ref)
+        return False
+
+    try:
+        gid = teacher_gid_from_legacy(legacy_id)
+        client = _get_rmp_client()
+        chunks: list[str] = []
+        used = 0
+        try:
+            for rating in client.iter_ratings(
+                gid, page_size=20, max_reviews=_WARM_REVIEW_CAP,
+            ):
+                txt = (rating.get("comment") or "").strip()
+                if not txt:
+                    continue
+                if used + len(txt) > _WARM_DOC_MAX_CHARS and chunks:
+                    break
+                chunks.append(txt)
+                used += len(txt)
+        except Exception as exc:
+            logger.warning(
+                "Recommender warm-up: RMP fetch failed for prof=%s (%s): %s",
+                prof.id, prof.external_ref, exc,
+            )
+            return False
+
+        if not chunks:
+            logger.info(
+                "Recommender warm-up: no usable reviews for prof=%s (%s)",
+                prof.id, prof.external_ref,
+            )
+            return False
+
+        label = f"{prof.name} @ {prof.institution}" if prof.institution else prof.name
+        ok = ml_recommender.add_embedding(
+            prof.external_ref,
+            label,
+            "  ".join(chunks),
+        )
+        if ok:
+            logger.info(
+                "Recommender warm-up: indexed prof=%s (%s) from %d reviews",
+                prof.id, prof.external_ref, len(chunks),
+            )
+        return ok
+    finally:
+        _warm_semaphore.release()
+        with _warm_in_progress_lock:
+            _warm_in_progress.discard(prof.external_ref)
+
+
+@api_view(["GET"])
+def platform_summary(request):
+    """GET /api/summary/ — lightweight landing-page stats."""
+    from django.db.models import Count, Avg
+    total_profs = Professor.objects.count()
+    total_reviews = Review.objects.count()
+    top = (
+        Professor.objects.select_related("department", "stats")
+        .filter(stats__review_count__gte=3)
+        .order_by("-stats__recommendation_score")[:5]
+    )
+    depts_with_counts = (
+        Department.objects.annotate(count=Count("professors"))
+        .order_by("-count")[:8]
+    )
+    return Response({
+        "professor_count": total_profs,
+        "review_count": total_reviews,
+        "top_professors": ProfessorListSerializer(top, many=True).data,
+        "departments": [
+            {"id": d.id, "name": d.name, "professor_count": d.count}
+            for d in depts_with_counts
+        ],
+    })
