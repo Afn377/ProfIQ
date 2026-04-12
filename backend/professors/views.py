@@ -227,3 +227,106 @@ def _run_lazy_analyze(prof_id: int) -> None:
             _analyze_in_progress.discard(prof_id)
 
 
+class ProfessorSearchView(generics.ListCreateAPIView):
+    """List, search, and create professor records."""
+
+    throttle_scope = "professor_create"
+
+    def get_throttles(self):
+        # Throttle writes only.
+        if self.request.method == "POST":
+            return [ScopedRateThrottle()]
+        return []
+
+    def get_serializer_class(self):
+        return (
+            ProfessorCreateSerializer
+            if self.request.method == "POST"
+            else ProfessorListSerializer
+        )
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Duplicate submissions return the existing professor.
+        existing = serializer.existing_instance
+        if existing is not None:
+            payload = ProfessorListSerializer(existing).data
+            payload["created"] = False
+            return Response(payload, status=status.HTTP_200_OK)
+
+        instance = serializer.save()
+        # Start stats in the background when possible.
+        try:
+            _enqueue_lazy_analyze(instance)
+        except Exception:  # noqa: BLE001
+            logger.exception("Failed to enqueue lazy analyze for new professor %s", instance.pk)
+
+        payload = ProfessorListSerializer(instance).data
+        payload["created"] = True
+        return Response(payload, status=status.HTTP_201_CREATED)
+
+    def get_queryset(self):
+        qs = Professor.objects.select_related("department", "stats")
+
+        q = self.request.query_params.get("q", "").strip()
+        if q:
+            qs = qs.filter(
+                Q(name__icontains=q)
+                | Q(institution__icontains=q)
+                | Q(department__name__icontains=q)
+                | Q(courses__code__icontains=q)
+            ).distinct()
+
+        dept = self.request.query_params.get("department")
+        if dept:
+            qs = qs.filter(department_id=dept)
+
+        institution = self.request.query_params.get("institution", "").strip()
+        if institution:
+            qs = qs.filter(institution__iexact=institution)
+
+        sort = self.request.query_params.get("sort", "score")
+        if sort == "name":
+            qs = qs.order_by("name")
+        elif sort == "reviews":
+            qs = qs.order_by("-stats__review_count", "name")
+        else:  # score (default)
+            qs = qs.order_by("-stats__recommendation_score", "name")
+        return qs
+
+
+class ProfessorDetailView(generics.RetrieveAPIView):
+    serializer_class = ProfessorDetailSerializer
+
+    def get_queryset(self):
+        return Professor.objects.select_related("department", "stats").prefetch_related(
+            "courses",
+            Prefetch(
+                "reviews",
+                queryset=Review.objects
+                    .select_related("source", "course", "sentiment")
+                    .order_by("-posted_at", "-id"),
+            ),
+        )
+
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        # Start stats after building the response.
+        instance = self.get_object()
+        stats = getattr(instance, "stats", None)
+        needs_review_text_stats = stats is None or not (stats.theme_counts or {})
+        if needs_review_text_stats:
+            queued = _enqueue_lazy_analyze(instance)
+            if queued:
+                response["X-ProfIQ-Analyze"] = "queued"
+        return response
+
+
+class DepartmentListView(generics.ListAPIView):
+    queryset = Department.objects.all().order_by("name")
+    serializer_class = DepartmentSerializer
+    pagination_class = None
+
+
