@@ -65,6 +65,27 @@ def _adjusted_compound(text: str) -> float:
     return max(-1.0, min(1.0, adjusted))
 
 
+# Dashboard themes: which topics a review talks about.
+THEME_KEYWORDS = {
+    "clarity": ("clear", "explain", "explains", "confusing", "unclear", "organized", "lecture", "lectures", "examples"),
+    "fairness": ("fair", "unfair", "biased", "lenient", "harsh"),
+    "workload": ("workload", "homework", "assignments", "easy", "hard", "heavy", "projects", "reading"),
+    "helpfulness": ("helpful", "unhelpful", "office hours", "responsive", "supportive", "approachable", "cares"),
+    "engagement": ("engaging", "boring", "passionate", "monotone", "interesting", "funny", "dry"),
+    "grading": ("grade", "grades", "grading", "exam", "exams", "test", "tests", "quiz", "curve"),
+}
+
+
+def extract_themes(text: str) -> list[str]:
+    """Naive: a theme is present if any of its keywords appears as a substring."""
+    lowered = text.lower()
+    found = []
+    for theme, keywords in THEME_KEYWORDS.items():
+        if any(kw in lowered for kw in keywords):
+            found.append(theme)
+    return found
+
+
 def classify(compound: float) -> str:
     # VADER's own recommended thresholds.
     if compound >= 0.05:
@@ -74,13 +95,26 @@ def classify(compound: float) -> str:
     return "neutral"
 
 
-def analyze_text(text: str) -> dict:
+# Star ratings nudge the text score without replacing it.
+_RATING_BLEND_WEIGHT = 0.30
+
+
+def _rating_to_compound(rating: float) -> float:
+    # 1 star -> -1.0, 3 -> 0.0, 5 -> +1.0
+    return max(-1.0, min(1.0, (float(rating) - 3.0) / 2.0))
+
+
+def analyze_text(text: str, rating: float | None = None) -> dict:
     scores = _ANALYZER.polarity_scores(text or "")
     compound = _adjusted_compound(text or "")
+    if rating is not None:
+        compound = (1 - _RATING_BLEND_WEIGHT) * compound + _RATING_BLEND_WEIGHT * _rating_to_compound(rating)
+        compound = max(-1.0, min(1.0, compound))
     return {
         "compound": compound,
         "positive": scores["pos"],
         "neutral": scores["neu"],
         "negative": scores["neg"],
         "label": classify(compound),
+        "themes": extract_themes(text or ""),
     }
