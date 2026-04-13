@@ -49,12 +49,20 @@ POSITIVE_IDIOMS = [
 
 
 def _adjusted_compound(text: str) -> float:
-    """VADER's compound, then naive idiom handling: add each matched target."""
-    compound = _ANALYZER.polarity_scores(text)["compound"]
-    for pattern, target in NEGATIVE_IDIOMS + POSITIVE_IDIOMS:
-        if pattern.search(text):
-            compound += target
-    return max(-1.0, min(1.0, compound))
+    """VADER's compound, then let the strongest idiom set a floor or ceiling.
+
+    A recommendation like "do not take" is the point of a review; it should
+    not be outvoted by adjectives. So instead of adding, the dominant idiom
+    pulls the score at least as far as its target: min() for negative,
+    max() for positive. Several idioms agreeing don't stack.
+    """
+    base = _ANALYZER.polarity_scores(text)["compound"]
+    targets = [t for p, t in NEGATIVE_IDIOMS + POSITIVE_IDIOMS if p.search(text)]
+    if not targets:
+        return base
+    dominant = max(targets, key=abs)
+    adjusted = min(base, dominant) if dominant < 0 else max(base, dominant)
+    return max(-1.0, min(1.0, adjusted))
 
 
 def classify(compound: float) -> str:
