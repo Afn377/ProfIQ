@@ -44,3 +44,8 @@ class DomainPhraseTests(unittest.TestCase):
             analyze_text("Amazing lectures but do not take this class.")["label"],
             "negative",
         )
+
+    def test_warning_beats_a_pile_of_praise(self):
+        # No amount of adjectives should outvote an explicit "do not take".
+        text = "Amazing, brilliant, best professor ever, super engaging, do not take this class."
+        self.assertEqual(analyze_text(text)["label"], "negative")
