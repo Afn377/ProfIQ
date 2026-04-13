@@ -505,3 +505,83 @@ class RMPClient:
 # High-level scrape function
 
 
+def scrape_rmp(
+    school_name: str,
+    teacher_names: Iterable[str] | None = None,
+    max_teachers: int = 10,
+    max_reviews_per_teacher: int = 30,
+    throttle_seconds: float = 1.0,
+) -> tuple[list[ScrapedProfessor], list[ScrapedReview]]:
+    """Scrape RMP for professors at ``school_name``.
+
+    - If ``teacher_names`` is provided, one search is issued per name (more
+      precise).
+    - Otherwise the top ``max_teachers`` teachers at the school are fetched.
+    """
+    client = RMPClient(throttle_seconds=throttle_seconds)
+    school_id = client.find_school_id(school_name)
+    if not school_id:
+        raise RuntimeError(f"No RMP school found matching: {school_name!r}")
+
+    teachers: list[RMPTeacher] = []
+    if teacher_names:
+        seen: set[int] = set()
+        for name in teacher_names:
+            for t in client.search_teachers(school_id, text=name, limit=5):
+                if t.legacy_id in seen:
+                    continue
+                # Keep only reasonably close name matches
+                hay = (t.full_name or "").casefold()
+                needle = name.casefold()
+                if needle in hay or hay in needle:
+                    seen.add(t.legacy_id)
+                    teachers.append(t)
+    else:
+        teachers = client.search_teachers(school_id, text="", limit=max_teachers)
+
+    profs: list[ScrapedProfessor] = []
+    reviews: list[ScrapedReview] = []
+
+    for t in teachers:
+        profs.append(ScrapedProfessor(
+            name=t.full_name,
+            institution=t.school_name or school_name,
+            department=t.department,
+            bio=(
+                f"Listed on RateMyProfessors with {t.num_ratings} ratings"
+                + (f" · avg {t.avg_rating:.1f}" if t.avg_rating else "")
+            ),
+            courses=[],
+        ))
+        for rating in client.iter_ratings(
+            t.gid, max_reviews=max_reviews_per_teacher
+        ):
+            comment = (rating.get("comment") or "").strip()
+            if not comment:
+                continue
+            course_code = (rating.get("class") or "").strip()
+            reviews.append(ScrapedReview(
+                professor=t.full_name,
+                source="RateMyProfessors",
+                text=comment,
+                source_url=(
+                    f"{t.profile_url}#rating-{rating.get('legacyId')}"
+                    if rating.get("legacyId") else t.profile_url
+                ),
+                rating=_quality_rating(rating),
+                course=course_code,
+                posted_at=_normalize_rmp_date(rating.get("date")),
+            ))
+    return profs, reviews
+
+
+def _quality_rating(rating: dict) -> float | None:
+    """RMP doesn't expose a single 1–5 overall in this query; approximate
+    using the average of helpful + clarity (and subtract difficulty nothing).
+    """
+    helpful = rating.get("helpfulRating")
+    clarity = rating.get("clarityRating")
+    vals = [v for v in (helpful, clarity) if isinstance(v, (int, float))]
+    if not vals:
+        return None
+    return round(sum(vals) / len(vals), 2)
