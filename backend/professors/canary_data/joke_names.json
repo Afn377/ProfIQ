@@ -1,0 +1,27 @@
+{
+  "_comment": "Sophomoric/joke 'gag' names commonly used as fake-record placeholders or honeypot bait. The list is deliberately small and avoids slurs; it targets the obvious homophone-style pranks RMP-era reviewers used to slip in. Loader concatenates every list whose key does not start with an underscore.",
+
+  "homophones": [
+    "Hugh Jass", "Hugh G Rection", "Mike Hunt", "Mike Rotch",
+    "Mike Litoris", "Ben Dover", "Phil McCracken", "Phil McKraken",
+    "Phil Latio", "Heywood Jablowme", "Heywood Jablomi", "Seymour Butz",
+    "Seymour Asses", "Amanda Hugnkiss", "Amanda Hugankiss", "Anita Bath",
+    "Anita Mann", "Eileen Dover", "Ivana Tinkle", "Holden McGroin",
+    "Dixie Normous", "Drew Peacock", "Pete Sariya", "Sam Hain",
+    "Don Keykong", "Bart Ender", "Wilma Dickfit", "Hugh R Yass",
+    "Stu Pidasso", "Buster Hyman"
+  ],
+
+  "rmp_meta": [
+    "Rate Myprofessors", "Rate My Professors", "Cheddar Mate Sorpro",
+    "Rms Reapport Foes", "Test Account", "Test Professor",
+    "Demo Professor", "Sample Faculty", "Honey Pot", "Trap Record",
+    "Canary Bird", "Canary Test"
+  ],
+
+  "obviously_fake": [
+    "John Doe", "Jane Doe", "Foo Bar", "Foo Baz", "Lorem Ipsum",
+    "First Last", "Anonymous Anonymous", "Asdf Asdf", "Qwerty Qwerty",
+    "Aaaa Bbbb", "Test Test", "Sample Sample"
+  ]
+}
