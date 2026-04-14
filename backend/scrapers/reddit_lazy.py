@@ -351,3 +351,201 @@ def _query_for_sub(
     return last_name or name
 
 
+def fetch_for_professor(
+    name: str,
+    institution: str | None = None,
+    *,
+    max_comments: int = 25,
+    subreddits: Iterable[str] = DEFAULT_SUBREDDITS,
+    user_agent: str | None = None,
+    deadline: float | None = None,
+    extra_aliases: Iterable[str] | None = None,
+) -> list[dict]:
+    """Fetch a small batch of Reddit comments for one professor."""
+    if not name or not name.strip():
+        return []
+
+    if deadline is None:
+        deadline = time.monotonic() + WALL_BUDGET_SECONDS
+
+    matcher = _AliasMatcher(name, institution, extra_aliases=extra_aliases)
+    inst_kw = _institution_keyword(institution)
+
+    # Use school-aware subreddit order unless the caller supplied one.
+    if subreddits is DEFAULT_SUBREDDITS:
+        subreddit_list = _subreddits_for_institution(institution)
+    else:
+        subreddit_list = list(subreddits)
+
+    session = requests.Session()
+    session.headers.update({
+        "User-Agent": user_agent
+        or os.environ.get("REDDIT_USER_AGENT", "profiq-lazy/0.1"),
+    })
+
+    out: list[dict] = []
+
+    for sub in subreddit_list:
+        if time.monotonic() >= deadline or len(out) >= max_comments:
+            break
+        query = _query_for_sub(name, inst_kw, sub)
+        try:
+            posts = _search(session, sub, query, deadline)
+        except Exception as exc:
+            logger.debug("Reddit lazy: search r/%s failed: %s", sub, exc)
+            continue
+
+        for post in posts[:MAX_POSTS_PER_SUB]:
+            if time.monotonic() >= deadline or len(out) >= max_comments:
+                break
+            post_id = post.get("id") or ""
+            permalink = post.get("permalink") or ""
+            title = post.get("title") or ""
+            selftext = post.get("selftext") or ""
+            post_text = (title + "\n" + selftext).strip()
+            post_url = (
+                f"https://www.reddit.com{permalink}" if permalink else ""
+            )
+
+            # Keep only the title/body pieces that mention this professor.
+            kept_lines: list[str] = []
+            if matcher.matches(title):
+                kept_lines.append(title.strip())
+            kept_lines.extend(matcher.select_sentences(selftext))
+            sliced_post = "\n".join(line for line in kept_lines if line).strip()
+
+            if len(sliced_post) >= MIN_TEXT_LEN:
+                out.append({
+                    "text": _clean_body(sliced_post),
+                    "source": "reddit",
+                    "source_url": post_url,
+                    "posted_at": _to_iso(post.get("created_utc")),
+                })
+                if len(out) >= max_comments:
+                    break
+
+            if not post_id:
+                continue
+
+            try:
+                children = _fetch_comments(session, sub, post_id, deadline)
+            except Exception as exc:
+                logger.debug(
+                    "Reddit lazy: comments fetch %s failed: %s", post_id, exc,
+                )
+                continue
+
+            _walk(
+                children,
+                matcher=matcher,
+                out=out,
+                post_url=post_url,
+                max_comments=max_comments,
+                deadline=deadline,
+            )
+
+    return out[:max_comments]
+
+
+def _search(
+    session: requests.Session,
+    sub: str,
+    query: str,
+    deadline: float,
+) -> list[dict]:
+    if time.monotonic() >= deadline:
+        return []
+    url = f"https://www.reddit.com/r/{sub}/search.json"
+    params = {
+        "q": query,
+        "restrict_sr": 1,
+        "limit": MAX_POSTS_PER_SUB * 2,
+        "sort": "relevance",
+        "t": "all",
+    }
+    timeout = min(REQ_TIMEOUT, max(1.0, deadline - time.monotonic()))
+    resp = session.get(url, params=params, timeout=timeout)
+    if resp.status_code == 429:
+        logger.debug("Reddit lazy: 429 on search r/%s", sub)
+        return []
+    resp.raise_for_status()
+    data = resp.json()
+    children = (data.get("data") or {}).get("children") or []
+    return [(c.get("data") or {}) for c in children]
+
+
+def _fetch_comments(
+    session: requests.Session,
+    sub: str,
+    post_id: str,
+    deadline: float,
+) -> list[dict]:
+    if time.monotonic() >= deadline:
+        return []
+    url = f"https://www.reddit.com/r/{sub}/comments/{post_id}.json"
+    timeout = min(REQ_TIMEOUT, max(1.0, deadline - time.monotonic()))
+    resp = session.get(
+        url, params={"limit": 200, "raw_json": 1}, timeout=timeout,
+    )
+    if resp.status_code == 429:
+        return []
+    resp.raise_for_status()
+    payload = resp.json()
+    if not isinstance(payload, list) or len(payload) < 2:
+        return []
+    return (payload[1].get("data") or {}).get("children") or []
+
+
+def _walk(
+    children: list[dict],
+    *,
+    matcher: _AliasMatcher,
+    out: list[dict],
+    post_url: str,
+    max_comments: int,
+    deadline: float,
+    depth: int = 0,
+    depth_limit: int = 8,
+) -> None:
+    """Walk comments and keep only professor-matching sentence slices."""
+    if depth > depth_limit:
+        return
+    for c in children:
+        if len(out) >= max_comments or time.monotonic() >= deadline:
+            return
+        if c.get("kind") != "t1":
+            continue  # 'more' stub — can't expand without OAuth
+        data = c.get("data") or {}
+        body = _clean_body(data.get("body") or "")
+        if body:
+            relevant = matcher.select_sentences(body)
+            sliced = " ".join(relevant).strip()
+            if sliced and len(sliced) >= MIN_TEXT_LEN:
+                c_permalink = data.get("permalink") or ""
+                c_url = (
+                    f"https://www.reddit.com{c_permalink}"
+                    if c_permalink
+                    else f"{post_url}{data.get('id', '')}/"
+                )
+                out.append({
+                    "text": sliced,
+                    "source": "reddit",
+                    "source_url": c_url,
+                    "posted_at": _to_iso(data.get("created_utc")),
+                })
+                if len(out) >= max_comments:
+                    return
+        replies = data.get("replies")
+        if isinstance(replies, dict):
+            sub_children = (replies.get("data") or {}).get("children") or []
+            if sub_children:
+                _walk(
+                    sub_children,
+                    matcher=matcher,
+                    out=out,
+                    post_url=post_url,
+                    max_comments=max_comments,
+                    deadline=deadline,
+                    depth=depth + 1,
+                    depth_limit=depth_limit,
+                )
