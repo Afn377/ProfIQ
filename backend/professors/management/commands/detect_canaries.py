@@ -206,3 +206,117 @@ class Command(BaseCommand):
 
     # ------------------------------------------------------------------ L1
 
+    def _run_layer1(self, limit: int | None) -> dict:
+        qs: QuerySet = Professor.objects.values(
+            "id", "name", "institution", "external_ref",
+        )
+        if limit:
+            qs = qs[:limit]
+            scanned_total = limit
+        else:
+            scanned_total = Professor.objects.count()
+
+        flagged: list[dict] = []
+        scanned = 0
+        for p in qs.iterator(chunk_size=5000):
+            scanned += 1
+            norm = normalise_name(p["name"])
+            if not norm:
+                continue
+            reasons: list[str] = []
+            if norm in KNOWN_FICTIONAL:
+                reasons.append("fictional_character")
+            if norm in KNOWN_JOKES:
+                reasons.append("joke_name")
+            if _is_rmp_anagram(norm):
+                reasons.append("rmp_anagram")
+            if _looks_palindromic(norm):
+                reasons.append("palindrome")
+            if reasons:
+                flagged.append({
+                    "id": p["id"],
+                    "name": p["name"],
+                    "institution": p["institution"],
+                    "external_ref": p["external_ref"],
+                    "reasons": reasons,
+                })
+            if scanned % 250_000 == 0:
+                self.stdout.write(f"  ... {scanned:,} scanned, {len(flagged)} flagged so far")
+
+        return {"scanned": scanned, "flagged": flagged}
+
+    # ------------------------------------------------------------------ L2
+
+    def _run_layer2(
+        self,
+        n: int,
+        mailto: str | None,
+        rate_per_sec: float,
+    ) -> dict:
+        if n <= 0:
+            return {"sampled": 0, "flagged": [], "queried": 0, "errors": 0}
+
+        # Sample size is small enough for SQLite random ordering.
+        pool = list(
+            Professor.objects.exclude(name="").order_by("?")
+            [:n]
+            .values("id", "name", "institution")
+        )
+
+        ua = "profiq-canary-audit/0.1"
+        if mailto:
+            ua = f"{ua} (mailto:{mailto})"
+        session = requests.Session()
+        session.headers["User-Agent"] = ua
+
+        sleep_between = 1.0 / max(rate_per_sec, 0.5)
+        flagged: list[dict] = []
+        errors = 0
+        queried = 0
+
+        for idx, p in enumerate(pool, 1):
+            try:
+                hits = self._openalex_lookup(session, p["name"])
+                queried += 1
+            except Exception as exc:  # noqa: BLE001  - audit must continue
+                errors += 1
+                logger.warning("OpenAlex lookup failed for %s: %s", p["name"], exc)
+                hits = None  # unknown, not a flag
+
+            if hits is None:
+                pass  # skip on error to avoid false flags
+            elif not hits:
+                flagged.append({
+                    "id": p["id"],
+                    "name": p["name"],
+                    "institution": p["institution"],
+                    "reason": "no_openalex_match",
+                })
+            else:
+                if not self._institution_matches_any(p["institution"], hits):
+                    flagged.append({
+                        "id": p["id"],
+                        "name": p["name"],
+                        "institution": p["institution"],
+                        "reason": "openalex_institution_mismatch",
+                        "openalex_top_affiliations": [
+                            h.get("affiliation", "") for h in hits[:3]
+                        ],
+                    })
+
+            if idx % 50 == 0:
+                self.stdout.write(
+                    f"  ... {idx}/{len(pool)} queried, {len(flagged)} flagged, "
+                    f"{errors} errors"
+                )
+            time.sleep(sleep_between)
+
+        return {
+            "sampled": len(pool),
+            "queried": queried,
+            "errors": errors,
+            "flagged": flagged,
+        }
+
+    # ---------------------------------------------------------- layer 3
+
