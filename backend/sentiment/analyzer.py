@@ -77,12 +77,23 @@ THEME_KEYWORDS = {
 
 
 def extract_themes(text: str) -> list[str]:
-    """Naive: a theme is present if any of its keywords appears as a substring."""
+    """A theme is present if one of its keywords appears as a whole word.
+
+    Single words match on word boundaries so "hard" does not fire inside
+    "hardly". Multi-word phrases ("office hours") are matched as substrings
+    since they cannot accidentally sit inside another word.
+    """
     lowered = text.lower()
     found = []
     for theme, keywords in THEME_KEYWORDS.items():
-        if any(kw in lowered for kw in keywords):
-            found.append(theme)
+        for kw in keywords:
+            if " " in kw:
+                hit = kw in lowered
+            else:
+                hit = re.search(rf"\b{re.escape(kw)}\b", lowered) is not None
+            if hit:
+                found.append(theme)
+                break
     return found
 
 
