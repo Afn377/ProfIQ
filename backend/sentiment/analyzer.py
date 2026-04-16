@@ -222,3 +222,78 @@ THEME_KEYWORDS: dict[str, tuple[str, ...]] = {
 }
 
 
+def extract_themes(text: str) -> list[str]:
+    """Return the list of theme names mentioned in ``text``."""
+    lowered = text.lower()
+    found: list[str] = []
+    for theme, keywords in THEME_KEYWORDS.items():
+        for kw in keywords:
+            # word-boundary match; multi-word keywords just need substring match
+            if " " in kw:
+                if kw in lowered:
+                    found.append(theme)
+                    break
+            elif re.search(rf"\b{re.escape(kw)}\b", lowered):
+                found.append(theme)
+                break
+    return found
+
+
+def classify(compound: float) -> str:
+    if compound >= 0.05:
+        return "positive"
+    if compound <= -0.05:
+        return "negative"
+    return "neutral"
+
+
+# ---------------------------------------------------------------------------
+# Public API
+
+# Star ratings nudge the text score without replacing it.
+_RATING_BLEND_WEIGHT = 0.30
+
+
+def _rating_to_compound(rating: float) -> float:
+    """Map a 1–5 RMP-style rating onto VADER's [-1, 1] compound scale."""
+    # 1 -> -1.0, 2 -> -0.5, 3 -> 0.0, 4 -> +0.5, 5 -> +1.0
+    return max(-1.0, min(1.0, (float(rating) - 3.0) / 2.0))
+
+
+def analyze_text(text: str, rating: float | None = None) -> dict:
+    """Analyze one review and return sentiment fields."""
+    base_scores = _ANALYZER.polarity_scores(text or "")
+    compound = _adjusted_compound(text or "")
+
+    if rating is not None:
+        rating_compound = _rating_to_compound(rating)
+        compound = (1 - _RATING_BLEND_WEIGHT) * compound + _RATING_BLEND_WEIGHT * rating_compound
+        compound = max(-1.0, min(1.0, compound))
+
+    # Optional model score; rules still work if artifacts are missing.
+    ml_label: str | None = None
+    ml_confidence: float | None = None
+    ml_model: str | None = None
+    try:
+        from .ml import inference as ml_inference
+        prediction = ml_inference.predict(text or "")
+        if prediction is not None:
+            ml_label = prediction.label
+            ml_confidence = round(prediction.confidence, 4)
+            ml_model = prediction.model
+    except Exception:  # pragma: no cover - defensive
+        pass
+
+    return {
+        "compound": compound,
+        "positive": base_scores["pos"],
+        "neutral": base_scores["neu"],
+        "negative": base_scores["neg"],
+        "label": classify(compound),
+        "themes": extract_themes(text or ""),
+        "ml_label": ml_label,
+        "ml_confidence": ml_confidence,
+        "ml_model": ml_model,
+    }
+
+
