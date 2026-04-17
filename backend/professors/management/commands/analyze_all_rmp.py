@@ -37,18 +37,26 @@ class Command(BaseCommand):
         qs = (
             Professor.objects
             .filter(external_ref__startswith="rmp:", source_num_ratings__gte=opts["min_ratings"], stats__isnull=True)
-            .exclude(id__in=done_ids)          # naive resume
             .order_by("-source_num_ratings")
         )
+        # Skip done ids in Python, not with exclude(id__in=...): SQLite caps the
+        # number of bound variables per statement and a resumed checkpoint can
+        # hold hundreds of thousands of ids.
+        total = sum(1 for pid in qs.values_list("id", flat=True).iterator(chunk_size=2000) if pid not in done_ids)
         if opts["limit"]:
-            qs = qs[: opts["limit"]]
-        total = qs.count()
+            total = min(total, opts["limit"])
         self.stdout.write(f"Analyzing {total} professors (max {opts['max_reviews']} reviews each)")
 
         client = RMPClient(throttle_seconds=opts["throttle"])
         start = monotonic()
         written = 0
-        for i, prof in enumerate(qs.iterator(chunk_size=100), 1):
+        i = 0
+        for prof in qs.iterator(chunk_size=100):
+            if prof.id in done_ids:
+                continue
+            i += 1
+            if opts["limit"] and i > opts["limit"]:
+                break
             legacy_id = int(prof.external_ref.split(":")[1])
             sentiments = []
             try:
