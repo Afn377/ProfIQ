@@ -135,11 +135,21 @@ def analyze_text(text: str, rating: float | None = None) -> dict:
 # Per-professor aggregation
 
 def compute_recommendation_score(avg_compound: float, positive_ratio: float, review_count: int) -> float:
-    """Combine sentiment and positivity into a 0-100 score. Naive: no sample-size handling."""
+    """Combine sentiment and positivity into a 0-100 score, shrunk toward 50
+    when there are few reviews.
+
+    One glowing review is weak evidence. confidence = n / (n + k) is how much
+    we trust the raw score; the rest of the weight sits on a neutral 50. With
+    k = 10, one review moves the score 9 percent of the way; 100 reviews, 91.
+    """
     sentiment_component = (avg_compound + 1) * 50      # -1..1 -> 0..100
     ratio_component = positive_ratio * 100
-    score = 0.6 * sentiment_component + 0.4 * ratio_component
-    return max(0.0, min(100.0, round(score, 2)))
+    base = 0.6 * sentiment_component + 0.4 * ratio_component
+
+    k = 10
+    confidence = review_count / (review_count + k) if review_count > 0 else 0.0
+    shrunk = confidence * base + (1 - confidence) * 50
+    return max(0.0, min(100.0, round(shrunk, 2)))
 
 
 def aggregate_stats(sentiments: list[dict]) -> dict:
