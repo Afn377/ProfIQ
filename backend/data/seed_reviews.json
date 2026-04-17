@@ -1,0 +1,139 @@
+{
+  "source": {
+    "name": "Seed",
+    "base_url": ""
+  },
+  "professors": [
+    {
+      "name": "Avery Stone",
+      "institution": "State University",
+      "department": "Computer Science",
+      "reviews": [
+        {
+          "text": "Clear lectures and fair exams. Highly recommend.",
+          "rating": 5,
+          "course": "CS 101"
+        },
+        {
+          "text": "Really cares about students, office hours are great.",
+          "rating": 5,
+          "course": "CS 101"
+        },
+        {
+          "text": "Best professor I have had. Engaging every class.",
+          "rating": 5,
+          "course": "CS 210"
+        },
+        {
+          "text": "Workload is heavy but worth it.",
+          "rating": 4,
+          "course": "CS 210"
+        },
+        {
+          "text": "Explains hard topics well.",
+          "rating": 5,
+          "course": "CS 210"
+        },
+        {
+          "text": "Fantastic teacher, super clear.",
+          "rating": 5,
+          "course": "CS 101"
+        },
+        {
+          "text": "Best class I have taken, would recommend.",
+          "rating": 5,
+          "course": "CS 210"
+        },
+        {
+          "text": "Very approachable and patient.",
+          "rating": 5,
+          "course": "CS 101"
+        },
+        {
+          "text": "Lectures are engaging and well organized.",
+          "rating": 5,
+          "course": "CS 210"
+        },
+        {
+          "text": "Fair exams, helpful feedback.",
+          "rating": 5,
+          "course": "CS 101"
+        },
+        {
+          "text": "Explains everything clearly. Easy A if you do the work.",
+          "rating": 5,
+          "course": "CS 210"
+        },
+        {
+          "text": "Genuinely cares, lifesaver during finals.",
+          "rating": 5,
+          "course": "CS 101"
+        },
+        {
+          "text": "Great course, learned a lot.",
+          "rating": 5,
+          "course": "CS 210"
+        },
+        {
+          "text": "Passionate about the subject.",
+          "rating": 5,
+          "course": "CS 101"
+        },
+        {
+          "text": "Would take again in a heartbeat.",
+          "rating": 5,
+          "course": "CS 210"
+        }
+      ]
+    },
+    {
+      "name": "Morgan Reed",
+      "institution": "State University",
+      "department": "Mathematics",
+      "reviews": [
+        {
+          "text": "Boring lectures, do not take this class.",
+          "rating": 1,
+          "course": "MATH 150"
+        },
+        {
+          "text": "Unfair grading and unclear expectations.",
+          "rating": 2,
+          "course": "MATH 150"
+        },
+        {
+          "text": "Confusing and monotone.",
+          "rating": 1,
+          "course": "MATH 150"
+        },
+        {
+          "text": "Homework was fine but exams were brutal.",
+          "rating": 2,
+          "course": "MATH 150"
+        }
+      ]
+    },
+    {
+      "name": "Jordan Blake",
+      "institution": "State University",
+      "department": "Computer Science",
+      "reviews": [
+        {
+          "text": "Decent. Nothing special.",
+          "rating": 3,
+          "course": "CS 101"
+        },
+        {
+          "text": "Helpful in office hours, average lectures.",
+          "rating": 3,
+          "course": "CS 101"
+        },
+        {
+          "text": "Fair grader, easy A if you show up.",
+          "rating": 4,
+          "course": "CS 101"
+        }
+      ]
+    }
+  ]
+}
