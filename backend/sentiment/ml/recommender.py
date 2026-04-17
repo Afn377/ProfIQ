@@ -152,3 +152,143 @@ def similar_by_external_ref(external_ref: str, k: int = 5) -> Optional[list[Neig
 # similarity lookups for that professor return real neighbors instantly
 # without re-encoding.
 
+def _load_encoder(model_name: str | None = None):
+    """Lazy-load the sentence-transformer encoder once per process."""
+    global _ENCODER
+    if _ENCODER is not None:
+        return _ENCODER or None
+    name = model_name or DEFAULT_MODEL
+    with _ENCODER_LOCK:
+        if _ENCODER is not None:
+            return _ENCODER or None
+        try:
+            os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+            os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")
+            # Default to using the workspace cache shipped with the repo
+            # so demo machines don't re-download the 80 MB model.
+            cache_dir = ROOT / "data" / "ml" / "hf_cache"
+            for var in (
+                "HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE",
+                "SENTENCE_TRANSFORMERS_HOME",
+            ):
+                os.environ.setdefault(var, str(cache_dir))
+            from sentence_transformers import SentenceTransformer
+            _ENCODER = SentenceTransformer(name)
+            logger.info("Loaded recommender encoder %s", name)
+        except Exception as exc:
+            logger.warning("Failed to load recommender encoder %s (%s)", name, exc)
+            _ENCODER = False
+            return None
+    return _ENCODER
+
+
+def encoder_available() -> bool:
+    """True if the on-the-fly encoder can be loaded (model present)."""
+    return _load_encoder() is not None
+
+
+def add_embedding(
+    external_ref: str,
+    label: str,
+    doc: str,
+    *,
+    persist: bool = True,
+    warm_path: Path | None = None,
+) -> bool:
+    """Add one runtime embedding to the live index."""
+    if not external_ref or not (doc or "").strip():
+        return False
+
+    encoder = _load_encoder()
+    if encoder is None:
+        return False
+
+    if warm_path is None:
+        warm_path = DEFAULT_WARM_PATH
+
+    try:
+        import numpy as np
+        vec = encoder.encode(
+            [doc],
+            batch_size=1,
+            show_progress_bar=False,
+            normalize_embeddings=True,
+            convert_to_numpy=True,
+        ).astype("float32")[0]
+    except Exception as exc:
+        logger.warning("Encoder failed for %s (%s)", external_ref, exc)
+        return False
+
+    with _LOCK:
+        # Force initial state before merging.
+        pass
+    # Load outside the critical section.
+    _load()
+
+    with _LOCK:
+        import numpy as np
+        if _INDEX is None or _INDEX is False:
+            # Start a warm-only index.
+            ids = np.asarray([external_ref], dtype=np.str_)
+            names = np.asarray([label or external_ref], dtype=np.str_)
+            vecs = vec[None, :].astype("float32")
+        else:
+            cur_ids, cur_names, cur_vecs, cur_map = _INDEX
+            if external_ref in cur_map:
+                # Existing vectors win.
+                return True
+            ids = np.concatenate([
+                cur_ids,
+                np.asarray([external_ref], dtype=np.str_),
+            ])
+            names = np.concatenate([
+                cur_names,
+                np.asarray([label or external_ref], dtype=np.str_),
+            ])
+            vecs = np.vstack([cur_vecs, vec[None, :]]).astype("float32")
+
+        id_to_row = {ext: i for i, ext in enumerate(ids.tolist())}
+        globals()["_INDEX"] = (ids, names, vecs, id_to_row)
+
+        if persist:
+            try:
+                _persist_warm(warm_path, external_ref, label or external_ref, vec)
+            except Exception as exc:
+                logger.warning("Failed to persist warm embedding for %s (%s)",
+                               external_ref, exc)
+
+    return True
+
+
+def _persist_warm(warm_path: Path, external_ref: str, label: str, vec) -> None:
+    """Append one row to the warm-cache npz."""
+    import numpy as np
+
+    warm_path.parent.mkdir(parents=True, exist_ok=True)
+    existing = _load_npz(warm_path)
+    if existing is None:
+        ids = np.asarray([external_ref], dtype=np.str_)
+        names = np.asarray([label], dtype=np.str_)
+        vecs = vec[None, :].astype("float32")
+    else:
+        old_ids, old_names, old_vecs = existing
+        if external_ref in set(old_ids.tolist()):
+            return  # already persisted
+        ids = np.concatenate([old_ids, np.asarray([external_ref], dtype=np.str_)])
+        names = np.concatenate([old_names, np.asarray([label], dtype=np.str_)])
+        vecs = np.vstack([old_vecs, vec[None, :]]).astype("float32")
+
+    # numpy.savez_compressed appends ".npz" if the path doesn't already
+    # end in it, so we use a sibling temp filename with the same suffix.
+    tmp = warm_path.with_name(warm_path.stem + ".tmp.npz")
+    np.savez_compressed(tmp, ids=ids, names=names, vecs=vecs)
+    os.replace(tmp, warm_path)
+
+
+def reset() -> None:
+    """Test hook: drop cached index so subsequent calls reload."""
+    global _INDEX, _ENCODER
+    with _LOCK:
+        _INDEX = None
+    with _ENCODER_LOCK:
+        _ENCODER = None
