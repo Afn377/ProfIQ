@@ -81,3 +81,24 @@ class ThemeTests(unittest.TestCase):
         # "hardly" is not "hard"; "unfair" contains "fair" but is its own word.
         themes = extract_themes("He is hardly ever around.")
         self.assertNotIn("workload", themes)
+
+
+class RecommendationScoreTests(unittest.TestCase):
+    def test_many_good_reviews_beat_one_glowing_review(self):
+        from sentiment.analyzer import compute_recommendation_score as score
+        one_glowing = score(avg_compound=0.95, positive_ratio=1.0, review_count=1)
+        many_good = score(avg_compound=0.60, positive_ratio=0.9, review_count=200)
+        self.assertGreater(many_good, one_glowing)
+
+    def test_one_review_stays_near_the_middle(self):
+        from sentiment.analyzer import compute_recommendation_score as score
+        self.assertLess(score(0.95, 1.0, 1), 65)
+        self.assertGreater(score(-0.9, 0.0, 1), 35)
+
+    def test_more_reviews_move_further_from_the_middle(self):
+        from sentiment.analyzer import compute_recommendation_score as score
+        s1 = score(0.8, 1.0, 1)
+        s10 = score(0.8, 1.0, 10)
+        s100 = score(0.8, 1.0, 100)
+        self.assertLess(s1, s10)
+        self.assertLess(s10, s100)
