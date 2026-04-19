@@ -130,7 +130,10 @@ def compare_professors(request):
 @api_view(["GET"])
 def platform_summary(request):
     # GET /api/summary/ — landing-page numbers.
-    analyzed = Professor.objects.filter(stats__review_count__gte=3)
+    # Seed rows were all loaded at once; anything analyzed after that cutoff is real.
+    from datetime import datetime, timezone
+    SEED_CUTOFF = datetime(2026, 9, 22, 3, 20, tzinfo=timezone.utc)
+    analyzed = Professor.objects.filter(stats__review_count__gte=3, stats__updated_at__gt=SEED_CUTOFF)
     top = (
         analyzed.select_related("department", "stats")
         .order_by("-stats__recommendation_score")[:5]
