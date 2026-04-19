@@ -46,7 +46,10 @@ class Command(BaseCommand):
                         review=review, compound=s["compound"], positive=s["positive"],
                         neutral=s["neutral"], negative=s["negative"], label=s["label"], themes=s["themes"],
                     )
-            ProfessorStats.objects.update_or_create(professor=prof, defaults=aggregate_stats(sentiments))
+            ProfessorStats.objects.update_or_create(
+                professor=prof,
+                defaults={**aggregate_stats(sentiments), "analysis_source": ProfessorStats.SEED},
+            )
             self.stdout.write(f"  {prof.name}: {len(sentiments)} reviews")
 
         self.stdout.write(self.style.SUCCESS("Seed loaded"))

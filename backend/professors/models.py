@@ -103,7 +103,14 @@ class SentimentResult(models.Model):
 class ProfessorStats(models.Model):
     """Aggregated dashboard numbers for one professor."""
 
+    SEED = "seed"
+    LIVE_RMP = "live_rmp"
+    ANALYSIS_SOURCE_CHOICES = [(SEED, "Seed/demo data"), (LIVE_RMP, "Live RateMyProfessors analysis")]
+
     professor = models.OneToOneField(Professor, on_delete=models.CASCADE, related_name="stats")
+    # Where these numbers came from. Set explicitly by each loader so a
+    # re-seed can never be mistaken for real analysis.
+    analysis_source = models.CharField(max_length=16, choices=ANALYSIS_SOURCE_CHOICES, default=LIVE_RMP)
     review_count = models.IntegerField(default=0)
     avg_compound = models.FloatField(default=0.0)
     positive_count = models.IntegerField(default=0)

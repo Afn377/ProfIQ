@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from django.db.models import Count, Prefetch, Q
-from .models import Department, Professor, Review
+from .models import Department, Professor, ProfessorStats, Review
 from .serializers import (
     DepartmentSerializer,
     ProfessorCreateSerializer,
@@ -51,6 +51,11 @@ class ProfessorListView(generics.ListCreateAPIView):
         # select_related JOINs department and stats into the same query, so the
         # serializer doesn't fire one extra lookup per professor (N+1).
         qs = Professor.objects.select_related("department", "stats")
+
+        # Keep the seed batch out of the plain Browse gallery; an explicit
+        # search can still find those professors by name.
+        if not self.request.query_params.get("q", "").strip():
+            qs = qs.exclude(stats__analysis_source=ProfessorStats.SEED)
 
         # ?q= free-text search across name, institution, department name, and course code
         q = self.request.query_params.get("q", "").strip()
@@ -130,10 +135,9 @@ def compare_professors(request):
 @api_view(["GET"])
 def platform_summary(request):
     # GET /api/summary/ — landing-page numbers.
-    # Seed rows were all loaded at once; anything analyzed after that cutoff is real.
-    from datetime import datetime, timezone
-    SEED_CUTOFF = datetime(2026, 9, 22, 3, 20, tzinfo=timezone.utc)
-    analyzed = Professor.objects.filter(stats__review_count__gte=3, stats__updated_at__gt=SEED_CUTOFF)
+    analyzed = Professor.objects.filter(
+        stats__review_count__gte=3, stats__analysis_source=ProfessorStats.LIVE_RMP,
+    )
     top = (
         analyzed.select_related("department", "stats")
         .order_by("-stats__recommendation_score")[:5]

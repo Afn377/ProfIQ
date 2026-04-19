@@ -19,6 +19,14 @@ class ProfessorListSerializer(serializers.ModelSerializer):
         source="stats.review_count", read_only=True, default=0
     )
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        stats = getattr(instance, "stats", None)
+        if stats is not None and stats.analysis_source == ProfessorStats.SEED:
+            data["recommendation_score"] = None
+            data["review_count"] = 0
+        return data
+
     class Meta:
         model = Professor
         fields = [

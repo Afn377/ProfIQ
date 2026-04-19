@@ -52,3 +52,16 @@ class CompareTests(TestCase):
         response = self.client.get(f"/api/compare/?ids={prof.id}")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()[0]["theme_counts"], {"clarity": 3})
+
+
+class ProvenanceTests(TestCase):
+    def test_seed_professor_never_in_top_list_and_score_hidden(self):
+        prof = Professor.objects.create(name="Avery Stone", institution="State University")
+        ProfessorStats.objects.create(
+            professor=prof, review_count=15, recommendation_score=90.0,
+            analysis_source=ProfessorStats.SEED,
+        )
+        summary = self.client.get("/api/summary/").json()
+        self.assertEqual(summary["top_professors"], [])
+        row = self.client.get("/api/professors/?q=avery").json()["results"][0]
+        self.assertIsNone(row["recommendation_score"])

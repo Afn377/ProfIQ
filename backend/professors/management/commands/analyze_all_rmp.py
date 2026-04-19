@@ -67,7 +67,10 @@ class Command(BaseCommand):
             except Exception as exc:
                 self.stderr.write(f"  {prof.name}: fetch failed ({exc}); skipping")
             if sentiments:
-                ProfessorStats.objects.update_or_create(professor=prof, defaults=aggregate_stats(sentiments))
+                ProfessorStats.objects.update_or_create(
+                    professor=prof,
+                    defaults={**aggregate_stats(sentiments), "analysis_source": ProfessorStats.LIVE_RMP},
+                )
                 written += 1
             done_ids.add(prof.id)
             ckpt["done"] = sorted(done_ids)
