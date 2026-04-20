@@ -98,6 +98,13 @@ class ProfessorDetailView(generics.RetrieveAPIView):
 
     serializer_class = ProfessorDetailSerializer
 
+    def retrieve(self, request, *args, **kwargs):
+        prof = self.get_object()
+        if not hasattr(prof, "stats") and prof.external_ref.startswith("rmp:"):
+            # v0: no stats yet, so compute them right here, inside the request.
+            _analyze_professor(prof.id)
+        return super().retrieve(request, *args, **kwargs)
+
     def get_queryset(self):
         return Professor.objects.select_related("department", "stats").prefetch_related(
             "courses",
@@ -240,3 +247,26 @@ def professor_live_reviews(request, pk: int):
     payload = {"results": results, "next_cursor": next_cursor, "has_more": has_more}
     _cache_put(cache_key, payload)
     return Response(payload)
+
+
+# ---------------------------------------------------------------------------
+# Lazy analysis: build a professor's stats the first time someone looks.
+
+from sentiment.analyzer import aggregate_stats
+
+_LAZY_REVIEW_CAP = 100
+
+
+def _analyze_professor(prof_id: int) -> None:
+    prof = Professor.objects.get(pk=prof_id)
+    legacy_id = int(prof.external_ref.split(":")[1])
+    sentiments = []
+    for r in _rmp_client.iter_ratings(teacher_gid_from_legacy(legacy_id), max_reviews=_LAZY_REVIEW_CAP):
+        comment = (r.get("comment") or "").strip()
+        if comment:
+            sentiments.append(analyze_text(comment, rating=_quality_rating(r)))
+    if sentiments:
+        ProfessorStats.objects.update_or_create(
+            professor_id=prof_id,
+            defaults={**aggregate_stats(sentiments), "analysis_source": ProfessorStats.LIVE_RMP},
+        )
