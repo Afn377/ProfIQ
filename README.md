@@ -39,6 +39,36 @@ The backend runs at:
 http://127.0.0.1:8000
 ```
 
+## Building the Database From Scratch
+
+For a small local/demo database, run:
+
+```bash
+cd backend
+python manage.py migrate
+python manage.py ingest_seed --reset
+```
+
+`ingest_seed --reset` clears the existing local tables, loads `backend/data/seed_reviews.json`, runs sentiment analysis, and rebuilds professor stats.
+
+For a larger database, start with an empty SQLite database, run migrations, crawl professor metadata from RateMyProfessors, then run analysis:
+
+```bash
+cd backend
+python manage.py migrate
+python manage.py crawl_rmp_directory --schools-limit 50 --min-ratings 1 --resume
+python manage.py analyze_all_rmp --resume
+```
+
+The directory crawl builds the searchable professor catalog. The analysis command fetches bounded review pages, computes sentiment/theme aggregates, and stores `ProfessorStats`.
+
+Optional recommender artifacts can be rebuilt after the ML corpus exists:
+
+```bash
+cd backend
+python manage.py build_prof_embeddings
+```
+
 ## Frontend Setup
 
 Open a second terminal from the project root:
@@ -103,4 +133,3 @@ ProfIQ_Project_Report.pdf
 ## Notes
 
 The large professor catalog stores professor metadata and summary ratings. Review text is mainly fetched live or processed during bounded analysis jobs, so the database does not need to permanently store every scraped review.
-
