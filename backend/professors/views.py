@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -154,3 +155,50 @@ def platform_summary(request):
             {"id": d.id, "name": d.name, "professor_count": d.count} for d in departments
         ],
     })
+
+
+# ---------------------------------------------------------------------------
+# Live reviews: fetched from RMP on demand, never stored.
+
+from scrapers.rmp import RMPClient, teacher_gid_from_legacy
+from sentiment.analyzer import analyze_text
+
+_rmp_client = RMPClient(throttle_seconds=0.35)
+
+
+def _quality_rating(rating: dict) -> float | None:
+    vals = [v for v in (rating.get("helpfulRating"), rating.get("clarityRating")) if isinstance(v, (int, float))]
+    return round(sum(vals) / len(vals), 2) if vals else None
+
+
+@api_view(["GET"])
+def professor_live_reviews(request, pk: int):
+    # GET /api/professors/<id>/reviews/?cursor=&limit= — one page of reviews from RMP.
+    prof = get_object_or_404(Professor, pk=pk)
+    if not prof.external_ref.startswith("rmp:"):
+        return Response({"detail": "Professor has no RateMyProfessors reference."}, status=404)
+    legacy_id = int(prof.external_ref.split(":")[1])
+
+    cursor = request.query_params.get("cursor") or None
+    try:
+        limit = max(1, min(50, int(request.query_params.get("limit", 20))))
+    except ValueError:
+        limit = 20
+
+    # Naive: hit RMP every single time.
+    nodes, next_cursor, has_more = _rmp_client.fetch_ratings_page(
+        teacher_gid_from_legacy(legacy_id), cursor=cursor, count=limit,
+    )
+    results = []
+    for n in nodes:
+        comment = (n.get("comment") or "").strip()
+        if not comment:
+            continue
+        rating = _quality_rating(n)
+        s = analyze_text(comment, rating=rating)
+        results.append({
+            "text": comment, "rating": rating, "course": (n.get("class") or "").strip() or None,
+            "posted_at": n.get("date"),
+            "sentiment": {"label": s["label"], "compound": s["compound"], "themes": s["themes"]},
+        })
+    return Response({"results": results, "next_cursor": next_cursor, "has_more": has_more})

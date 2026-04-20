@@ -129,6 +129,16 @@ class RMPClient:
                 return e["node"]["id"]
         return edges[0]["node"]["id"]
 
+    def fetch_ratings_page(self, teacher_gid: str, cursor: str | None = None, count: int = 20):
+        """One page of ratings plus the cursor for the next, for a load-more UI."""
+        data = self._post(RATINGS_QUERY, {"id": teacher_gid, "count": count, "cursor": cursor})
+        ratings = (data.get("node") or {}).get("ratings") or {}
+        edges = ratings.get("edges") or []
+        page_info = ratings.get("pageInfo") or {}
+        nodes = [e.get("node") or {} for e in edges]
+        has_more = bool(page_info.get("hasNextPage"))
+        return nodes, (page_info.get("endCursor") if has_more else None), has_more
+
     def iter_ratings(self, teacher_gid: str, page_size: int = 20, max_reviews: int | None = None):
         """Yield one rating dict at a time, fetching pages as needed.
 
