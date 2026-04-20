@@ -1,3 +1,6 @@
+from collections import OrderedDict
+from threading import Lock
+
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.decorators import api_view
@@ -165,6 +168,28 @@ from sentiment.analyzer import analyze_text
 
 _rmp_client = RMPClient(throttle_seconds=0.35)
 
+# Small LRU for review pages: the same (professor, cursor, limit) is asked for
+# again every time someone refreshes, and RMP rate-limits us.
+_PAGE_CACHE_LIMIT = 256
+_page_cache: OrderedDict = OrderedDict()
+_page_cache_lock = Lock()
+
+
+def _cache_get(key):
+    with _page_cache_lock:
+        val = _page_cache.get(key)
+        if val is not None:
+            _page_cache.move_to_end(key)      # mark as recently used
+        return val
+
+
+def _cache_put(key, value):
+    with _page_cache_lock:
+        _page_cache[key] = value
+        _page_cache.move_to_end(key)
+        while len(_page_cache) > _PAGE_CACHE_LIMIT:
+            _page_cache.popitem(last=False)   # evict the least recently used
+
 
 def _quality_rating(rating: dict) -> float | None:
     vals = [v for v in (rating.get("helpfulRating"), rating.get("clarityRating")) if isinstance(v, (int, float))]
@@ -185,10 +210,21 @@ def professor_live_reviews(request, pk: int):
     except ValueError:
         limit = 20
 
-    # Naive: hit RMP every single time.
-    nodes, next_cursor, has_more = _rmp_client.fetch_ratings_page(
-        teacher_gid_from_legacy(legacy_id), cursor=cursor, count=limit,
-    )
+    cache_key = (pk, cursor or "", limit)
+    cached = _cache_get(cache_key)
+    if cached is not None:
+        return Response(cached)
+
+    try:
+        nodes, next_cursor, has_more = _rmp_client.fetch_ratings_page(
+            teacher_gid_from_legacy(legacy_id), cursor=cursor, count=limit,
+        )
+    except Exception as exc:
+        # The failure is upstream, not ours: 502, not 500.
+        return Response(
+            {"detail": "Upstream review source unavailable.", "error": type(exc).__name__},
+            status=status.HTTP_502_BAD_GATEWAY,
+        )
     results = []
     for n in nodes:
         comment = (n.get("comment") or "").strip()
@@ -201,4 +237,6 @@ def professor_live_reviews(request, pk: int):
             "posted_at": n.get("date"),
             "sentiment": {"label": s["label"], "compound": s["compound"], "themes": s["themes"]},
         })
-    return Response({"results": results, "next_cursor": next_cursor, "has_more": has_more})
+    payload = {"results": results, "next_cursor": next_cursor, "has_more": has_more}
+    _cache_put(cache_key, payload)
+    return Response(payload)
