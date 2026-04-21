@@ -2,6 +2,7 @@ import threading
 from collections import OrderedDict
 from threading import Lock
 
+from django.db import close_old_connections
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.decorators import api_view
@@ -265,6 +266,11 @@ _LAZY_REVIEW_CAP = 100
 _in_progress: set[int] = set()
 _in_progress_lock = threading.Lock()
 
+# v3: at most this many analyses run at once. The rest wait their turn
+# instead of all hitting RMP and the database in the same second.
+_MAX_CONCURRENT = 4
+_analyze_slots = threading.Semaphore(_MAX_CONCURRENT)
+
 
 def _enqueue_analyze(prof_id: int) -> bool:
     with _in_progress_lock:
@@ -276,7 +282,12 @@ def _enqueue_analyze(prof_id: int) -> bool:
 
 
 def _analyze_professor(prof_id: int) -> None:
-    print(f"[analyze] thread {threading.get_ident()} starting prof {prof_id}", flush=True)
+    with _analyze_slots:
+        print(f"[analyze] thread {threading.get_ident()} starting prof {prof_id}", flush=True)
+        _analyze_professor_inner(prof_id)
+
+
+def _analyze_professor_inner(prof_id: int) -> None:
     try:
         prof = Professor.objects.get(pk=prof_id)
         legacy_id = int(prof.external_ref.split(":")[1])
@@ -291,6 +302,8 @@ def _analyze_professor(prof_id: int) -> None:
                 defaults={**aggregate_stats(sentiments), "analysis_source": ProfessorStats.LIVE_RMP},
             )
     finally:
+        # Each thread gets its own DB connection; nothing else will close it.
+        close_old_connections()
         # Always release the slot, even if the fetch blew up, or this
         # professor could never be analyzed again until restart.
         with _in_progress_lock:

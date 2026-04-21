@@ -11,3 +11,5 @@ db.sqlite3
 
 # crawler state
 backend/data/*_checkpoint.json
+db.sqlite3-wal
+db.sqlite3-shm
