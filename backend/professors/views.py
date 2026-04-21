@@ -1,3 +1,4 @@
+import threading
 from collections import OrderedDict
 from threading import Lock
 
@@ -100,10 +101,12 @@ class ProfessorDetailView(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         prof = self.get_object()
+        response = super().retrieve(request, *args, **kwargs)
         if not hasattr(prof, "stats") and prof.external_ref.startswith("rmp:"):
-            # v0: no stats yet, so compute them right here, inside the request.
-            _analyze_professor(prof.id)
-        return super().retrieve(request, *args, **kwargs)
+            # v1: kick the work to a thread and return right away.
+            threading.Thread(target=_analyze_professor, args=(prof.id,), daemon=True).start()
+            response["X-ProfIQ-Analyze"] = "queued"
+        return response
 
     def get_queryset(self):
         return Professor.objects.select_related("department", "stats").prefetch_related(
@@ -258,6 +261,7 @@ _LAZY_REVIEW_CAP = 100
 
 
 def _analyze_professor(prof_id: int) -> None:
+    print(f"[analyze] thread {threading.get_ident()} starting prof {prof_id}", flush=True)
     prof = Professor.objects.get(pk=prof_id)
     legacy_id = int(prof.external_ref.split(":")[1])
     sentiments = []
