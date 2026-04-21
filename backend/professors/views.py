@@ -103,9 +103,8 @@ class ProfessorDetailView(generics.RetrieveAPIView):
         prof = self.get_object()
         response = super().retrieve(request, *args, **kwargs)
         if not hasattr(prof, "stats") and prof.external_ref.startswith("rmp:"):
-            # v1: kick the work to a thread and return right away.
-            threading.Thread(target=_analyze_professor, args=(prof.id,), daemon=True).start()
-            response["X-ProfIQ-Analyze"] = "queued"
+            if _enqueue_analyze(prof.id):
+                response["X-ProfIQ-Analyze"] = "queued"
         return response
 
     def get_queryset(self):
@@ -259,18 +258,40 @@ from sentiment.analyzer import aggregate_stats
 
 _LAZY_REVIEW_CAP = 100
 
+# v2: remember which professors are being analyzed right now, so a burst of
+# refreshes starts one thread, not one per request. The set is shared by all
+# request threads, so the check-and-add has to happen under a lock or two
+# requests can both see "not in progress" and both start.
+_in_progress: set[int] = set()
+_in_progress_lock = threading.Lock()
+
+
+def _enqueue_analyze(prof_id: int) -> bool:
+    with _in_progress_lock:
+        if prof_id in _in_progress:
+            return False
+        _in_progress.add(prof_id)
+    threading.Thread(target=_analyze_professor, args=(prof_id,), daemon=True).start()
+    return True
+
 
 def _analyze_professor(prof_id: int) -> None:
     print(f"[analyze] thread {threading.get_ident()} starting prof {prof_id}", flush=True)
-    prof = Professor.objects.get(pk=prof_id)
-    legacy_id = int(prof.external_ref.split(":")[1])
-    sentiments = []
-    for r in _rmp_client.iter_ratings(teacher_gid_from_legacy(legacy_id), max_reviews=_LAZY_REVIEW_CAP):
-        comment = (r.get("comment") or "").strip()
-        if comment:
-            sentiments.append(analyze_text(comment, rating=_quality_rating(r)))
-    if sentiments:
-        ProfessorStats.objects.update_or_create(
-            professor_id=prof_id,
-            defaults={**aggregate_stats(sentiments), "analysis_source": ProfessorStats.LIVE_RMP},
-        )
+    try:
+        prof = Professor.objects.get(pk=prof_id)
+        legacy_id = int(prof.external_ref.split(":")[1])
+        sentiments = []
+        for r in _rmp_client.iter_ratings(teacher_gid_from_legacy(legacy_id), max_reviews=_LAZY_REVIEW_CAP):
+            comment = (r.get("comment") or "").strip()
+            if comment:
+                sentiments.append(analyze_text(comment, rating=_quality_rating(r)))
+        if sentiments:
+            ProfessorStats.objects.update_or_create(
+                professor_id=prof_id,
+                defaults={**aggregate_stats(sentiments), "analysis_source": ProfessorStats.LIVE_RMP},
+            )
+    finally:
+        # Always release the slot, even if the fetch blew up, or this
+        # professor could never be analyzed again until restart.
+        with _in_progress_lock:
+            _in_progress.discard(prof_id)
