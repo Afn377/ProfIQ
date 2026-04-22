@@ -65,3 +65,41 @@ class ProvenanceTests(TestCase):
         self.assertEqual(summary["top_professors"], [])
         row = self.client.get("/api/professors/?q=avery").json()["results"][0]
         self.assertIsNone(row["recommendation_score"])
+
+
+class LazyAnalyzeTests(TestCase):
+    def setUp(self):
+        import professors.views as v
+        v._in_progress.clear()
+        self.prof = Professor.objects.create(name="Ann Lee", institution="Rutgers", external_ref="rmp:1")
+
+    def test_enqueue_refuses_a_professor_already_in_progress(self):
+        import professors.views as v
+        from unittest.mock import patch
+        with patch.object(v.threading, "Thread") as thread:
+            first = v._enqueue_analyze(self.prof.id)
+            second = v._enqueue_analyze(self.prof.id)
+        self.assertTrue(first)
+        self.assertFalse(second)
+        self.assertEqual(thread.call_count, 1)
+
+    def test_analysis_writes_live_stats_and_frees_the_slot(self):
+        import professors.views as v
+        from unittest.mock import patch
+        fake = [{"comment": "Great lectures, would recommend.", "helpfulRating": 5, "clarityRating": 5}] * 3
+        v._in_progress.add(self.prof.id)
+        with patch.object(v._rmp_client, "iter_ratings", return_value=iter(fake)):
+            v._analyze_professor(self.prof.id)
+        stats = ProfessorStats.objects.get(professor=self.prof)
+        self.assertEqual(stats.review_count, 3)
+        self.assertEqual(stats.analysis_source, ProfessorStats.LIVE_RMP)
+        self.assertNotIn(self.prof.id, v._in_progress)
+
+    def test_slot_is_freed_even_when_the_fetch_fails(self):
+        import professors.views as v
+        from unittest.mock import patch
+        v._in_progress.add(self.prof.id)
+        with patch.object(v._rmp_client, "iter_ratings", side_effect=ConnectionError("boom")):
+            with self.assertRaises(ConnectionError):
+                v._analyze_professor(self.prof.id)
+        self.assertNotIn(self.prof.id, v._in_progress)
