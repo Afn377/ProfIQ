@@ -1,0 +1,4 @@
+# Install this in addition to requirements.txt to enable PostgreSQL.
+# Requires local libpq (on macOS: `brew install libpq` and optionally export
+# `LDFLAGS`/`CPPFLAGS` so the build can find it).
+psycopg[binary]>=3.2.0
