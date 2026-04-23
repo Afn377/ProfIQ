@@ -41,3 +41,7 @@ a { color: inherit; text-decoration: none; }
 .sub { color: var(--muted); }
 .card.selected { outline: 2px solid var(--accent); }
 .btn { margin-top: 10px; background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.detail-grid .wide { grid-column: 1 / -1; }
+.big-score { font-size: 3rem; font-weight: 800; color: var(--accent); }
+h1 { margin-bottom: 4px; }

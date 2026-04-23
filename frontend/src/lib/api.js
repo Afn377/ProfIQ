@@ -17,6 +17,13 @@ async function request(path) {
 export const api = {
   summary: () => request("/summary/"),
   departments: () => request("/departments/"),
+  professor: (id) => request(`/professors/${id}/`),
+  professorReviews: (id, { cursor = null, limit = 10 } = {}) => {
+    const p = new URLSearchParams();
+    if (cursor) p.set("cursor", cursor);
+    p.set("limit", String(limit));
+    return request(`/professors/${id}/reviews/?${p.toString()}`);
+  },
   searchProfessors: ({ q = "", department = "", sort = "score" } = {}) => {
     const p = new URLSearchParams();
     if (q) p.set("q", q);

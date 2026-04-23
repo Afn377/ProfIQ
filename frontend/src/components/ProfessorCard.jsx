@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function bucket(score) {
   if (score === null || score === undefined) return "none";
   if (score >= 65) return "good";
@@ -11,7 +13,7 @@ export default function ProfessorCard({ prof, selected = false, onToggle }) {
   const score = prof.recommendation_score;
   return (
     <div className={`card${selected ? " selected" : ""}`}>
-      <h3>{prof.name}</h3>
+      <h3><Link to={`/professors/${prof.id}`}>{prof.name}</Link></h3>
       <div className="sub">
         {prof.department ?? "No department"} · {prof.institution}
       </div>
