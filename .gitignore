@@ -13,3 +13,7 @@ db.sqlite3
 backend/data/*_checkpoint.json
 db.sqlite3-wal
 db.sqlite3-shm
+
+# generated ml artifacts
+backend/data/ml/*
+!backend/data/ml/.gitkeep
