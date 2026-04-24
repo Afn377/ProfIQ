@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis } from "recharts";
 import { api } from "../lib/api.js";
@@ -60,10 +60,10 @@ export default function ProfessorDetail() {
           </div>
           <div className="card">
             <h3>Sentiment</h3>
-            {/* Naive: no explicit height on the container's parent. */}
-            <ResponsiveContainer>
+            {/* ResponsiveContainer fills its parent, so the parent must have a height. */}
+            <ResponsiveContainer width="100%" height={180}>
               <PieChart>
-                <Pie data={sentimentData} dataKey="value" nameKey="name" innerRadius={45} outerRadius={70}>
+                <Pie data={sentimentData} dataKey="value" nameKey="name" innerRadius={45} outerRadius={70} isAnimationActive={false}>
                   {sentimentData.map((d) => <Cell key={d.name} fill={d.color} />)}
                 </Pie>
                 <Tooltip />
@@ -72,7 +72,7 @@ export default function ProfessorDetail() {
           </div>
           <div className="card wide">
             <h3>What reviews talk about</h3>
-            <ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={Math.max(120, themeData.length * 32)}>
               <BarChart data={themeData} layout="vertical" margin={{ left: 20 }}>
                 <XAxis type="number" hide />
                 <YAxis type="category" dataKey="name" width={90} />
@@ -93,18 +93,44 @@ function ReviewsSection({ professorId, hasRmp }) {
   const [cursor, setCursor] = useState(null);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  // State updates are async, so `loading` alone can't stop a double-click:
+  // all the clicks in one tick see loading === false. A ref changes at once.
+  const inFlight = useRef(false);
 
   const load = () => {
+    if (inFlight.current) return;
+    inFlight.current = true;
+    setLoading(true);
     api.professorReviews(professorId, { cursor })
       .then((data) => {
-        setReviews(data.results);          // naive: replaces instead of appending
+        setReviews((prev) => [...prev, ...data.results]);   // append, don't replace
         setCursor(data.next_cursor);
         setHasMore(data.has_more);
       })
-      .catch((e) => setError(e.message));
+      .catch((e) => setError(e.message))
+      .finally(() => { inFlight.current = false; setLoading(false); });
   };
 
-  useEffect(() => { if (hasRmp) load(); }, [professorId]);
+  useEffect(() => {
+    // Fetch page one when the professor changes. `current` guards against a
+    // superseded run (StrictMode double-run in dev, or a fast route change)
+    // appending its page after a newer run has already started.
+    if (!hasRmp) return;
+    let current = true;
+    setReviews([]);
+    setCursor(null);
+    setHasMore(true);
+    api.professorReviews(professorId, { cursor: null })
+      .then((data) => {
+        if (!current) return;
+        setReviews(data.results);
+        setCursor(data.next_cursor);
+        setHasMore(data.has_more);
+      })
+      .catch((e) => current && setError(e.message));
+    return () => { current = false; };
+  }, [professorId]);
 
   if (!hasRmp) return null;
   return (
@@ -123,7 +149,11 @@ function ReviewsSection({ professorId, hasRmp }) {
           <p style={{ margin: "8px 0 0" }}>{r.text}</p>
         </div>
       ))}
-      {hasMore && <button className="btn" onClick={load}>Load more</button>}
+      {hasMore && (
+        <button className="btn" onClick={load} disabled={loading}>
+          {loading ? "Loading…" : "Load more"}
+        </button>
+      )}
     </section>
   );
 }
