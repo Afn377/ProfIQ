@@ -15,13 +15,26 @@ export default function ProfessorDetail() {
     api.professor(id).then(setProf).catch((e) => setError(e.message));
   }, [id]);
 
-  // Naive polling: while there are no stats, ask again every 3 s.
+  // Poll while the background analysis runs. One pending timer at a time
+  // (setTimeout, not setInterval), cleared whenever the effect re-runs or
+  // the component unmounts, and capped so it stops after ~2 minutes.
+  const POLL_MS = 3000;
+  const POLL_MAX = 40;
+  const [polls, setPolls] = useState(0);
+  const gaveUp = polls >= POLL_MAX;
+
+  useEffect(() => { setPolls(0); }, [id]);
+
   useEffect(() => {
-    if (!prof || prof.stats) return;
-    setInterval(() => {
-      api.professor(id).then(setProf);
-    }, 3000);
-  }, [prof, id]);
+    if (!prof || prof.stats || gaveUp) return;
+    const handle = setTimeout(() => {
+      api.professor(id).then((next) => {
+        setProf(next);
+        setPolls((n) => n + 1);
+      });
+    }, POLL_MS);
+    return () => clearTimeout(handle);
+  }, [prof, id, gaveUp]);
 
   if (error) return <div className="container error">{error}</div>;
   if (!prof) return <div className="container spinner">Loading…</div>;
@@ -49,7 +62,11 @@ export default function ProfessorDetail() {
 
       {!stats ? (
         <div className="card" style={{ marginTop: 16 }}>
-          <div className="spinner">Analyzing reviews… this takes a few seconds the first time.</div>
+          <div className="spinner">
+            {gaveUp
+              ? "Analysis is taking longer than expected. Try refreshing in a minute."
+              : "Analyzing reviews… this takes a few seconds the first time."}
+          </div>
         </div>
       ) : (
         <div className="detail-grid">
