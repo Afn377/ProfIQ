@@ -14,9 +14,22 @@ from .dataset import split_corpus
 from .labels import LABELS
 
 
-def build_pipeline() -> Pipeline:
-    # Naive: sklearn defaults.
-    return Pipeline([("tfidf", TfidfVectorizer()), ("clf", LogisticRegression(max_iter=1000))])
+def build_pipeline(C: float = 1.0) -> Pipeline:
+    return Pipeline([
+        ("tfidf", TfidfVectorizer(
+            ngram_range=(1, 2),      # bigrams: "not good" is one feature, not two
+            min_df=3,                # drop words seen fewer than 3 times (typos, names)
+            max_df=0.95,
+            sublinear_tf=True,       # log-scale term counts
+            strip_accents="unicode",
+        )),
+        ("clf", LogisticRegression(
+            class_weight="balanced", # up-weight rare classes so neutral counts
+            C=C,
+            max_iter=2000,
+            random_state=42,
+        )),
+    ])
 
 
 def evaluate(pipe, X, y) -> dict:
@@ -44,7 +57,8 @@ def main(argv=None):
     pipe.fit(train.text, train.label)
     print(f"fit in {time.time()-t0:.0f}s")
     metrics = {"val": evaluate(pipe, val.text, val.label), "test": evaluate(pipe, test.text, test.label)}
-    print(f"test accuracy = {metrics['test']['accuracy']:.4f}")
+    print(f"test accuracy = {metrics['test']['accuracy']:.4f}   macro-F1 = {metrics['test']['macro_f1']:.4f}   "
+          f"neutral recall = {metrics['test']['per_class']['neutral']['recall']:.3f}")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(pipe, args.out, compress=3)
     args.metrics_out.write_text(json.dumps(metrics, indent=2))
