@@ -121,8 +121,18 @@ def analyze_text(text: str, rating: float | None = None) -> dict:
     if rating is not None:
         compound = (1 - _RATING_BLEND_WEIGHT) * compound + _RATING_BLEND_WEIGHT * _rating_to_compound(rating)
         compound = max(-1.0, min(1.0, compound))
+    # Optional learned model alongside the rules.
+    ml = None
+    try:
+        from .ml import inference as ml_inference
+        ml = ml_inference.predict(text or "")
+    except Exception:
+        pass
+
     return {
         "compound": compound,
+        "ml_label": ml["label"] if ml else None,
+        "ml_confidence": round(ml["confidence"], 4) if ml else None,
         "positive": scores["pos"],
         "neutral": scores["neu"],
         "negative": scores["neg"],
