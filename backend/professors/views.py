@@ -330,3 +330,174 @@ class DepartmentListView(generics.ListAPIView):
     pagination_class = None
 
 
+@api_view(["GET"])
+def institutions_autocomplete(request):
+    """Return institution autocomplete results."""
+    from django.db.models import Count
+
+    q = request.query_params.get("q", "").strip()
+    try:
+        limit = max(1, min(50, int(request.query_params.get("limit", 15))))
+    except ValueError:
+        limit = 15
+
+    base = Professor.objects.exclude(institution="")
+    if q:
+        rows = list(
+            base.filter(institution__istartswith=q)
+            .values("institution")
+            .annotate(count=Count("id"))
+            .order_by("-count", "institution")[:limit]
+        )
+        if not rows and len(q) >= 4:
+            rows = list(
+                base.filter(institution__icontains=q)
+                .values("institution")
+                .annotate(count=Count("id"))
+                .order_by("-count", "institution")[:limit]
+            )
+    else:
+        # Default dropdown values.
+        rows = list(
+            base.values("institution")
+            .annotate(count=Count("id"))
+            .order_by("-count", "institution")[:limit]
+        )
+
+    return Response([
+        {"name": r["institution"], "professor_count": r["count"]}
+        for r in rows
+    ])
+
+
+@api_view(["GET"])
+def compare_professors(request):
+    """GET /api/compare/?ids=1,2,3 — returns compact stats for multiple professors."""
+    raw = request.query_params.get("ids", "")
+    try:
+        ids = [int(x) for x in raw.split(",") if x.strip()]
+    except ValueError:
+        return Response({"detail": "ids must be comma-separated integers"},
+                        status=status.HTTP_400_BAD_REQUEST)
+    if not ids:
+        return Response({"detail": "provide at least one id"},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    profs = Professor.objects.select_related("department", "stats").filter(id__in=ids)
+    data = ProfessorListSerializer(profs, many=True).data
+    # Include theme counts for the comparison chart.
+    theme_by_id = {
+        p.id: (p.stats.theme_counts if hasattr(p, "stats") else {}) for p in profs
+    }
+    for row in data:
+        row["theme_counts"] = theme_by_id.get(row["id"], {})
+    return Response(data)
+
+
+@api_view(["GET"])
+def professor_live_reviews(request, pk: int):
+    """Return one live review page for a professor."""
+    prof = get_object_or_404(Professor, pk=pk)
+    legacy_id = _legacy_id_from_ref(prof.external_ref)
+    if legacy_id is None:
+        return Response(
+            {"detail": "Professor has no RateMyProfessors reference."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    # Make sure aggregate stats are being built too.
+    _enqueue_lazy_analyze(prof)
+
+    cursor = request.query_params.get("cursor") or None
+    try:
+        limit = max(1, min(50, int(request.query_params.get("limit", 25))))
+    except ValueError:
+        limit = 25
+
+    cache_key = (pk, cursor or "", limit)
+    cached = _cache_get(cache_key)
+    if cached is not None:
+        return Response(cached)
+
+    gid = teacher_gid_from_legacy(legacy_id)
+    client = _get_rmp_client()
+
+    try:
+        nodes, next_cursor, has_more = client.fetch_ratings_page(
+            gid, cursor=cursor, count=limit,
+        )
+    except Exception as exc:
+        logger.exception(
+            "RMP live fetch failed for prof=%s (legacy=%s): %s: %s",
+            pk, legacy_id, type(exc).__name__, exc,
+        )
+        return Response(
+            {
+                "detail": "Upstream review source unavailable.",
+                "error_type": type(exc).__name__,
+                "error_message": str(exc),
+            },
+            status=status.HTTP_502_BAD_GATEWAY,
+        )
+
+    results = []
+
+    # Reddit results are shown once at the top of the live feed.
+    if cursor is None:
+        for r in _get_reddit_reviews(prof, max_comments=15):
+            text = (r.get("text") or "").strip()
+            if not text:
+                continue
+            sentiment = analyze_text(text)
+            results.append({
+                "text": text,
+                "source": "reddit",
+                "rating": None,
+                "course": None,
+                "posted_at": r.get("posted_at"),
+                "source_url": r.get("source_url"),
+            "sentiment": {
+                "label": sentiment["label"],
+                "compound": sentiment["compound"],
+                "themes": sentiment["themes"],
+                "ml_label": sentiment.get("ml_label"),
+                "ml_confidence": sentiment.get("ml_confidence"),
+                "ml_model": sentiment.get("ml_model"),
+            },
+        })
+
+    for n in nodes:
+        comment = (n.get("comment") or "").strip()
+        if not comment:
+            continue
+        rating_val = _quality_rating(n)
+        sentiment = analyze_text(comment, rating=rating_val)
+        results.append({
+            "text": comment,
+            "source": "rmp",
+            "rating": rating_val,
+            "course": (n.get("class") or "").strip() or None,
+            "posted_at": _normalize_rmp_date(n.get("date")),
+            "source_url": (
+                f"https://www.ratemyprofessors.com/professor/{legacy_id}"
+                f"#rating-{n.get('legacyId')}" if n.get("legacyId") else None
+            ),
+            "sentiment": {
+                "label": sentiment["label"],
+                "compound": sentiment["compound"],
+                "themes": sentiment["themes"],
+                "ml_label": sentiment.get("ml_label"),
+                "ml_confidence": sentiment.get("ml_confidence"),
+                "ml_model": sentiment.get("ml_model"),
+            },
+        })
+
+    payload = {
+        "results": results,
+        "next_cursor": next_cursor,
+        "has_more": has_more,
+    }
+    _cache_put(cache_key, payload)
+    return Response(payload)
+
+
