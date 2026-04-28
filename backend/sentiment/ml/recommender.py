@@ -1,5 +1,4 @@
-"""Nearest-neighbour lookup over professor embeddings. Naive: a Python loop."""
-import math
+"""Nearest-neighbour lookup over professor embeddings."""
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -33,13 +32,10 @@ def similar(external_ref: str, k: int = 5) -> list[Neighbor]:
     if row is None:
         return []
     q = vecs[row]
-    scored = []
-    for i in range(len(vecs)):
-        if i == row:
-            continue
-        v = vecs[i]
-        dot = sum(a * b for a, b in zip(q, v))
-        norm = math.sqrt(sum(a * a for a in q)) * math.sqrt(sum(b * b for b in v))
-        scored.append((dot / norm, i))
-    scored.sort(reverse=True)
-    return [Neighbor(str(ids[i]), str(names[i]), float(s)) for s, i in scored[:k]]
+    # Vectors are unit length, so cosine is just the dot product, and one
+    # matrix multiply scores every professor at once.
+    sims = vecs @ q
+    sims[row] = -1.0                       # exclude self
+    top = np.argpartition(-sims, kth=min(k, len(sims) - 1))[:k]   # top k without a full sort
+    top = top[np.argsort(-sims[top])]
+    return [Neighbor(str(ids[i]), str(names[i]), float(sims[i])) for i in top if sims[i] > 0]
