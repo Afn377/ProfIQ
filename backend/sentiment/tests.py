@@ -102,3 +102,33 @@ class RecommendationScoreTests(unittest.TestCase):
         s100 = score(0.8, 1.0, 100)
         self.assertLess(s1, s10)
         self.assertLess(s10, s100)
+
+
+class InferenceTests(unittest.TestCase):
+    def setUp(self):
+        from sentiment.ml import inference
+        inference.reset()
+        self.inference = inference
+
+    def tearDown(self):
+        self.inference.reset()
+
+    def test_missing_model_degrades_to_none(self):
+        from unittest.mock import patch
+        from pathlib import Path
+        with patch.object(self.inference, "CLF_PATH", Path("/nonexistent.joblib")):
+            self.assertIsNone(self.inference.predict("Great class"))
+            self.assertFalse(self.inference.is_available())
+
+    def test_analyzer_works_without_model(self):
+        from unittest.mock import patch
+        from pathlib import Path
+        with patch.object(self.inference, "CLF_PATH", Path("/nonexistent.joblib")):
+            r = analyze_text("Great class, would recommend.")
+        self.assertEqual(r["label"], "positive")
+        self.assertIsNone(r["ml_label"])
+
+    def test_question_is_neutral_without_the_model(self):
+        r = self.inference.predict("Does he curve the final?")
+        self.assertEqual(r["label"], "neutral")
+        self.assertEqual(r["model"], "question_guard")
