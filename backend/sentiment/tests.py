@@ -132,3 +132,34 @@ class InferenceTests(unittest.TestCase):
         r = self.inference.predict("Does he curve the final?")
         self.assertEqual(r["label"], "neutral")
         self.assertEqual(r["model"], "question_guard")
+
+
+class RecommenderTests(unittest.TestCase):
+    """Run against a tiny hand-made index so no model or file is needed."""
+
+    def setUp(self):
+        import numpy as np
+        from sentiment.ml import recommender as r
+        self.r = r
+        v = np.array([[1, 0, 0], [0.9, 0.1, 0], [0, 1, 0], [0, 0, 1]], dtype="float32")
+        v /= np.linalg.norm(v, axis=1, keepdims=True)
+        ids = np.array(["a", "b", "c", "d"]); names = np.array(["A", "B", "C", "D"])
+        r._INDEX = (ids, names, v, {e: i for i, e in enumerate(ids)})
+
+    def tearDown(self):
+        self.r._INDEX = None
+
+    def test_nearest_is_correct_and_self_excluded(self):
+        out = self.r.similar("a", k=2)
+        self.assertEqual([n.external_ref for n in out], ["b", "c"])
+        self.assertNotIn("a", [n.external_ref for n in out])
+
+    def test_unknown_ref_returns_empty(self):
+        self.assertEqual(self.r.similar("zzz"), [])
+
+    def test_missing_file_is_unavailable(self):
+        from unittest.mock import patch
+        from pathlib import Path
+        self.r._INDEX = None
+        with patch.object(self.r, "EMB_PATH", Path("/nonexistent.npz")):
+            self.assertFalse(self.r.is_available())

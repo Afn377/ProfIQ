@@ -1,3 +1,4 @@
+import logging
 import threading
 from collections import OrderedDict
 from threading import Lock
@@ -177,6 +178,7 @@ from scrapers.rmp import RMPClient, teacher_gid_from_legacy
 from sentiment.analyzer import analyze_text
 
 _rmp_client = RMPClient(throttle_seconds=0.35)
+logger = logging.getLogger(__name__)
 
 # Small LRU for review pages: the same (professor, cursor, limit) is asked for
 # again every time someone refreshes, and RMP rate-limits us.
@@ -308,3 +310,52 @@ def _analyze_professor_inner(prof_id: int) -> None:
         # professor could never be analyzed again until restart.
         with _in_progress_lock:
             _in_progress.discard(prof_id)
+
+
+# ---------------------------------------------------------------------------
+# Similar professors
+
+from sentiment.ml import recommender as ml_recommender
+
+
+@api_view(["GET"])
+def similar_professors(request, pk: int):
+    # GET /api/professors/<id>/similar/?k=5 — same-institution neighbours by review language.
+    prof = get_object_or_404(Professor, pk=pk)
+    try:
+        k = max(1, min(20, int(request.query_params.get("k", 5))))
+    except ValueError:
+        k = 5
+    if not ml_recommender.is_available() or not prof.external_ref:
+        return Response({"available": False, "results": []})
+
+    # Not in the offline index? Embed them now from their live reviews.
+    warmed = False
+    if not ml_recommender.is_indexed(prof.external_ref):
+        legacy_id = int(prof.external_ref.split(":")[1])
+        texts = []
+        try:
+            for r in _rmp_client.iter_ratings(teacher_gid_from_legacy(legacy_id), max_reviews=30):
+                t = (r.get("comment") or "").strip()
+                if t:
+                    texts.append(t)
+        except Exception as exc:
+            logger.warning("similar: fetch failed for %s: %s", prof.external_ref, exc)
+        warmed = ml_recommender.add_professor(prof.external_ref, f"{prof.name} @ {prof.institution}", texts)
+
+    # Over-fetch, then keep only same-institution matches.
+    raw = ml_recommender.similar(prof.external_ref, k=max(50, k * 10))
+    refs = [n.external_ref for n in raw]
+    by_ref = {p.external_ref: p for p in Professor.objects.select_related("department", "stats").filter(external_ref__in=refs)}
+    inst = (prof.institution or "").strip().lower()
+    out = []
+    for n in raw:
+        p = by_ref.get(n.external_ref)
+        if p is None or (p.institution or "").strip().lower() != inst:
+            continue
+        out.append({"id": p.id, "name": p.name, "department": p.department.name if p.department else None,
+                    "institution": p.institution, "score": round(n.score, 3),
+                    "recommendation_score": p.stats.recommendation_score if hasattr(p, "stats") else None})
+        if len(out) >= k:
+            break
+    return Response({"available": True, "warmed": warmed, "results": out})
