@@ -205,3 +205,128 @@ class RMPClient:
     # HTTP status codes we treat as transient and retry.
     _TRANSIENT_STATUSES = frozenset({429, 500, 502, 503, 504})
 
+    def __init__(
+        self,
+        throttle_seconds: float = 1.0,
+        timeout: int = 20,
+        max_retries: int = 4,
+    ) -> None:
+        self._session = requests.Session()
+        self._session.headers.update(DEFAULT_HEADERS)
+        self._throttle = Throttle(throttle_seconds)
+        self._timeout = timeout
+        self._max_retries = max_retries
+
+    def _post(self, query: str, variables: dict) -> dict:
+        """POST a GraphQL query with retry-on-transient-error.
+
+        Retries up to ``self._max_retries`` times on connection errors,
+        timeouts, or transient HTTP statuses (429/5xx). Backoff is
+        exponential starting at 0.5s. Non-retryable failures (4xx other
+        than 429, malformed JSON) raise immediately.
+        """
+        attempts = self._max_retries + 1
+        last_exc: Exception | None = None
+        for attempt in range(attempts):
+            self._throttle.wait()
+            try:
+                resp = self._session.post(
+                    GRAPHQL_URL,
+                    json={"query": query, "variables": variables},
+                    timeout=self._timeout,
+                )
+            except (requests.exceptions.ConnectionError,
+                    requests.exceptions.Timeout) as exc:
+                last_exc = exc
+                if attempt < attempts - 1:
+                    delay = 0.5 * (2 ** attempt)
+                    logger.info(
+                        "RMP transient %s (attempt %d/%d) — sleeping %.1fs",
+                        type(exc).__name__, attempt + 1, attempts, delay,
+                    )
+                    time.sleep(delay)
+                    continue
+                raise
+
+            if resp.status_code in self._TRANSIENT_STATUSES and attempt < attempts - 1:
+                delay = 0.5 * (2 ** attempt)
+                logger.info(
+                    "RMP HTTP %d (attempt %d/%d) — sleeping %.1fs",
+                    resp.status_code, attempt + 1, attempts, delay,
+                )
+                time.sleep(delay)
+                continue
+
+            resp.raise_for_status()
+            try:
+                payload = resp.json()
+            except ValueError as exc:
+                last_exc = exc
+                if attempt < attempts - 1:
+                    time.sleep(0.5 * (2 ** attempt))
+                    continue
+                raise
+            if "errors" in payload:
+                logger.warning("GraphQL errors: %s", payload["errors"])
+            return payload.get("data", {}) or {}
+
+        # Loop only exits via ``return`` or raise; this is defensive.
+        if last_exc is not None:
+            raise last_exc
+        raise RuntimeError("RMP request retries exhausted")
+
+    # ------------------------------------------------------------------ API
+
+    def find_school_id(self, school_name: str) -> str | None:
+        """Return the Relay school ID (or None) for the closest name match."""
+        data = self._post(
+            SCHOOL_SEARCH_QUERY,
+            {"query": {"text": school_name}},
+        )
+        edges = (
+            data.get("newSearch", {})
+            .get("schools", {})
+            .get("edges", [])
+        )
+        if not edges:
+            return None
+        target = school_name.casefold()
+        for e in edges:
+            node = e.get("node") or {}
+            if node.get("name", "").casefold() == target:
+                return node["id"]
+        return edges[0]["node"]["id"]
+
+    def search_teachers(
+        self,
+        school_id: str,
+        text: str = "",
+        limit: int = 20,
+    ) -> list[RMPTeacher]:
+        data = self._post(
+            TEACHER_SEARCH_QUERY,
+            {
+                "query": {"text": text, "schoolID": school_id},
+                "count": limit,
+            },
+        )
+        edges = (
+            data.get("newSearch", {})
+            .get("teachers", {})
+            .get("edges", [])
+        )
+        result: list[RMPTeacher] = []
+        for e in edges:
+            n = e.get("node") or {}
+            result.append(RMPTeacher(
+                gid=n.get("id", ""),
+                legacy_id=n.get("legacyId") or 0,
+                first_name=n.get("firstName", ""),
+                last_name=n.get("lastName", ""),
+                department=n.get("department", "") or "",
+                school_name=(n.get("school") or {}).get("name", ""),
+                avg_rating=n.get("avgRating"),
+                num_ratings=n.get("numRatings") or 0,
+            ))
+        return result
+
