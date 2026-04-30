@@ -330,3 +330,178 @@ class RMPClient:
             ))
         return result
 
+    def iter_schools(
+        self,
+        texts: Iterable[str] = _DISCOVERY_TEXTS,
+        page_size: int = 100,
+        us_only: bool = True,
+    ) -> Iterator[RMPSchool]:
+        """Yield schools matching a set of broad discovery queries.
+
+        RMP's schools endpoint requires a non-empty ``text`` so we rotate
+        through ``_DISCOVERY_TEXTS`` (``"university"``, ``"college"`` etc.) to
+        cover the space. Duplicates are suppressed by school ID. When
+        ``us_only`` is True, results are filtered by state-abbreviation.
+        """
+        seen: set[str] = set()
+        for text in texts:
+            cursor = None
+            while True:
+                data = self._post(
+                    SCHOOL_LIST_QUERY,
+                    {
+                        "query": {"text": text},
+                        "count": page_size,
+                        "cursor": cursor,
+                    },
+                )
+                schools = (data.get("newSearch") or {}).get("schools") or {}
+                edges = schools.get("edges") or []
+                if not edges:
+                    break
+                for e in edges:
+                    n = e.get("node") or {}
+                    gid = n.get("id") or ""
+                    if not gid or gid in seen:
+                        continue
+                    seen.add(gid)
+                    school = RMPSchool(
+                        gid=gid,
+                        legacy_id=n.get("legacyId") or 0,
+                        name=n.get("name") or "",
+                        city=n.get("city") or "",
+                        state=(n.get("state") or "").strip(),
+                        country=n.get("country") or "",
+                    )
+                    if us_only and not school.is_us:
+                        continue
+                    yield school
+                page_info = schools.get("pageInfo") or {}
+                if not page_info.get("hasNextPage"):
+                    break
+                cursor = page_info.get("endCursor")
+
+    def iter_teachers_all(
+        self,
+        school_id: str,
+        page_size: int = 1000,
+        max_teachers: int | None = None,
+    ) -> Iterator[RMPTeacher]:
+        """Yield every teacher at ``school_id``, paginating until exhausted."""
+        cursor = None
+        fetched = 0
+        while True:
+            data = self._post(
+                """
+                query BulkTeachersQuery(
+                    $query: TeacherSearchQuery!,
+                    $count: Int,
+                    $cursor: String
+                ) {
+                  newSearch {
+                    teachers(query: $query, first: $count, after: $cursor) {
+                      edges {
+                        cursor
+                        node {
+                          id
+                          legacyId
+                          firstName
+                          lastName
+                          department
+                          school { name }
+                          avgRating
+                          numRatings
+                        }
+                      }
+                      pageInfo { hasNextPage endCursor }
+                    }
+                  }
+                }
+                """,
+                {
+                    "query": {"text": "", "schoolID": school_id},
+                    "count": page_size,
+                    "cursor": cursor,
+                },
+            )
+            teachers = (data.get("newSearch") or {}).get("teachers") or {}
+            edges = teachers.get("edges") or []
+            if not edges:
+                return
+            for e in edges:
+                n = e.get("node") or {}
+                yield RMPTeacher(
+                    gid=n.get("id", ""),
+                    legacy_id=n.get("legacyId") or 0,
+                    first_name=n.get("firstName", "") or "",
+                    last_name=n.get("lastName", "") or "",
+                    department=(n.get("department") or "").strip(),
+                    school_name=(n.get("school") or {}).get("name", "") or "",
+                    avg_rating=n.get("avgRating"),
+                    num_ratings=n.get("numRatings") or 0,
+                )
+                fetched += 1
+                if max_teachers and fetched >= max_teachers:
+                    return
+            page_info = teachers.get("pageInfo") or {}
+            if not page_info.get("hasNextPage"):
+                return
+            cursor = page_info.get("endCursor")
+
+    def iter_ratings(
+        self,
+        teacher_gid: str,
+        page_size: int = 20,
+        max_reviews: int | None = None,
+    ) -> Iterator[dict]:
+        cursor = None
+        fetched = 0
+        while True:
+            data = self._post(
+                RATINGS_QUERY,
+                {"id": teacher_gid, "count": page_size, "cursor": cursor},
+            )
+            node = (data.get("node") or {})
+            ratings = node.get("ratings") or {}
+            edges = ratings.get("edges") or []
+            if not edges:
+                return
+            for e in edges:
+                yield e.get("node") or {}
+                fetched += 1
+                if max_reviews and fetched >= max_reviews:
+                    return
+            page_info = ratings.get("pageInfo") or {}
+            if not page_info.get("hasNextPage"):
+                return
+            cursor = page_info.get("endCursor")
+
+    def fetch_ratings_page(
+        self,
+        teacher_gid: str,
+        cursor: str | None = None,
+        count: int = 25,
+    ) -> tuple[list[dict], str | None, bool]:
+        """Fetch a single page of ratings for ``teacher_gid``.
+
+        Returns ``(nodes, next_cursor, has_more)``. Used by the live
+        review-fetch endpoint so the client can thread cursor state for
+        infinite-scroll pagination.
+        """
+        data = self._post(
+            RATINGS_QUERY,
+            {"id": teacher_gid, "count": count, "cursor": cursor},
+        )
+        node = (data.get("node") or {})
+        ratings = node.get("ratings") or {}
+        edges = ratings.get("edges") or []
+        page_info = ratings.get("pageInfo") or {}
+        nodes = [e.get("node") or {} for e in edges]
+        next_cursor = page_info.get("endCursor") if page_info.get("hasNextPage") else None
+        return nodes, next_cursor, bool(page_info.get("hasNextPage"))
+
+
+# ---------------------------------------------------------------------------
+# High-level scrape function
+
+
