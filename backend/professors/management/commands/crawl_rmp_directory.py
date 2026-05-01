@@ -140,3 +140,102 @@ class Command(BaseCommand):
 
     # ---------------------------------------------------------------- helpers
 
+    def _crawl_school(
+        self,
+        client: RMPClient,
+        school: RMPSchool,
+        per_school_limit: int | None,
+        min_ratings: int,
+        dry_run: bool,
+    ) -> int:
+        """Page through all teachers at ``school`` and upsert them."""
+        new_profs = 0
+        dept_cache: dict[str, Department] = {}
+
+        for t in client.iter_teachers_all(
+            school.gid, page_size=1000, max_teachers=per_school_limit,
+        ):
+            full_name = t.full_name
+            if not full_name:
+                continue
+            if t.num_ratings < min_ratings:
+                continue
+            if dry_run:
+                new_profs += 1
+                continue
+
+            dept = None
+            dept_name = t.department.strip()
+            if dept_name:
+                dept = dept_cache.get(dept_name.casefold())
+                if dept is None:
+                    dept, _ = Department.objects.get_or_create(name=dept_name)
+                    dept_cache[dept_name.casefold()] = dept
+
+            external_ref = f"rmp:{t.legacy_id}" if t.legacy_id else ""
+            defaults = {
+                "department": dept,
+                "institution": school.name,
+                "external_ref": external_ref,
+                "source_avg_rating": t.avg_rating,
+                "source_num_ratings": t.num_ratings,
+            }
+
+            # Prefer dedup-by-external_ref when available (most reliable)
+            # then fall back to (name, institution) uniqueness.
+            try:
+                with transaction.atomic():
+                    if external_ref:
+                        obj, created = Professor.objects.update_or_create(
+                            external_ref=external_ref, defaults={
+                                "name": full_name, **defaults,
+                            },
+                        )
+                    else:
+                        obj, created = Professor.objects.update_or_create(
+                            name=full_name, institution=school.name,
+                            defaults=defaults,
+                        )
+                if created:
+                    new_profs += 1
+            except Exception as exc:
+                # Name+institution collision between two different RMP IDs —
+                # log and skip. This is rare but possible (two "John Smith"s
+                # at the same school).
+                logger.warning(
+                    "Skipped %s @ %s: %s", full_name, school.name, exc,
+                )
+
+        return new_profs
+
+    def _install_signal_handlers(self, ckpt: dict) -> None:
+        """Save checkpoint on SIGTERM so we can resume cleanly."""
+        def _on_term(signum, frame):  # noqa: ARG001
+            _save_checkpoint(ckpt)
+            self.stdout.write(self.style.WARNING(
+                "\nReceived SIGTERM — checkpoint saved."
+            ))
+            sys.exit(143)
+        signal.signal(signal.SIGTERM, _on_term)
+
+
+# ---------------------------------------------------------------------------
+# Checkpoint helpers
+
+
+def _fresh_checkpoint() -> dict:
+    return {"done_schools": [], "total_profs": 0}
+
+
+def _load_checkpoint() -> dict:
+    if not CHECKPOINT_PATH.exists():
+        return _fresh_checkpoint()
+    try:
+        return json.loads(CHECKPOINT_PATH.read_text())
+    except json.JSONDecodeError:
+        return _fresh_checkpoint()
+
+
+def _save_checkpoint(ckpt: dict) -> None:
+    CHECKPOINT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    CHECKPOINT_PATH.write_text(json.dumps(ckpt, indent=2))
