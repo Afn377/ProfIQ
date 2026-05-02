@@ -1,31 +1,98 @@
 import { Link } from "react-router-dom";
+import SentimentBar from "./SentimentBar.jsx";
+import ScoreRing from "./ScoreRing.jsx";
+import { scoreBucket, topThemes } from "../lib/format.js";
+import { useCompare } from "../lib/compareStore.jsx";
 
-function bucket(score) {
-  if (score === null || score === undefined) return "none";
-  if (score >= 65) return "good";
-  if (score >= 50) return "meh";
-  return "bad";
-}
+export default function ProfessorCard({ prof }) {
+  const { has, toggle, full } = useCompare();
+  const selected = has(prof.id);
 
-// `selected` is decided by the parent (a set of ids), never by the card:
-// state about *which* items are chosen must be tied to an identity, not a slot.
-export default function ProfessorCard({ prof, selected = false, onToggle }) {
-  const score = prof.recommendation_score;
+  const reviewCount = prof.review_count || 0;
+  const analyzed = reviewCount > 0;
+  const bucket = scoreBucket(prof.recommendation_score || 0);
+
+  const onToggle = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!selected && full) return;
+    toggle(prof.id);
+  };
+
+  const themes = topThemes(prof.theme_counts || {}, 3);
+
   return (
-    <div className={`card${selected ? " selected" : ""}`}>
-      <h3><Link to={`/professors/${prof.id}`}>{prof.name}</Link></h3>
-      <div className="sub">
-        {prof.department ?? "No department"} · {prof.institution}
+    <Link to={`/professors/${prof.id}`} className="prof-card">
+      <button
+        type="button"
+        className={"compare-toggle" + (selected ? " active" : "")}
+        onClick={onToggle}
+        title={selected ? "Remove from compare" : full ? "Max 4 selected" : "Add to compare"}
+        aria-label="Toggle compare"
+      >
+        {selected ? "✓" : "+"}
+      </button>
+
+      <div className="row">
+        <div style={{ minWidth: 0 }}>
+          <div className="name">{prof.name}</div>
+          <div className="meta">
+            {prof.department || "—"}
+            {prof.institution ? ` · ${prof.institution}` : ""}
+          </div>
+        </div>
+        {analyzed ? (
+          <ScoreRing
+            value={prof.recommendation_score}
+            max={100}
+            tier={bucket}
+            label="/100"
+            size={58}
+          />
+        ) : prof.source_avg_rating != null ? (
+          <ScoreRing
+            value={prof.source_avg_rating}
+            max={5}
+            tier="unanalyzed"
+            label="RMP"
+            size={58}
+            title="RateMyProfessors summary — not yet analyzed locally"
+          />
+        ) : (
+          <ScoreRing size={58} />
+        )}
       </div>
-      <div className={`score ${bucket(score)}`}>
-        {score === null ? "Not analyzed" : `${score.toFixed(1)} / 100`}
-        {prof.review_count > 0 && ` · ${prof.review_count} reviews`}
-      </div>
-      {onToggle && (
-        <button className="btn" onClick={onToggle}>
-          {selected ? "✓ Selected" : "Select to compare"}
-        </button>
+
+      {analyzed ? (
+        <>
+          <SentimentBar
+            positive={prof.positive_count || 0}
+            neutral={prof.neutral_count || 0}
+            negative={prof.negative_count || 0}
+          />
+          {themes.length > 0 && (
+            <div className="pill-row">
+              {themes.map((t) => (
+                <span key={t.name} className="pill accent">
+                  {t.name} · {t.count}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="prof-card-footer">
+            <span>{reviewCount} reviews</span>
+            <span>avg {((prof.avg_compound ?? 0) * 1).toFixed(2)}</span>
+          </div>
+        </>
+      ) : (
+        <div className="prof-card-footer unanalyzed-footer">
+          {prof.source_num_ratings > 0 ? (
+            <span>{prof.source_num_ratings.toLocaleString()} RMP ratings · click to analyze</span>
+          ) : (
+            <span>No reviews yet</span>
+          )}
+        </div>
       )}
-    </div>
+    </Link>
   );
 }

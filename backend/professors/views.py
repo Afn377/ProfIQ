@@ -129,6 +129,21 @@ class DepartmentListView(generics.ListAPIView):
 
 
 @api_view(["GET"])
+def institutions_autocomplete(request):
+    # GET /api/institutions/?q=rut&limit=15 — school names with professor counts.
+    q = request.query_params.get("q", "").strip()
+    try:
+        limit = max(1, min(50, int(request.query_params.get("limit", 15))))
+    except ValueError:
+        limit = 15
+    base = Professor.objects.exclude(institution="")
+    if q:
+        base = base.filter(institution__icontains=q)
+    rows = base.values("institution").annotate(count=Count("id")).order_by("-count", "institution")[:limit]
+    return Response([{"name": r["institution"], "professor_count": r["count"]} for r in rows])
+
+
+@api_view(["GET"])
 def compare_professors(request):
     # GET /api/compare/?ids=1,2,3 — compact rows for several professors at once.
     raw = request.query_params.get("ids", "")
@@ -149,8 +164,12 @@ def compare_professors(request):
 
 @api_view(["GET"])
 def platform_summary(request):
-    # GET /api/summary/ — landing-page numbers.
-    analyzed = Professor.objects.filter(
+    # GET /api/summary/?institution=<name> — landing-page numbers, optionally scoped to one school.
+    institution = request.query_params.get("institution", "").strip()
+    profs = Professor.objects.all()
+    if institution:
+        profs = profs.filter(institution__iexact=institution)
+    analyzed = profs.filter(
         stats__review_count__gte=3, stats__analysis_source=ProfessorStats.LIVE_RMP,
     )
     top = (
@@ -158,11 +177,13 @@ def platform_summary(request):
         .order_by("-stats__recommendation_score")[:5]
     )
     departments = (
-        Department.objects.annotate(count=Count("professors"))
-        .order_by("-count")[:8]
+        Department.objects.filter(professors__in=profs).annotate(count=Count("professors", filter=Q(professors__in=profs)))
+        .filter(count__gt=0).order_by("-count")[:8]
     )
+    from django.db.models import Sum
     return Response({
-        "professor_count": Professor.objects.count(),
+        "professor_count": profs.count(),
+        "review_count": analyzed.aggregate(total=Sum("stats__review_count"))["total"] or 0,
         "analyzed_count": analyzed.count(),
         "top_professors": ProfessorListSerializer(top, many=True).data,
         "departments": [

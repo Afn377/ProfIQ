@@ -1,45 +1,99 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { api } from "../lib/api.js";
+import { useUniversity } from "../lib/universityStore.jsx";
 import ProfessorCard from "../components/ProfessorCard.jsx";
 
 export default function Home() {
+  const { institution } = useUniversity();
   const [summary, setSummary] = useState(null);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  // Runs once, after the first render — not on every render.
   useEffect(() => {
-    fetch("/api/summary/")
-      .then((res) => res.json())
+    setLoading(true);
+    setError(null);
+    api
+      .summary({ institution })
       .then(setSummary)
-      .catch((e) => setError(e.message));
-  }, []);
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [institution]);
 
-  if (error) return <div className="container error">{error}</div>;
-  if (!summary) return <div className="container spinner">Loading…</div>;
+  const onSearch = (e) => {
+    e.preventDefault();
+    const q = query.trim();
+    navigate(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
+  };
 
   return (
-    <div className="container">
-      <section className="hero">
-        <h1>Find the right professor</h1>
-        <p>Sentiment-scored reviews, searchable by name, school, or course.</p>
-        <div className="stats">
-          <div className="stat">
-            <div className="value">{summary.professor_count}</div>
-            <div className="label">Professors</div>
+    <>
+      <section className="hero container">
+        <h1>
+          Find the right professor,
+          <br />
+          <span className="grad">powered by real feedback.</span>
+        </h1>
+        <p>
+          ProfIQ aggregates reviews from RateMyProfessors, runs NLP
+          sentiment analysis on every comment, and ranks instructors by an
+          evidence-based recommendation score.
+        </p>
+        <form className="search-bar" onSubmit={onSearch}>
+          <input
+            placeholder="Search by professor, course, or department…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            autoFocus
+          />
+          <button type="submit" className="btn btn-primary">
+            Search
+          </button>
+        </form>
+
+        {summary && (
+          <div className="hero-stats">
+            <div className="stat-chip">
+              <div className="value">{summary.professor_count}</div>
+              <div className="label">Professors</div>
+            </div>
+            <div className="stat-chip">
+              <div className="value">{summary.review_count}</div>
+              <div className="label">Reviews analyzed</div>
+            </div>
+            <div className="stat-chip">
+              <div className="value">{summary.departments.length}</div>
+              <div className="label">Departments</div>
+            </div>
           </div>
-          <div className="stat">
-            <div className="value">{summary.analyzed_count}</div>
-            <div className="label">Analyzed</div>
+        )}
+      </section>
+
+      <section className="section container">
+        <div className="section-head">
+          <div>
+            <h2>Top recommended{institution ? ` at ${institution}` : ""}</h2>
+            <div className="sub">
+              {summary
+                ? `Ranked by sentiment score · ${summary.analyzed_count.toLocaleString()} of ${summary.professor_count.toLocaleString()} professors analyzed so far`
+                : "Ranked by aggregated sentiment score"}
+            </div>
           </div>
         </div>
+        {loading ? (
+          <div className="spinner" />
+        ) : error ? (
+          <div className="empty">{error}</div>
+        ) : (
+          <div className="prof-grid">
+            {summary.top_professors.map((p) => (
+              <ProfessorCard key={p.id} prof={p} />
+            ))}
+          </div>
+        )}
       </section>
-      <section>
-        <h2>Top recommended</h2>
-        <div className="grid">
-          {summary.top_professors.map((p) => (
-            <ProfessorCard prof={p} />
-          ))}
-        </div>
-      </section>
-    </div>
+    </>
   );
 }
