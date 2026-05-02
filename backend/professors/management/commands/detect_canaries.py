@@ -522,3 +522,109 @@ class Command(BaseCommand):
 
     # ----------------------------------------------------------- markdown
 
+    def _render_markdown(self, report: dict) -> str:
+        lines = ["# Canary detection report", ""]
+        lines.append(f"_scan_time:_ `{report['scan_time']}`")
+        lines.append(f"_layers:_ `{', '.join(report['layers_requested'])}`")
+        lines.append("")
+
+        f = report["findings"]
+        if "l1" in f:
+            l1 = f["l1"]
+            lines.append("## Layer 1 — pattern blacklist")
+            lines.append("")
+            lines.append(
+                f"- scanned: **{l1['scanned']:,}** professors "
+                f"in {l1['duration_seconds']}s"
+            )
+            lines.append(f"- flagged: **{len(l1['flagged'])}**")
+            lines.append("")
+            if l1["flagged"]:
+                lines.append("| ID | Name | Institution | Reasons | external_ref |")
+                lines.append("|---:|------|-------------|---------|--------------|")
+                for row in l1["flagged"]:
+                    lines.append(
+                        f"| {row['id']} | {row['name']} | "
+                        f"{row['institution'] or '-'} | "
+                        f"{', '.join(row['reasons'])} | "
+                        f"`{row['external_ref'] or '-'}` |"
+                    )
+            else:
+                lines.append("_No pattern matches — none of the curated "
+                             "fictional/joke/anagram/palindrome heuristics fired._")
+            lines.append("")
+
+        if "l2" in f:
+            l2 = f["l2"]
+            lines.append("## Layer 2 — OpenAlex orphan sample")
+            lines.append("")
+            lines.append(
+                f"- sampled: **{l2['sampled']}**, queried: **{l2['queried']}**, "
+                f"errors: **{l2['errors']}**, in {l2['duration_seconds']}s"
+            )
+            lines.append(f"- flagged: **{len(l2['flagged'])}**")
+            lines.append("")
+            if l2["flagged"]:
+                lines.append("| ID | Name | Institution | Reason | OpenAlex top affiliations |")
+                lines.append("|---:|------|-------------|--------|---------------------------|")
+                for row in l2["flagged"]:
+                    affs = row.get("openalex_top_affiliations") or []
+                    aff_str = "; ".join(a for a in affs if a) or "-"
+                    lines.append(
+                        f"| {row['id']} | {row['name']} | "
+                        f"{row['institution'] or '-'} | "
+                        f"{row['reason']} | {aff_str} |"
+                    )
+            else:
+                lines.append("_All sampled professors had at least one "
+                             "plausible OpenAlex affiliation match._")
+            lines.append("")
+
+        if "l3" in f:
+            l3 = f["l3"]
+            lines.append("## Layer 3 — fake-institution check")
+            lines.append("")
+            lines.append(
+                f"- checked: **{l3['checked']:,}** distinct institutions, "
+                f"queried: **{l3['queried']:,}**, errors: **{l3['errors']}**, "
+                f"in {l3['duration_seconds']}s"
+            )
+            lines.append(
+                f"- flagged institutions: **{len(l3['flagged'])}**, "
+                f"affected professors (collateral cleanup candidates): "
+                f"**{l3['affected_professors']:,}**"
+            )
+            lines.append("")
+            if l3["flagged"]:
+                lines.append("Sorted by professor count — biggest fake institutions first.")
+                lines.append("")
+                lines.append("| Institution | Profs | Best OpenAlex match | Score | Top OpenAlex hits |")
+                lines.append("|-------------|------:|---------------------|------:|-------------------|")
+                for row in l3["flagged"]:
+                    tops = row.get("openalex_top_names") or []
+                    tops_str = "; ".join(t for t in tops if t) or "-"
+                    lines.append(
+                        f"| {row['institution']} | "
+                        f"{row['professor_count']:,} | "
+                        f"{row['best_match_name'] or '_(no hits)_'} | "
+                        f"{row['best_match_score']:.2f} | "
+                        f"{tops_str} |"
+                    )
+            else:
+                lines.append("_Every checked institution had a plausible "
+                             "OpenAlex match above the fuzzy threshold._")
+            lines.append("")
+
+        lines.append("---")
+        lines.append(
+            "Layer 1 catches obvious / legacy canaries only. Layer 2's flagged "
+            "rows are *suspicious*, not confirmed — adjuncts, retired faculty, "
+            "and lecturers who never published often look like orphans too. "
+            "Layer 3 is much higher-confidence: a school with a real catalog "
+            "of programs will be in OpenAlex's institutions index, so anything "
+            "missing is either a fake-school canary, a typo, or an org so "
+            "obscure (private training school, unlisted clinic) that pruning "
+            "it costs little even if it's real."
+        )
+        lines.append("")
+        return "\n".join(lines)
