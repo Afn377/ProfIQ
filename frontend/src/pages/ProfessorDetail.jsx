@@ -286,7 +286,7 @@ export default function ProfessorDetail() {
             <div style={{ width: "100%", height: 220 }}>
               <ResponsiveContainer>
                 <PieChart>
-                  <Pie
+                  <Pie isAnimationActive={false}
                     data={sentimentData}
                     dataKey="value"
                     nameKey="name"
