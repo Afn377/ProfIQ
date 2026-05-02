@@ -141,7 +141,7 @@ class RecommenderTests(unittest.TestCase):
         import numpy as np
         from sentiment.ml import recommender as r
         self.r = r
-        v = np.array([[1, 0, 0], [0.9, 0.1, 0], [0, 1, 0], [0, 0, 1]], dtype="float32")
+        v = np.array([[1, 0, 0], [0.9, 0.1, 0], [0.2, 1, 0], [0, 0, 1]], dtype="float32")
         v /= np.linalg.norm(v, axis=1, keepdims=True)
         ids = np.array(["a", "b", "c", "d"]); names = np.array(["A", "B", "C", "D"])
         r._INDEX = (ids, names, v, {e: i for i, e in enumerate(ids)})
