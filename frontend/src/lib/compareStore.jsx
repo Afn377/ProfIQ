@@ -8,22 +8,35 @@ const STORAGE_KEY = "profiq.compare";
 const MAX_SELECTION = 4;
 
 export function CompareProvider({ children }) {
-  // Naive: trust whatever is in storage.
+  // Storage is user-controlled: it can be missing, stale, or corrupted by
+  // an extension. A bad value must never take the app down.
   const [ids, setIds] = useState(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.filter((x) => Number.isInteger(x)) : [];
+    } catch {
+      return [];
+    }
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+    } catch {
+      /* storage unavailable, keep in-memory only */
+    }
   }, [ids]);
 
   const toggle = (id) => {
-    // Naive: mutate the array in place, then set it.
-    const i = ids.indexOf(id);
-    if (i >= 0) ids.splice(i, 1);
-    else if (ids.length < MAX_SELECTION) ids.push(id);
-    setIds(ids);
+    // React decides whether to re-render by comparing references. Mutating
+    // the existing array and setting it back looks like "nothing changed".
+    // Always build a new array.
+    setIds((prev) => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
+      if (prev.length >= MAX_SELECTION) return prev;
+      return [...prev, id];
+    });
   };
 
   const clear = () => setIds([]);
