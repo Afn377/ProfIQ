@@ -18,6 +18,9 @@ class ProfessorListSerializer(serializers.ModelSerializer):
     review_count = serializers.IntegerField(
         source="stats.review_count", read_only=True, default=0
     )
+    avg_compound = serializers.FloatField(
+        source="stats.avg_compound", read_only=True, default=0.0
+    )
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -25,13 +28,14 @@ class ProfessorListSerializer(serializers.ModelSerializer):
         if stats is not None and stats.analysis_source == ProfessorStats.SEED:
             data["recommendation_score"] = None
             data["review_count"] = 0
+            data["avg_compound"] = 0.0
         return data
 
     class Meta:
         model = Professor
         fields = [
             "id", "name", "department", "institution",
-            "recommendation_score", "review_count",
+            "recommendation_score", "review_count", "avg_compound",
             "source_avg_rating", "source_num_ratings", "external_ref",
         ]
 
