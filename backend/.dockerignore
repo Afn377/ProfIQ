@@ -6,3 +6,7 @@ db_big.sqlite3
 data/*_checkpoint.json
 data/ml/corpus.*
 data/ml/sentiment_bert
+
+# keep the small artifacts the live app needs (original project bug dca200d):
+!data/ml/sentiment_clf.joblib
+!data/ml/prof_embeddings.npz

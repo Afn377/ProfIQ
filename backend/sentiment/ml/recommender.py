@@ -61,6 +61,10 @@ def _encoder():
             return _ENCODER or None
         try:
             os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+            # The model is bundled in the image. Without this, huggingface_hub
+            # phones home to check for updates on every load and hangs for
+            # minutes on Cloud Run (original project, commit 811b0a7).
+            os.environ.setdefault("HF_HUB_OFFLINE", "1")
             from sentence_transformers import SentenceTransformer
             _ENCODER = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
         except Exception as exc:
