@@ -1,0 +1,8 @@
+.venv
+__pycache__
+*.pyc
+db.sqlite3*
+db_big.sqlite3
+data/*_checkpoint.json
+data/ml/corpus.*
+data/ml/sentiment_bert
