@@ -19,3 +19,4 @@ backend/data/ml/*
 !backend/data/ml/.gitkeep
 db_big.sqlite3
 staticfiles/
+db_big.sqlite3-*
