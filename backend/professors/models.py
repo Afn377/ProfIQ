@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.functions import Lower
 
 # Create your models here.
 
@@ -23,6 +24,11 @@ class Professor(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        indexes = [
+            # Case-insensitive institution lookups (search, summary, autocomplete)
+            # hit this instead of scanning 1.79M rows.
+            models.Index(Lower("institution"), name="idx_prof_institution_lower"),
+        ]
         constraints = [
             # ensure that (name, institution) is unique when external_ref is blank
             models.UniqueConstraint(fields=["name", "institution"], name="unique_professor_name_institution", condition=models.Q(external_ref="")),

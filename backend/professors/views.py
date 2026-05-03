@@ -10,6 +10,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from django.db.models import Count, Prefetch, Q
+from django.db.models.functions import Lower
 from .models import Department, Professor, ProfessorStats, Review
 from .serializers import (
     DepartmentSerializer,
@@ -84,7 +85,7 @@ class ProfessorListView(generics.ListCreateAPIView):
         # ?institution= exact school name, case-insensitive
         institution = self.request.query_params.get("institution", "").strip()
         if institution:
-            qs = qs.filter(institution__iexact=institution)
+            qs = qs.alias(inst_lower=Lower("institution")).filter(inst_lower=institution.lower())
 
         # ?sort=name for alphabetical; default is best recommendation score first
         sort = self.request.query_params.get("sort", "score")
@@ -128,17 +129,29 @@ class DepartmentListView(generics.ListAPIView):
     pagination_class = None
 
 
+def _prefix_upper_bound(prefix: str) -> str:
+    """Exclusive upper bound for a prefix range: 'rut' -> 'ruu'.
+
+    lower(col) >= 'rut' AND lower(col) < 'ruu' matches exactly the strings
+    starting with 'rut', and unlike LIKE 'rut%' it can use the expression
+    index.
+    """
+    return prefix[:-1] + chr(ord(prefix[-1]) + 1)
+
+
 @api_view(["GET"])
 def institutions_autocomplete(request):
     # GET /api/institutions/?q=rut&limit=15 — school names with professor counts.
-    q = request.query_params.get("q", "").strip()
+    q = request.query_params.get("q", "").strip().lower()
     try:
         limit = max(1, min(50, int(request.query_params.get("limit", 15))))
     except ValueError:
         limit = 15
     base = Professor.objects.exclude(institution="")
     if q:
-        base = base.filter(institution__icontains=q)
+        base = base.alias(inst_lower=Lower("institution")).filter(
+            inst_lower__gte=q, inst_lower__lt=_prefix_upper_bound(q),
+        )
     rows = base.values("institution").annotate(count=Count("id")).order_by("-count", "institution")[:limit]
     return Response([{"name": r["institution"], "professor_count": r["count"]} for r in rows])
 
@@ -168,7 +181,7 @@ def platform_summary(request):
     institution = request.query_params.get("institution", "").strip()
     profs = Professor.objects.all()
     if institution:
-        profs = profs.filter(institution__iexact=institution)
+        profs = profs.alias(inst_lower=Lower("institution")).filter(inst_lower=institution.lower())
     analyzed = profs.filter(
         stats__review_count__gte=3, stats__analysis_source=ProfessorStats.LIVE_RMP,
     )

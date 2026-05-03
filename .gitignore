@@ -17,3 +17,4 @@ db.sqlite3-shm
 # generated ml artifacts
 backend/data/ml/*
 !backend/data/ml/.gitkeep
+db_big.sqlite3

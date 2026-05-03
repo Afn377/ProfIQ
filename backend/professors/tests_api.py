@@ -103,3 +103,16 @@ class LazyAnalyzeTests(TestCase):
             with self.assertRaises(ConnectionError):
                 v._analyze_professor(self.prof.id)
         self.assertNotIn(self.prof.id, v._in_progress)
+
+
+class PrefixBoundTests(TestCase):
+    def test_increments_last_char(self):
+        from professors.views import _prefix_upper_bound
+        self.assertEqual(_prefix_upper_bound("rut"), "ruu")
+        self.assertEqual(_prefix_upper_bound("a"), "b")
+
+    def test_autocomplete_is_prefix_only_and_case_insensitive(self):
+        Professor.objects.create(name="A", institution="Rutgers")
+        Professor.objects.create(name="B", institution="Truthful College")   # contains "rut", not a prefix
+        names = [r["name"] for r in self.client.get("/api/institutions/?q=RUT").json()]
+        self.assertEqual(names, ["Rutgers"])
