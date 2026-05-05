@@ -116,3 +116,52 @@ class PrefixBoundTests(TestCase):
         Professor.objects.create(name="B", institution="Truthful College")   # contains "rut", not a prefix
         names = [r["name"] for r in self.client.get("/api/institutions/?q=RUT").json()]
         self.assertEqual(names, ["Rutgers"])
+
+
+class SeedStatsReanalysisTests(TestCase):
+    # Imported seed stats have counts but no themes. Opening the page should
+    # queue a live analysis the same way it does for a professor with no stats.
+    def setUp(self):
+        import professors.views as v
+        v._in_progress.clear()
+        self.prof = Professor.objects.create(name="Mark Ogletree", institution="Rutgers", external_ref="rmp:1488853")
+        ProfessorStats.objects.create(
+            professor=self.prof, review_count=2326, recommendation_score=70,
+            analysis_source=ProfessorStats.SEED, theme_counts={},
+        )
+
+    def test_detail_queues_analysis_for_seed_stats(self):
+        import professors.views as v
+        from unittest.mock import patch
+        with patch.object(v, "_enqueue_analyze", return_value=True) as enqueue:
+            response = self.client.get(f"/api/professors/{self.prof.id}/")
+        self.assertEqual(response.status_code, 200)
+        enqueue.assert_called_once_with(self.prof.id)
+        self.assertEqual(response["X-ProfIQ-Analyze"], "queued")
+
+    def test_detail_does_not_requeue_live_stats(self):
+        import professors.views as v
+        from unittest.mock import patch
+        self.prof.stats.analysis_source = ProfessorStats.LIVE_RMP
+        self.prof.stats.save()
+        with patch.object(v, "_enqueue_analyze", return_value=True) as enqueue:
+            self.client.get(f"/api/professors/{self.prof.id}/")
+        enqueue.assert_not_called()
+
+
+class LiveReviewsTests(TestCase):
+    def setUp(self):
+        import professors.views as v
+        v._page_cache.clear()
+        self.prof = Professor.objects.create(name="Ann Lee", institution="Rutgers", external_ref="rmp:1")
+
+    def test_live_review_carries_the_ml_label(self):
+        import professors.views as v
+        from unittest.mock import patch
+        node = {"comment": "Great lectures, would recommend.", "helpfulRating": 5, "clarityRating": 5, "class": "CS101"}
+        with patch.object(v._rmp_client, "fetch_ratings_page", return_value=([node], None, False)):
+            response = self.client.get(f"/api/professors/{self.prof.id}/reviews/")
+        self.assertEqual(response.status_code, 200)
+        sentiment = response.json()["results"][0]["sentiment"]
+        self.assertIn("ml_label", sentiment)
+        self.assertIn("ml_confidence", sentiment)

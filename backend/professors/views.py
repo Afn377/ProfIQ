@@ -105,7 +105,11 @@ class ProfessorDetailView(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         prof = self.get_object()
         response = super().retrieve(request, *args, **kwargs)
-        if not hasattr(prof, "stats") and prof.external_ref.startswith("rmp:"):
+        # Imported seed stats carry counts but no themes, so treat them like
+        # missing stats and let the live pass replace them on first visit.
+        stats = getattr(prof, "stats", None)
+        needs_live = stats is None or stats.analysis_source == ProfessorStats.SEED
+        if needs_live and prof.external_ref.startswith("rmp:"):
             if _enqueue_analyze(prof.id):
                 response["X-ProfIQ-Analyze"] = "queued"
         return response
@@ -281,7 +285,10 @@ def professor_live_reviews(request, pk: int):
         results.append({
             "text": comment, "rating": rating, "course": (n.get("class") or "").strip() or None,
             "posted_at": n.get("date"),
-            "sentiment": {"label": s["label"], "compound": s["compound"], "themes": s["themes"]},
+            "sentiment": {
+                "label": s["label"], "compound": s["compound"], "themes": s["themes"],
+                "ml_label": s["ml_label"], "ml_confidence": s["ml_confidence"],
+            },
         })
     payload = {"results": results, "next_cursor": next_cursor, "has_more": has_more}
     _cache_put(cache_key, payload)
