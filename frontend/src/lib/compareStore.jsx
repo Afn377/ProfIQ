@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { api } from "./api.js";
 
 // Which professors are selected for comparison. Lives here, keyed by id, so
 // every card and the compare bar read the same list (see I-1: state about
@@ -27,6 +28,34 @@ export function CompareProvider({ children }) {
       /* storage unavailable, keep in-memory only */
     }
   }, [ids]);
+
+  // Stored ids can outlive the professors they point at (the catalog was
+  // replaced once already). The compare endpoint only returns rows that
+  // exist, so ask it once on load and drop the rest. Otherwise the bar says
+  // "4 selected" and the limit trips while the page shows one card.
+  useEffect(() => {
+    if (ids.length === 0) return;
+    let cancelled = false;
+    api
+      .compare(ids)
+      .then((rows) => {
+        if (cancelled) return;
+        const alive = new Set(rows.map((r) => r.id));
+        setIds((prev) => {
+          const kept = prev.filter((id) => alive.has(id));
+          return kept.length === prev.length ? prev : kept;
+        });
+      })
+      .catch(() => {
+        /* offline or backend down: keep what we have */
+      });
+    return () => {
+      cancelled = true;
+    };
+    // Runs once on mount on purpose; later toggles only add ids that were
+    // just rendered from the API, so they are known to exist.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const toggle = (id) => {
     // React decides whether to re-render by comparing references. Mutating
