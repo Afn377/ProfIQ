@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from django.db.models import Count, Prefetch, Q
 from django.db.models.functions import Lower
+from django.core.cache import cache
 from .models import Department, Professor, ProfessorStats, Review
 from .serializers import (
     DepartmentSerializer,
@@ -179,10 +180,20 @@ def compare_professors(request):
     return Response(data)
 
 
+SUMMARY_CACHE_SECONDS = 600
+
+
 @api_view(["GET"])
 def platform_summary(request):
     # GET /api/summary/?institution=<name> — landing-page numbers, optionally scoped to one school.
     institution = request.query_params.get("institution", "").strip()
+    # The summary is the first call on every page load, costs seconds on
+    # CockroachDB and barely changes, so keep each answer for a few minutes.
+    # The cache is per process: a fresh instance fills it on its first call.
+    cache_key = f"summary:{institution.lower()}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return Response(cached)
     profs = Professor.objects.all()
     if institution:
         profs = profs.alias(inst_lower=Lower("institution")).filter(inst_lower=institution.lower())
@@ -203,15 +214,17 @@ def platform_summary(request):
         departments = Department.objects.annotate(count=Count("professors"))
     departments = departments.filter(count__gt=0).order_by("-count")[:8]
     from django.db.models import Sum
-    return Response({
+    payload = {
         "professor_count": profs.count(),
         "review_count": analyzed.aggregate(total=Sum("stats__review_count"))["total"] or 0,
         "analyzed_count": analyzed.count(),
-        "top_professors": ProfessorListSerializer(top, many=True).data,
+        "top_professors": list(ProfessorListSerializer(top, many=True).data),
         "departments": [
             {"id": d.id, "name": d.name, "professor_count": d.count} for d in departments
         ],
-    })
+    }
+    cache.set(cache_key, payload, SUMMARY_CACHE_SECONDS)
+    return Response(payload)
 
 
 # ---------------------------------------------------------------------------
@@ -366,7 +379,7 @@ from sentiment.ml import recommender as ml_recommender
 
 @api_view(["GET"])
 def similar_professors(request, pk: int):
-    # GET /api/professors/<id>/similar/?k=5 — same-institution neighbours by review language.
+    # GET /api/professors/<id>/similar/?k=5 — neighbours by review language, same department and school only.
     prof = get_object_or_404(Professor, pk=pk)
     try:
         k = max(1, min(20, int(request.query_params.get("k", 5))))
@@ -389,19 +402,24 @@ def similar_professors(request, pk: int):
             logger.warning("similar: fetch failed for %s: %s", prof.external_ref, exc)
         warmed = ml_recommender.add_professor(prof.external_ref, f"{prof.name} @ {prof.institution}", texts)
 
-    # Over-fetch, then keep only same-institution matches.
-    raw = ml_recommender.similar(prof.external_ref, k=max(50, k * 10))
-    refs = [n.external_ref for n in raw]
-    by_ref = {p.external_ref: p for p in Professor.objects.select_related("department", "stats").filter(external_ref__in=refs)}
-    inst = (prof.institution or "").strip().lower()
+    # Only professors in the same department at the same school are
+    # candidates. No fallback to the whole school or to everyone: an empty
+    # panel is more honest than a "similar" professor from another field.
+    source = {"department": prof.department.name if prof.department else None, "institution": prof.institution}
+    if prof.department_id is None:
+        return Response({"available": True, "warmed": warmed, "match_level": "department", "source": source, "results": []})
+    peers = (
+        Professor.objects.alias(inst_lower=Lower("institution"))
+        .filter(department_id=prof.department_id, inst_lower=(prof.institution or "").strip().lower())
+        .exclude(pk=prof.pk).exclude(external_ref="")
+        .select_related("department", "stats")
+    )
+    by_ref = {p.external_ref: p for p in peers}
     out = []
-    for n in raw:
-        p = by_ref.get(n.external_ref)
-        if p is None or (p.institution or "").strip().lower() != inst:
-            continue
+    for n in ml_recommender.similar(prof.external_ref, k=k, among=set(by_ref)):
+        p = by_ref[n.external_ref]
         out.append({"id": p.id, "name": p.name, "department": p.department.name if p.department else None,
                     "institution": p.institution, "score": round(n.score, 3),
+                    "review_count": p.stats.review_count if hasattr(p, "stats") else 0,
                     "recommendation_score": p.stats.recommendation_score if hasattr(p, "stats") else None})
-        if len(out) >= k:
-            break
-    return Response({"available": True, "warmed": warmed, "results": out})
+    return Response({"available": True, "warmed": warmed, "match_level": "department", "source": source, "results": out})

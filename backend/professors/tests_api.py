@@ -56,6 +56,8 @@ class CompareTests(TestCase):
 
 class ProvenanceTests(TestCase):
     def test_seed_professor_never_in_top_list_and_score_hidden(self):
+        from django.core.cache import cache
+        cache.clear()  # the summary is cached per process
         prof = Professor.objects.create(name="Avery Stone", institution="State University")
         ProfessorStats.objects.create(
             professor=prof, review_count=15, recommendation_score=90.0,

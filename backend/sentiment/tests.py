@@ -153,6 +153,10 @@ class RecommenderTests(unittest.TestCase):
         out = self.r.similar("a", k=2)
         self.assertEqual([n.external_ref for n in out], ["b", "c"])
         self.assertNotIn("a", [n.external_ref for n in out])
+        # Restricted to a candidate set (same department and school), the
+        # closest overall ("b") is not eligible, so "c" is the answer.
+        out = self.r.similar("a", k=2, among={"c", "d"})
+        self.assertEqual([n.external_ref for n in out], ["c"])
 
     def test_unknown_ref_returns_empty(self):
         self.assertEqual(self.r.similar("zzz"), [])

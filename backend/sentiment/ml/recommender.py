@@ -104,7 +104,9 @@ def add_professor(external_ref: str, label: str, reviews: list[str]) -> bool:
     return True
 
 
-def similar(external_ref: str, k: int = 5) -> list[Neighbor]:
+def similar(external_ref: str, k: int = 5, among: set[str] | None = None) -> list[Neighbor]:
+    """Top k by cosine. With `among`, only those refs are candidates, so a
+    match in the right department is never lost for ranking low globally."""
     idx = _load()
     if idx is None:
         return []
@@ -112,11 +114,17 @@ def similar(external_ref: str, k: int = 5) -> list[Neighbor]:
     row = id_to_row.get(external_ref)
     if row is None:
         return []
-    q = vecs[row]
+    if among is not None:
+        rows = np.array([id_to_row[e] for e in among if e in id_to_row and e != external_ref], dtype=int)
+        if rows.size == 0:
+            return []
+    else:
+        rows = np.arange(len(ids))
     # Vectors are unit length, so cosine is just the dot product, and one
-    # matrix multiply scores every professor at once.
-    sims = vecs @ q
-    sims[row] = -1.0                       # exclude self
-    top = np.argpartition(-sims, kth=min(k, len(sims) - 1))[:k]   # top k without a full sort
+    # matrix multiply scores every candidate at once.
+    sims = vecs[rows] @ vecs[row]
+    sims[rows == row] = -1.0               # exclude self
+    k = min(k, len(rows))
+    top = np.argpartition(-sims, kth=k - 1)[:k] if k < len(rows) else np.arange(len(rows))
     top = top[np.argsort(-sims[top])]
-    return [Neighbor(str(ids[i]), str(names[i]), float(sims[i])) for i in top if sims[i] > 0]
+    return [Neighbor(str(ids[rows[i]]), str(names[rows[i]]), float(sims[i])) for i in top if sims[i] > 0]

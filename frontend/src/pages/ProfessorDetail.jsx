@@ -462,9 +462,8 @@ function SimilarProfessorsPanel({ professorId }) {
           Powered by MiniLM sentence embeddings + cosine KNN.
         </div>
         <div className="empty" style={{ padding: 20 }}>
-          We couldn&apos;t find similar professors for this one yet — either
-          they have no public reviews to embed, or RateMyProfessors is
-          unreachable right now.
+          No other similar professors have been analyzed in this department
+          yet.
         </div>
       </div>
     );
