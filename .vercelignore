@@ -1,6 +1,8 @@
-# vercel uploads from the repo root, only the frontend is needed
-/backend
-/notebooks
-/.venv
-**/node_modules
-**/.DS_Store
+# vercel uploads from the repo root because the project root is frontend.
+# upload nothing but the frontend source.
+/*
+!/frontend
+/frontend/node_modules
+/frontend/dist
+/frontend/.env*
+/frontend/.vercel
