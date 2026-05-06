@@ -25,3 +25,6 @@ db_big.sqlite3-*
 backend/.env.deploy
 frontend/.vercel/
 .fuse_hidden*
+.vercel/
+.vercel
+.env*

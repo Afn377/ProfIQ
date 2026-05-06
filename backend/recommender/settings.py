@@ -187,3 +187,13 @@ CORS_ALLOWED_ORIGINS += [o.strip() for o in os.environ.get("CORS_EXTRA_ORIGINS",
 # Cloud Run terminates TLS and forwards plain http with this header.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 CSRF_TRUSTED_ORIGINS = [o for o in CORS_ALLOWED_ORIGINS if o.startswith("https://")]
+
+# Without this, DEBUG=0 sends request errors only to mail_admins and Cloud Run
+# logs show nothing for a 500. Print them to stderr instead.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "loggers": {"django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False}},
+    "root": {"handlers": ["console"], "level": "WARNING"},
+}

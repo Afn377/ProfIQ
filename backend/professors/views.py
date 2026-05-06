@@ -193,10 +193,15 @@ def platform_summary(request):
         analyzed.select_related("department", "stats")
         .order_by("-stats__recommendation_score")[:5]
     )
-    departments = (
-        Department.objects.filter(professors__in=profs).annotate(count=Count("professors", filter=Q(professors__in=profs)))
-        .filter(count__gt=0).order_by("-count")[:8]
-    )
+    if institution:
+        departments = Department.objects.filter(professors__in=profs).annotate(
+            count=Count("professors", filter=Q(professors__in=profs))
+        )
+    else:
+        # Every professor is in scope, so "id in (all professors)" filters
+        # nothing and on CockroachDB it ran past the 120s worker timeout.
+        departments = Department.objects.annotate(count=Count("professors"))
+    departments = departments.filter(count__gt=0).order_by("-count")[:8]
     from django.db.models import Sum
     return Response({
         "professor_count": profs.count(),

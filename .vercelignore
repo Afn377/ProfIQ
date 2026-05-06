@@ -1,0 +1,6 @@
+# vercel uploads from the repo root, only the frontend is needed
+/backend
+/notebooks
+/.venv
+**/node_modules
+**/.DS_Store

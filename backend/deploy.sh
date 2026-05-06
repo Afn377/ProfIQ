@@ -39,7 +39,8 @@ gcloud run deploy "$CLOUD_RUN_SERVICE" \
   --cpu 2 \
   --timeout 300 \
   --allow-unauthenticated \
-  --env-vars-file "$ENV_VARS_FILE"
+  --env-vars-file "$ENV_VARS_FILE" \
+  "$@"
 
 echo "deployed, service url:"
 gcloud run services describe "$CLOUD_RUN_SERVICE" \
