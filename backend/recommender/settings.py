@@ -78,23 +78,42 @@ WSGI_APPLICATION = "recommender.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-        # SQLite allows one writer at a time. Background analysis threads
-        # would otherwise die with "database is locked" the instant two of
-        # them finish together. timeout makes a writer wait up to 5s, but
-        # only if the transaction starts as a write: a plain BEGIN that
-        # later upgrades to a write is refused immediately. IMMEDIATE takes
-        # the write lock up front. WAL lets readers keep going meanwhile.
-        "OPTIONS": {
-            "timeout": 5,
-            "transaction_mode": "IMMEDIATE",
-            "init_command": "PRAGMA journal_mode=WAL;",
-        },
+# Production runs on CockroachDB Serverless (wire compatible with Postgres) when
+# USE_POSTGRES=1. Everything else stays on the SQLite file. The SQLite OPTIONS
+# below are SQLite only and would be rejected by the postgres driver.
+if os.environ.get("USE_POSTGRES") == "1":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django_cockroachdb",
+            "NAME": os.environ.get("DB_NAME", "defaultdb"),
+            "USER": os.environ.get("DB_USER", ""),
+            "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+            "HOST": os.environ.get("DB_HOST", "localhost"),
+            "PORT": os.environ.get("DB_PORT", "26257"),
+            "OPTIONS": {
+                "sslmode": os.environ.get("DB_SSLMODE") or "verify-full",
+                "sslrootcert": os.environ.get("DB_SSLROOTCERT") or str(BASE_DIR / "certs" / "cockroachdb-ca.crt"),
+            },
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+            # SQLite allows one writer at a time. Background analysis threads
+            # would otherwise die with "database is locked" the instant two of
+            # them finish together. timeout makes a writer wait up to 5s, but
+            # only if the transaction starts as a write: a plain BEGIN that
+            # later upgrades to a write is refused immediately. IMMEDIATE takes
+            # the write lock up front. WAL lets readers keep going meanwhile.
+            "OPTIONS": {
+                "timeout": 5,
+                "transaction_mode": "IMMEDIATE",
+                "init_command": "PRAGMA journal_mode=WAL;",
+            },
+        }
+    }
 
 
 # Password validation
@@ -164,3 +183,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 # Production frontend origins come from the environment, comma separated.
 CORS_ALLOWED_ORIGINS += [o.strip() for o in os.environ.get("CORS_EXTRA_ORIGINS", "").split(",") if o.strip()]
+
+# Cloud Run terminates TLS and forwards plain http with this header.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_TRUSTED_ORIGINS = [o for o in CORS_ALLOWED_ORIGINS if o.startswith("https://")]

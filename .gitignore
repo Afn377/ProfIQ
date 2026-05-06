@@ -20,3 +20,8 @@ backend/data/ml/*
 db_big.sqlite3
 staticfiles/
 db_big.sqlite3-*
+
+# deploy secrets and vercel link
+backend/.env.deploy
+frontend/.vercel/
+.fuse_hidden*

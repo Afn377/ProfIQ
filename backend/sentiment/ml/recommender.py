@@ -65,6 +65,14 @@ def _encoder():
             # phones home to check for updates on every load and hangs for
             # minutes on Cloud Run (original project, commit 811b0a7).
             os.environ.setdefault("HF_HUB_OFFLINE", "1")
+            os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+            # The image ships the model under data/ml/hf_cache, so point every
+            # cache variable there. A dev machine with its own ~/.cache still
+            # works because setdefault leaves an existing value alone.
+            cache_dir = ROOT / "data" / "ml" / "hf_cache"
+            if cache_dir.exists():
+                for var in ("HF_HOME", "HF_HUB_CACHE", "SENTENCE_TRANSFORMERS_HOME"):
+                    os.environ.setdefault(var, str(cache_dir))
             from sentence_transformers import SentenceTransformer
             _ENCODER = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
         except Exception as exc:

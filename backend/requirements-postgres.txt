@@ -1,0 +1,3 @@
+# Only for production. Adds the postgres driver and the cockroachdb backend.
+psycopg[binary]==3.3.3
+django-cockroachdb==5.2.1

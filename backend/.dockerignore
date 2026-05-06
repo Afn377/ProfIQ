@@ -10,3 +10,6 @@ data/ml/sentiment_bert
 # keep the small artifacts the live app needs (original project bug dca200d):
 !data/ml/sentiment_clf.joblib
 !data/ml/prof_embeddings.npz
+!data/ml/hf_cache/models--sentence-transformers--all-MiniLM-L6-v2
+.env.deploy
+.fuse_hidden*
