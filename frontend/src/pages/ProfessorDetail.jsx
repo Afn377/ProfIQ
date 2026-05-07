@@ -378,3 +378,190 @@ export default function ProfessorDetail() {
 }
 
 // Similar-professor results come from the backend embedding index.
+function SimilarProfessorsPanel({ professorId }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [warming, setWarming] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setWarming(false);
+    setError(null);
+
+    // Try the existing index first; warm up on demand only if needed.
+    api
+      .similarProfessors(professorId, { k: 5, warm: 0, scope: "department" })
+      .then((res) => {
+        if (cancelled) return;
+        setData(res);
+        const empty = !res?.results?.length;
+        if (empty && res?.available !== false) {
+          setWarming(true);
+          return api.similarProfessors(professorId, {
+            k: 5, warm: 1, scope: "department",
+          });
+        }
+        return null;
+      })
+      .then((res) => {
+        if (cancelled || !res) return;
+        setData(res);
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        setError(e.message || "Could not load similar professors");
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setLoading(false);
+        setWarming(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [professorId]);
+
+  if (loading) {
+    return (
+      <div className="card" style={{ marginTop: 16 }}>
+        <h3>Similar professors</h3>
+        <div className="empty" style={{ padding: 20, textAlign: "center" }}>
+          <div className="spinner" />
+          {warming && (
+            <div className="muted" style={{ fontSize: 12, marginTop: 10 }}>
+              Encoding this professor on the fly with MiniLM…
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) return null;
+  if (!data || data.available === false) return null;
+
+  const results = data.results || [];
+  if (results.length === 0) {
+    return (
+      <div className="card" style={{ marginTop: 16 }}>
+        <h3>Similar professors</h3>
+        <div className="muted" style={{ fontSize: 12, marginBottom: 8 }}>
+          Powered by MiniLM sentence embeddings + cosine KNN.
+        </div>
+        <div className="empty" style={{ padding: 20 }}>
+          We couldn&apos;t find similar professors for this one yet — either
+          they have no public reviews to embed, or RateMyProfessors is
+          unreachable right now.
+        </div>
+      </div>
+    );
+  }
+
+  const matchLevel = data?.match_level || "department";
+  const src = data?.source || {};
+  const scopeLine = (() => {
+    if (matchLevel === "department" && src.institution && src.department) {
+      return `In ${src.department} at ${src.institution}.`;
+    }
+    if (matchLevel === "institution" && src.institution) {
+      return `No same-department matches in the index — showing closest at ${src.institution}.`;
+    }
+    if (matchLevel === "global") {
+      return src.institution
+        ? `No matches at ${src.institution} yet — showing closest globally.`
+        : "Closest globally.";
+    }
+    return null;
+  })();
+  const badgeStyle = {
+    department: { bg: "rgba(46, 204, 143, 0.15)", color: "#2ecc8f" },
+    institution: { bg: "rgba(240, 199, 94, 0.18)", color: "#f0c75e" },
+    global: { bg: "rgba(124, 92, 255, 0.18)", color: "#a18bff" },
+  }[matchLevel] || { bg: "rgba(255,255,255,0.08)", color: "var(--muted)" };
+  const badgeLabel = {
+    department: "Same dept",
+    institution: "Same university",
+    global: "Global",
+  }[matchLevel] || matchLevel;
+
+  return (
+    <div className="card" style={{ marginTop: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+        <h3 style={{ margin: 0 }}>Similar professors</h3>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            padding: "2px 8px",
+            borderRadius: 999,
+            background: badgeStyle.bg,
+            color: badgeStyle.color,
+            textTransform: "uppercase",
+            letterSpacing: 0.4,
+          }}
+        >
+          {badgeLabel}
+        </span>
+      </div>
+      <div className="muted" style={{ fontSize: 12, marginBottom: 12 }}>
+        {scopeLine && <div style={{ marginBottom: 4 }}>{scopeLine}</div>}
+        Top {results.length} by review-content similarity. Powered by
+        MiniLM sentence embeddings + cosine KNN
+        {data.model ? ` (${data.model})` : ""}.
+      </div>
+      <div style={{ display: "grid", gap: 10 }}>
+        {results.map((r) => {
+          const pct = Math.round(((r.score ?? 0) + 1) * 50); // -1..1 -> 0..100
+          return (
+            <Link
+              key={r.id}
+              to={`/professors/${r.id}`}
+              className="card"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr auto",
+                alignItems: "center",
+                gap: 12,
+                margin: 0,
+                padding: 12,
+                background: "var(--surface-2)",
+                textDecoration: "none",
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: 600, color: "var(--text)" }}>
+                  {r.name}
+                </div>
+                <div className="muted" style={{ fontSize: 12 }}>
+                  {r.department || "—"}
+                  {r.institution ? ` · ${r.institution}` : ""}
+                  {typeof r.review_count === "number" && r.review_count > 0
+                    ? ` · ${r.review_count} reviews`
+                    : ""}
+                </div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 700,
+                    color: "var(--accent, #7c5cff)",
+                  }}
+                >
+                  {pct}%
+                </div>
+                <div className="muted" style={{ fontSize: 11 }}>
+                  similarity
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Review feed: RMP-backed professors use live pages; seed data uses embedded reviews.
