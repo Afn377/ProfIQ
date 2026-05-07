@@ -64,7 +64,7 @@ export default function Home() {
               <div className="label">Reviews analyzed</div>
             </div>
             <div className="stat-chip">
-              <div className="value">{summary.departments.length}</div>
+              <div className="value">{summary.department_count}</div>
               <div className="label">Departments</div>
             </div>
           </div>

@@ -205,24 +205,15 @@ def platform_summary(request):
         analyzed.select_related("department", "stats")
         .order_by("-stats__recommendation_score")[:5]
     )
-    if institution:
-        departments = Department.objects.filter(professors__in=profs).annotate(
-            count=Count("professors", filter=Q(professors__in=profs))
-        )
-    else:
-        # Every professor is in scope, so "id in (all professors)" filters
-        # nothing and on CockroachDB it ran past the 120s worker timeout.
-        departments = Department.objects.annotate(count=Count("professors"))
-    departments = departments.filter(count__gt=0).order_by("-count")[:8]
     from django.db.models import Sum
     payload = {
         "professor_count": profs.count(),
         "review_count": analyzed.aggregate(total=Sum("stats__review_count"))["total"] or 0,
         "analyzed_count": analyzed.count(),
         "top_professors": list(ProfessorListSerializer(top, many=True).data),
-        "departments": [
-            {"id": d.id, "name": d.name, "professor_count": d.count} for d in departments
-        ],
+        # The home page only shows how many departments there are. This used
+        # to be a top 8 list, so the tile always said 8.
+        "department_count": profs.exclude(department=None).values("department").distinct().count(),
     }
     cache.set(cache_key, payload, SUMMARY_CACHE_SECONDS)
     return Response(payload)
