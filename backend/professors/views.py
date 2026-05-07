@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import threading
 from collections import OrderedDict
@@ -190,7 +191,7 @@ def platform_summary(request):
     # The summary is the first call on every page load, costs seconds on
     # CockroachDB and barely changes, so keep each answer for a few minutes.
     # The cache is per process: a fresh instance fills it on its first call.
-    cache_key = f"summary:{institution.lower()}"
+    cache_key = "summary:" + hashlib.sha1(institution.lower().encode()).hexdigest()
     cached = cache.get(cache_key)
     if cached is not None:
         return Response(cached)
@@ -387,6 +388,10 @@ def similar_professors(request, pk: int):
         k = 5
     if not ml_recommender.is_available() or not prof.external_ref:
         return Response({"available": False, "results": []})
+    source = {"department": prof.department.name if prof.department else None, "institution": prof.institution}
+    if prof.department_id is None:
+        # Nothing to match on, so dont pay for loading the encoder.
+        return Response({"available": True, "warmed": False, "match_level": "department", "source": source, "results": []})
 
     # Not in the offline index? Embed them now from their live reviews.
     warmed = False
@@ -405,9 +410,6 @@ def similar_professors(request, pk: int):
     # Only professors in the same department at the same school are
     # candidates. No fallback to the whole school or to everyone: an empty
     # panel is more honest than a "similar" professor from another field.
-    source = {"department": prof.department.name if prof.department else None, "institution": prof.institution}
-    if prof.department_id is None:
-        return Response({"available": True, "warmed": warmed, "match_level": "department", "source": source, "results": []})
     peers = (
         Professor.objects.alias(inst_lower=Lower("institution"))
         .filter(department_id=prof.department_id, inst_lower=(prof.institution or "").strip().lower())

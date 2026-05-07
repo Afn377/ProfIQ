@@ -197,3 +197,14 @@ LOGGING = {
     "loggers": {"django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False}},
     "root": {"handlers": ["console"], "level": "WARNING"},
 }
+
+# gunicorn runs several worker processes. An in-memory cache would give each
+# worker its own copy, so half the requests missed. Files under /tmp are
+# shared by every worker in the container (on Cloud Run /tmp is in memory).
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": os.environ.get("CACHE_DIR", "/tmp/profiq-cache"),
+    }
+}
+
