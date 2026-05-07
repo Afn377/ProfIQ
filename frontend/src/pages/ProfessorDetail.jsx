@@ -462,7 +462,7 @@ function SimilarProfessorsPanel({ professorId }) {
           Powered by MiniLM sentence embeddings + cosine KNN.
         </div>
         <div className="empty" style={{ padding: 20 }}>
-          No other similar professors have been analyzed in this department
+          No other similar professors have been analyzed at this university
           yet.
         </div>
       </div>
@@ -476,7 +476,7 @@ function SimilarProfessorsPanel({ professorId }) {
       return `In ${src.department} at ${src.institution}.`;
     }
     if (matchLevel === "institution" && src.institution) {
-      return `No same-department matches in the index — showing closest at ${src.institution}.`;
+      return `At ${src.institution}.`;
     }
     if (matchLevel === "global") {
       return src.institution

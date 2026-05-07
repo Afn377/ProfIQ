@@ -371,7 +371,7 @@ from sentiment.ml import recommender as ml_recommender
 
 @api_view(["GET"])
 def similar_professors(request, pk: int):
-    # GET /api/professors/<id>/similar/?k=5 — neighbours by review language, same department and school only.
+    # GET /api/professors/<id>/similar/?k=5 — neighbours by review language, same school only.
     prof = get_object_or_404(Professor, pk=pk)
     try:
         k = max(1, min(20, int(request.query_params.get("k", 5))))
@@ -380,9 +380,6 @@ def similar_professors(request, pk: int):
     if not ml_recommender.is_available() or not prof.external_ref:
         return Response({"available": False, "results": []})
     source = {"department": prof.department.name if prof.department else None, "institution": prof.institution}
-    if prof.department_id is None:
-        # Nothing to match on, so dont pay for loading the encoder.
-        return Response({"available": True, "warmed": False, "match_level": "department", "source": source, "results": []})
 
     # Not in the offline index? Embed them now from their live reviews.
     warmed = False
@@ -398,12 +395,13 @@ def similar_professors(request, pk: int):
             logger.warning("similar: fetch failed for %s: %s", prof.external_ref, exc)
         warmed = ml_recommender.add_professor(prof.external_ref, f"{prof.name} @ {prof.institution}", texts)
 
-    # Only professors in the same department at the same school are
-    # candidates. No fallback to the whole school or to everyone: an empty
-    # panel is more honest than a "similar" professor from another field.
+    # Only professors at the same school are candidates, since a student can
+    # only take classes there. Filtered before scoring so a same school match
+    # is never lost for ranking low against the whole index. No fallback to
+    # other schools: an empty panel is more honest.
     peers = (
         Professor.objects.alias(inst_lower=Lower("institution"))
-        .filter(department_id=prof.department_id, inst_lower=(prof.institution or "").strip().lower())
+        .filter(inst_lower=(prof.institution or "").strip().lower())
         .exclude(pk=prof.pk).exclude(external_ref="")
         .select_related("department", "stats")
     )
@@ -415,4 +413,4 @@ def similar_professors(request, pk: int):
                     "institution": p.institution, "score": round(n.score, 3),
                     "review_count": p.stats.review_count if hasattr(p, "stats") else 0,
                     "recommendation_score": p.stats.recommendation_score if hasattr(p, "stats") else None})
-    return Response({"available": True, "warmed": warmed, "match_level": "department", "source": source, "results": out})
+    return Response({"available": True, "warmed": warmed, "match_level": "institution", "source": source, "results": out})
