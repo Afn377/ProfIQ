@@ -565,3 +565,162 @@ function SimilarProfessorsPanel({ professorId }) {
 }
 
 // Review feed: RMP-backed professors use live pages; seed data uses embedded reviews.
+function ReviewsSection({ professor }) {
+  const liveCapable = Boolean(professor.external_ref);
+  const fallbackReviews = professor.reviews || [];
+
+  const [reviews, setReviews] = useState([]);
+  const [cursor, setCursor] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [initialized, setInitialized] = useState(false);
+  const [error, setError] = useState(null);
+
+  const sentinelRef = useRef(null);
+  const inFlight = useRef(false);
+
+  const fetchNext = useCallback(async () => {
+    if (!liveCapable || inFlight.current || !hasMore) return;
+    inFlight.current = true;
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await api.professorReviews(professor.id, {
+        cursor,
+        limit: 20,
+      });
+      setReviews((prev) => [...prev, ...(data.results || [])]);
+      setCursor(data.next_cursor);
+      setHasMore(Boolean(data.has_more));
+    } catch (e) {
+      setError(e.message || "Could not load reviews");
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+      setInitialized(true);
+      inFlight.current = false;
+    }
+  }, [liveCapable, professor.id, cursor, hasMore]);
+
+  useEffect(() => {
+    setReviews([]);
+    setCursor(null);
+    setHasMore(true);
+    setInitialized(false);
+    setError(null);
+  }, [professor.id]);
+
+  useEffect(() => {
+    if (!liveCapable || initialized || reviews.length > 0) return;
+    fetchNext();
+  }, [liveCapable, initialized, reviews.length, fetchNext]);
+
+  useEffect(() => {
+    if (!liveCapable || !sentinelRef.current || !hasMore) return;
+    const el = sentinelRef.current;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) fetchNext();
+      },
+      { rootMargin: "400px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [liveCapable, hasMore, fetchNext]);
+
+  const headingCount = useMemo(() => {
+    if (!liveCapable) return fallbackReviews.length;
+    if (professor.stats?.review_count) return professor.stats.review_count;
+    return reviews.length;
+  }, [liveCapable, fallbackReviews.length, professor.stats, reviews.length]);
+
+  if (!liveCapable) {
+    return (
+      <div className="card" style={{ marginTop: 16 }}>
+        <h3>Reviews ({fallbackReviews.length})</h3>
+        {fallbackReviews.length === 0 && (
+          <div className="empty">No reviews yet.</div>
+        )}
+        {fallbackReviews.map((r) => (
+          <ReviewItem
+            key={r.id}
+            source={r.source}
+            rating={r.rating}
+            course={r.course}
+            text={r.text}
+            sentiment={r.sentiment}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="card" style={{ marginTop: 16 }}>
+      <h3>
+        Reviews{" "}
+        <span style={{ color: "var(--text-dim)", fontWeight: 400, fontSize: 13 }}>
+          ({reviews.length}
+          {headingCount > reviews.length ? ` of ${headingCount}` : ""} loaded)
+        </span>
+      </h3>
+      <div className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
+        Live from RateMyProfessors and Reddit, analyzed on the fly.
+        Reddit comments appear at the top of the first page; scroll for
+        more RMP reviews — nothing is persisted.
+      </div>
+
+      {reviews.map((r, idx) => (
+        <ReviewItem
+          key={`${r.source_url || idx}-${idx}`}
+          source={r.source || "rmp"}
+          rating={r.rating}
+          course={r.course}
+          text={r.text}
+          sentiment={r.sentiment}
+          sourceUrl={r.source_url}
+        />
+      ))}
+
+      {loading && (
+        <div style={{ padding: "14px 0", textAlign: "center" }}>
+          <div className="spinner" />
+        </div>
+      )}
+
+      {!loading && !hasMore && reviews.length > 0 && (
+        <div
+          className="muted"
+          style={{ textAlign: "center", padding: "14px 0", fontSize: 12 }}
+        >
+          End of reviews.
+        </div>
+      )}
+
+      {!loading && reviews.length === 0 && initialized && !error && (
+        <div className="empty">No reviews available.</div>
+      )}
+
+      {error && (
+        <div
+          className="empty"
+          style={{ color: "var(--neg)", padding: 16 }}
+        >
+          {error}
+          {hasMore && (
+            <button
+              className="btn btn-ghost"
+              style={{ marginLeft: 10 }}
+              onClick={fetchNext}
+            >
+              Retry
+            </button>
+          )}
+        </div>
+      )}
+
+      {hasMore && !error && <div ref={sentinelRef} style={{ height: 1 }} />}
+    </div>
+  );
+}
+
