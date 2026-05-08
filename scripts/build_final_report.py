@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import tempfile
 from pathlib import Path
 
 from docx import Document
@@ -15,7 +16,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT_DOCX = ROOT / "ProfIQ_Project_Report.docx"
-ASSET_DIR = ROOT / "docs" / "report_assets"
+ASSET_DIR = Path(tempfile.gettempdir()) / "profiq_report_assets"
 ASSET_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -303,6 +304,7 @@ def add_title_page(doc):
         ("Student", "Afnan Haider"),
         ("Date", "May 2026"),
         ("Repository", "https://github.com/Afn377/ProfIQ"),
+        ("Demo video", "https://youtu.be/o1A1l2W680g?si=4a1GuE1157LvYent"),
         ("Project type", "End-to-end data management, NLP analytics, and web application"),
     ]:
         p = doc.add_paragraph()
@@ -519,7 +521,12 @@ def build_report():
     add_heading(doc, "8. Reproducibility", 1)
     add_para(
         doc,
-        "The repository includes the backend, frontend, migrations, requirements, README, ML report, evaluation notebook, and example data. A fresh local run uses the seed ingest path; large crawls and ML artifacts can be rebuilt from the documented management commands.",
+        "The repository includes the backend, frontend, migrations, requirements, evaluation notebook, report builders, and example data. A fresh local run uses the seed ingest path; large crawls and ML artifacts can be rebuilt from the documented management commands.",
+    )
+    add_para(
+        doc,
+        "Demo video: https://youtu.be/o1A1l2W680g?si=4a1GuE1157LvYent",
+        bold=True,
     )
     add_table(
         doc,
@@ -551,6 +558,7 @@ def build_report():
         "Pedregosa, F. et al. (2011). Scikit-learn: Machine learning in Python. Journal of Machine Learning Research.",
         "Django Software Foundation. Django documentation. https://docs.djangoproject.com/",
         "React documentation. https://react.dev/",
+        "AI assistance disclosure: ChatGPT was used for assistance with debugging, explanation, editing, and project organization. It was not used as the source of generated project content submitted in place of my own work.",
     ]
     for ref in refs:
         add_para(doc, ref, size=10, after=4)

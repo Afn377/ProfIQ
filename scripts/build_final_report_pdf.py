@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import tempfile
 from pathlib import Path
 
 from reportlab.lib import colors
@@ -20,7 +21,7 @@ from reportlab.platypus import (
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT_PDF = ROOT / "ProfIQ_Project_Report.pdf"
-ASSET_DIR = ROOT / "docs" / "report_assets"
+ASSET_DIR = Path(tempfile.gettempdir()) / "profiq_report_assets"
 
 
 def styles():
@@ -159,6 +160,7 @@ def build():
         ("Student", "Afnan Haider"),
         ("Date", "May 2026"),
         ("Repository", "https://github.com/Afn377/ProfIQ"),
+        ("Demo video", "https://youtu.be/o1A1l2W680g?si=4a1GuE1157LvYent"),
         ("Project type", "End-to-end data management, NLP analytics, and web application"),
     ]:
         story.append(p(f"<b>{label}:</b> {value}"))
@@ -284,7 +286,8 @@ def build():
     story.append(p("Future work would add better entity resolution across campuses, topic modeling or lemmatized theme extraction, calibration checks for sentiment scores, user preference controls, cache invalidation policies, and accessibility/performance hardening for the frontend."))
 
     story.append(p("8. Reproducibility", "h1"))
-    story.append(p("The repository includes the backend, frontend, migrations, requirements, README, ML report, evaluation notebook, and example data. A fresh local run uses the seed ingest path; large crawls and ML artifacts can be rebuilt from the documented management commands."))
+    story.append(p("The repository includes the backend, frontend, migrations, requirements, evaluation notebook, report builders, and example data. A fresh local run uses the seed ingest path; large crawls and ML artifacts can be rebuilt from the documented management commands."))
+    story.append(p("<b>Demo video:</b> https://youtu.be/o1A1l2W680g?si=4a1GuE1157LvYent"))
     story.append(table(
         ["Step", "Command"],
         [
@@ -310,6 +313,7 @@ def build():
         "Pedregosa, F. et al. (2011). Scikit-learn: Machine learning in Python. Journal of Machine Learning Research.",
         "Django Software Foundation. Django documentation. https://docs.djangoproject.com/",
         "React documentation. https://react.dev/",
+        "AI assistance disclosure: ChatGPT was used for assistance with debugging, explanation, editing, and project organization. It was not used as the source of generated project content submitted in place of my own work.",
     ]
     for ref in refs:
         story.append(p(ref, "ref"))
