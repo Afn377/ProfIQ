@@ -8,7 +8,6 @@ ProfIQ is a professor search and comparison web app. It uses a Django backend an
 backend/   Django API, database models, scrapers, sentiment analysis, ML helpers
 frontend/  React/Vite user interface
 notebooks/ ML evaluation notebook
-scripts/   report builder scripts
 ```
 
 ## Main Features
@@ -108,19 +107,12 @@ cd frontend
 npm run build
 ```
 
-## Demo and Report
+## Demo
 
 Demo video:
 
 ```text
 https://youtu.be/o1A1l2W680g?si=4a1GuE1157LvYent
-```
-
-Final report files:
-
-```text
-ProfIQ_Project_Report.docx
-ProfIQ_Project_Report.pdf
 ```
 
 ## Notes
