@@ -1,0 +1,126 @@
+{
+  "_comment": "Curated full names of fictional characters used by Layer 1 of detect_canaries. Hand-assembled from public/cultural sources. Matched case-insensitively against Professor.name after whitespace collapse. Sources span common franchises any prankster (or honeypot author) is likely to reach for. Add categories freely; the loader concatenates every list whose key does not start with an underscore.",
+
+  "harry_potter": [
+    "Harry Potter", "Hermione Granger", "Ronald Weasley", "Ron Weasley",
+    "Albus Dumbledore", "Severus Snape", "Minerva McGonagall", "Rubeus Hagrid",
+    "Sirius Black", "Remus Lupin", "Bellatrix Lestrange", "Lord Voldemort",
+    "Tom Riddle", "Draco Malfoy", "Lucius Malfoy", "Neville Longbottom",
+    "Luna Lovegood", "Ginny Weasley", "Fred Weasley", "George Weasley",
+    "Arthur Weasley", "Molly Weasley", "Cedric Diggory", "Cho Chang",
+    "Dolores Umbridge", "Horace Slughorn", "Filius Flitwick", "Pomona Sprout",
+    "Argus Filch", "Nymphadora Tonks", "Kingsley Shacklebolt", "Alastor Moody",
+    "James Potter", "Lily Potter", "Peter Pettigrew", "Gilderoy Lockhart",
+    "Quirinus Quirrell", "Sybill Trelawney"
+  ],
+
+  "lord_of_the_rings": [
+    "Frodo Baggins", "Bilbo Baggins", "Samwise Gamgee", "Sam Gamgee",
+    "Peregrin Took", "Pippin Took", "Meriadoc Brandybuck", "Merry Brandybuck",
+    "Aragorn Elessar", "Boromir Denethor", "Faramir Denethor", "Eowyn Theoden",
+    "Eomer Theoden", "Theoden King", "Gandalf Mithrandir", "Saruman Curunir",
+    "Galadriel Lorien", "Elrond Halfelven", "Arwen Undomiel", "Legolas Greenleaf",
+    "Gimli Gloin", "Tom Bombadil", "Treebeard Fangorn"
+  ],
+
+  "game_of_thrones": [
+    "Tyrion Lannister", "Cersei Lannister", "Jaime Lannister", "Tywin Lannister",
+    "Joffrey Baratheon", "Tommen Baratheon", "Stannis Baratheon", "Robert Baratheon",
+    "Renly Baratheon", "Daenerys Targaryen", "Aegon Targaryen", "Viserys Targaryen",
+    "Rhaegar Targaryen", "Eddard Stark", "Catelyn Stark", "Robb Stark",
+    "Sansa Stark", "Arya Stark", "Bran Stark", "Rickon Stark", "Jon Snow",
+    "Theon Greyjoy", "Yara Greyjoy", "Petyr Baelish", "Varys Spider",
+    "Sandor Clegane", "Gregor Clegane", "Brienne Tarth", "Margaery Tyrell",
+    "Olenna Tyrell", "Loras Tyrell", "Davos Seaworth", "Melisandre Asshai",
+    "Tormund Giantsbane", "Khal Drogo", "Jorah Mormont"
+  ],
+
+  "marvel": [
+    "Tony Stark", "Steve Rogers", "Bruce Banner", "Natasha Romanoff",
+    "Clint Barton", "Thor Odinson", "Loki Laufeyson", "Peter Parker",
+    "Stephen Strange", "Wanda Maximoff", "Pietro Maximoff", "Sam Wilson",
+    "Bucky Barnes", "Scott Lang", "Hank Pym", "Carol Danvers",
+    "Nick Fury", "Phil Coulson", "Maria Hill", "Pepper Potts",
+    "Happy Hogan", "Matt Murdock", "Frank Castle", "Jessica Jones",
+    "Luke Cage", "Danny Rand", "Charles Xavier", "Erik Lehnsherr",
+    "Logan Howlett", "Ororo Munroe", "Scott Summers", "Jean Grey",
+    "Hank McCoy", "Kurt Wagner", "Remy LeBeau", "Wade Wilson"
+  ],
+
+  "dc": [
+    "Bruce Wayne", "Clark Kent", "Diana Prince", "Barry Allen",
+    "Hal Jordan", "Arthur Curry", "Victor Stone", "Dick Grayson",
+    "Jason Todd", "Tim Drake", "Damian Wayne", "Barbara Gordon",
+    "Selina Kyle", "Harleen Quinzel", "Pamela Isley", "Edward Nygma",
+    "Oswald Cobblepot", "Lex Luthor", "Lois Lane", "Jimmy Olsen",
+    "Perry White", "Alfred Pennyworth", "James Gordon", "Harvey Dent"
+  ],
+
+  "star_wars": [
+    "Luke Skywalker", "Leia Organa", "Han Solo", "Ben Kenobi",
+    "Obi Wan Kenobi", "Anakin Skywalker", "Padme Amidala", "Mace Windu",
+    "Qui Gon Jinn", "Darth Vader", "Darth Sidious", "Sheev Palpatine",
+    "Darth Maul", "Count Dooku", "Kylo Ren", "Rey Skywalker",
+    "Poe Dameron", "Lando Calrissian", "Boba Fett", "Jango Fett",
+    "Din Djarin", "Ahsoka Tano", "Cad Bane"
+  ],
+
+  "star_trek": [
+    "James Kirk", "Jean Luc Picard", "Leonard McCoy", "Montgomery Scott",
+    "Hikaru Sulu", "Pavel Chekov", "Nyota Uhura", "William Riker",
+    "Geordi LaForge", "Beverly Crusher", "Deanna Troi", "Wesley Crusher",
+    "Tasha Yar", "Benjamin Sisko", "Kira Nerys", "Jadzia Dax",
+    "Julian Bashir", "Kathryn Janeway", "Tom Paris", "Belanna Torres"
+  ],
+
+  "sherlock": [
+    "Sherlock Holmes", "John Watson", "Mycroft Holmes", "James Moriarty",
+    "Irene Adler", "Mary Morstan"
+  ],
+
+  "disney_pixar": [
+    "Mickey Mouse", "Minnie Mouse", "Donald Duck", "Daisy Duck",
+    "Walt Disney", "Buzz Lightyear", "Woody Pride", "Mike Wazowski",
+    "James Sullivan", "Carl Fredricksen", "Edna Mode", "Bob Parr",
+    "Helen Parr", "Violet Parr", "Dash Parr"
+  ],
+
+  "classic_lit": [
+    "Atticus Finch", "Scout Finch", "Jem Finch", "Boo Radley",
+    "Holden Caulfield", "Jay Gatsby", "Nick Carraway", "Daisy Buchanan",
+    "Tom Buchanan", "Jordan Baker", "Hester Prynne", "Arthur Dimmesdale",
+    "Edmond Dantes", "Jean Valjean", "Inspector Javert", "Marius Pontmercy",
+    "Captain Ahab", "Pip Pirrip", "Miss Havisham", "Abel Magwitch",
+    "Oliver Twist", "David Copperfield", "Uriah Heep", "Sydney Carton",
+    "Charles Darnay", "Madame Defarge", "Lucie Manette", "Nicholas Nickleby",
+    "Ebenezer Scrooge", "Bob Cratchit"
+  ],
+
+  "other_pop_culture": [
+    "James Bond", "Indiana Jones", "Forrest Gump", "Hannibal Lecter",
+    "Clarice Starling", "Vito Corleone", "Michael Corleone", "Sonny Corleone",
+    "Travis Bickle", "Tyler Durden", "Patrick Bateman", "Walter White",
+    "Jesse Pinkman", "Saul Goodman", "Don Draper", "Peggy Olson",
+    "Tony Soprano", "Carmela Soprano", "Omar Little", "Stringer Bell",
+    "Jack Bauer", "Jack Sparrow", "Hector Barbossa", "Will Turner",
+    "Elizabeth Swann", "Ferris Bueller", "John McClane", "Ellen Ripley",
+    "Sarah Connor", "John Connor"
+  ],
+
+  "anime_manga": [
+    "Naruto Uzumaki", "Sasuke Uchiha", "Sakura Haruno", "Kakashi Hatake",
+    "Itachi Uchiha", "Madara Uchiha", "Vegeta Saiyan", "Bulma Briefs",
+    "Light Yagami", "Misa Amane", "Edward Elric", "Alphonse Elric",
+    "Roy Mustang", "Eren Yeager", "Mikasa Ackerman", "Levi Ackerman",
+    "Armin Arlert", "Roronoa Zoro", "Sanji Vinsmoke"
+  ],
+
+  "video_games": [
+    "Princess Peach", "Bowser Koopa", "Princess Zelda", "Ganondorf Hyrule",
+    "Samus Aran", "Donkey Kong", "Diddy Kong", "Master Chief",
+    "Marcus Fenix", "Lara Croft", "Nathan Drake", "Geralt Rivia",
+    "Yennefer Vengerberg", "Triss Merigold", "Solid Snake", "Gordon Freeman",
+    "Alyx Vance", "Cloud Strife", "Tifa Lockhart", "Aerith Gainsborough",
+    "Sephiroth Jenova", "Squall Leonhart", "Dante Sparda", "Vergil Sparda"
+  ]
+}

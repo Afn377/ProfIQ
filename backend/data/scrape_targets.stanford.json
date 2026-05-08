@@ -1,0 +1,12 @@
+{
+  "rmp": {
+    "school": "Stanford University",
+    "teacher_names": ["Andrew Ng", "Scott McKeon"],
+    "reviews_per_teacher": 25
+  },
+  "reddit": {
+    "subreddits": ["stanford", "MachineLearning"],
+    "per_query_limit": 20,
+    "include_comments": true
+  }
+}

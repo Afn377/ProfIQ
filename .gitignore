@@ -1,0 +1,38 @@
+# Python / Django
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+db.sqlite3
+db.sqlite3-journal
+*.bak
+.env
+
+# Scraped payloads (regenerate via scrape_* management commands)
+backend/data/scraped/
+backend/data/logs/
+backend/data/*_checkpoint.json
+
+# Generated ML artifacts / model caches
+backend/data/ml/*
+!backend/data/ml/.gitkeep
+
+# Generated reports and local analysis output
+backend/reports/run.log
+
+# Local Jupyter/IPython/runtime directories
+.ipython_dir/
+.jupyter_dir/
+.matplotlib_cache/
+
+# Node / Vite
+node_modules/
+dist/
+.vite/
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/

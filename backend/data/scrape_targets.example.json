@@ -1,0 +1,13 @@
+{
+  "rmp": {
+    "school": "Stanford University",
+    "teacher_names": ["Jennifer Widom", "Andrew Ng"],
+    "max_teachers": 10,
+    "reviews_per_teacher": 40
+  },
+  "reddit": {
+    "subreddits": ["stanford", "college"],
+    "per_query_limit": 25,
+    "include_comments": true
+  }
+}

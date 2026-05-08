@@ -1,0 +1,5463 @@
+{
+  "scan_time": "2026-04-18T23:49:24.982026+00:00",
+  "layers_requested": [
+    "l1",
+    "l2",
+    "l3"
+  ],
+  "config": {
+    "limit": null,
+    "sample_size": 500,
+    "rate": 6.0,
+    "openalex_mailto_set": true,
+    "fuzzy_threshold": 0.65
+  },
+  "findings": {
+    "l1": {
+      "scanned": 1702454,
+      "flagged": [
+        {
+          "id": 1105198,
+          "name": ". Hannah",
+          "institution": "Palm Beach State College (all campuses)",
+          "external_ref": "rmp:842669",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 242142,
+          "name": "Alastor Moody",
+          "institution": "University of Wisconsin - Eau Claire",
+          "external_ref": "rmp:1657980",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1681924,
+          "name": "Albus Dumbledore",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:467407",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 29126,
+          "name": "Anita Bath",
+          "institution": "California State University - Northridge",
+          "external_ref": "rmp:1648938",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1096716,
+          "name": "Anna Anna",
+          "institution": "College of Staten Island (CUNY - Staten Island)",
+          "external_ref": "rmp:2497536",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 333372,
+          "name": "Barbara Gordon",
+          "institution": "University of Louisville",
+          "external_ref": "rmp:2681820",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 496986,
+          "name": "Barbara Gordon",
+          "institution": "Elon University",
+          "external_ref": "rmp:67504",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 664221,
+          "name": "Barbara Gordon",
+          "institution": "Idaho State University",
+          "external_ref": "rmp:3004557",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 820672,
+          "name": "Barbara Gordon",
+          "institution": "University of Phoenix Online",
+          "external_ref": "rmp:1150729",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 827175,
+          "name": "Barbara Gordon",
+          "institution": "Felician University (all campuses)",
+          "external_ref": "rmp:1100254",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1376900,
+          "name": "Barbara Gordon",
+          "institution": "Trident Technical College (all campuses)",
+          "external_ref": "rmp:1101636",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1389895,
+          "name": "Barry Allen",
+          "institution": "Rollins College",
+          "external_ref": "rmp:219410",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 98301,
+          "name": "Ben Dover",
+          "institution": "Binghamton University (SUNY)",
+          "external_ref": "rmp:3101923",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 702092,
+          "name": "Ben Dover",
+          "institution": "Harvard University",
+          "external_ref": "rmp:2958288",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 749242,
+          "name": "Ben Kenobi",
+          "institution": "Northeastern State University",
+          "external_ref": "rmp:1347864",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 978958,
+          "name": "Bob Bob",
+          "institution": "California Pacific University",
+          "external_ref": "rmp:1238233",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 142723,
+          "name": "Bruce Wayne",
+          "institution": "University of Delaware",
+          "external_ref": "rmp:808825",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 315276,
+          "name": "Charles Xavier",
+          "institution": "University of Rhode Island",
+          "external_ref": "rmp:1550664",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 178252,
+          "name": "Clark Kent",
+          "institution": "University of Louisiana at Lafayette",
+          "external_ref": "rmp:1682833",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 879545,
+          "name": "Dee Reed",
+          "institution": "AdventHealth University (was Adventist University of Health Sciences)",
+          "external_ref": "rmp:1482260",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 1678019,
+          "name": "Dee Reed",
+          "institution": "California Institute of Integral Studies",
+          "external_ref": "rmp:3097831",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 85403,
+          "name": "Dena Ned",
+          "institution": "University of Utah",
+          "external_ref": "rmp:2744638",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 107067,
+          "name": "Dixie Normous",
+          "institution": "University of Nevada Las Vegas",
+          "external_ref": "rmp:1218198",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 450925,
+          "name": "Dixie Normous",
+          "institution": "Tennessee Tech University",
+          "external_ref": "rmp:1205819",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1273151,
+          "name": "Dixie Normous",
+          "institution": "Ventura College",
+          "external_ref": "rmp:1306144",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1681939,
+          "name": "Draco Malfoy",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:2619708",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 298450,
+          "name": "Elizabeth Swann",
+          "institution": "California State University Los Angeles",
+          "external_ref": "rmp:2747470",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 620356,
+          "name": "Elizabeth Swann",
+          "institution": "Nova Southeastern University",
+          "external_ref": "rmp:736585",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 236320,
+          "name": "Emily Lime",
+          "institution": "The University of North Carolina at Chapel Hill",
+          "external_ref": "rmp:2641503",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 1626703,
+          "name": "Ere Ere",
+          "institution": "Union College",
+          "external_ref": "rmp:169743",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 1691628,
+          "name": "Erik Lehnsherr",
+          "institution": "Xavier's School for Gifted Youngsters",
+          "external_ref": "rmp:2157960",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 222244,
+          "name": "Evan Nave",
+          "institution": "Illinois State University",
+          "external_ref": "rmp:1800381",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 630819,
+          "name": "Evan Nave",
+          "institution": "Bradley University",
+          "external_ref": "rmp:2421408",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 1681938,
+          "name": "Filius Flitwick",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:1155091",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 979914,
+          "name": "Foo Bar",
+          "institution": "Baltimore Hebrew University",
+          "external_ref": "rmp:1668431",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1630369,
+          "name": "Foo Bar",
+          "institution": "Delaware College of Art and Design",
+          "external_ref": "rmp:651321",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1681949,
+          "name": "Fred Weasley",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:1599621",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1681954,
+          "name": "George Weasley",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:1599622",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 500868,
+          "name": "Gordon Freeman",
+          "institution": "Western Illinois University",
+          "external_ref": "rmp:1541965",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1672810,
+          "name": "Gordon Freeman",
+          "institution": "Massachusetts Institute of Technology",
+          "external_ref": "rmp:547286",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1500059,
+          "name": "Hannah Hannah",
+          "institution": "Oakland Community College - Royal Oak",
+          "external_ref": "rmp:1341496",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 702170,
+          "name": "Harry Potter",
+          "institution": "Harvard University",
+          "external_ref": "rmp:2901551",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1681931,
+          "name": "Harry Potter",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:1470742",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1681933,
+          "name": "Hermione Granger",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:1557681",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 189803,
+          "name": "Heywood Jablowme",
+          "institution": "University of Oregon",
+          "external_ref": "rmp:2576690",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 829803,
+          "name": "Indiana Jones",
+          "institution": "University of Chicago",
+          "external_ref": "rmp:2260206",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 900273,
+          "name": "Indiana Jones",
+          "institution": "Princeton University",
+          "external_ref": "rmp:2014097",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1008480,
+          "name": "Indiana Jones",
+          "institution": "Hunter College",
+          "external_ref": "rmp:2912533",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 979042,
+          "name": "Ivana Tinkle",
+          "institution": "Kaplan University, South Portland Campus",
+          "external_ref": "rmp:1612808",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 290302,
+          "name": "Jack Bauer",
+          "institution": "University of Dayton",
+          "external_ref": "rmp:1120849",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 294933,
+          "name": "Jack Bauer",
+          "institution": "American Public University System (all campuses)",
+          "external_ref": "rmp:1416709",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1595665,
+          "name": "Jack Bauer",
+          "institution": "Hopkinsville Community College",
+          "external_ref": "rmp:612043",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1033454,
+          "name": "James  Gordon",
+          "institution": "Houston Community College (all campuses)",
+          "external_ref": "rmp:1979826",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 300303,
+          "name": "James  Sullivan",
+          "institution": "University of Vermont",
+          "external_ref": "rmp:3054623",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1377132,
+          "name": "James  Sullivan",
+          "institution": "Merced College",
+          "external_ref": "rmp:3105894",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 685402,
+          "name": "James Bond",
+          "institution": "California Lutheran University",
+          "external_ref": "rmp:145910",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1045226,
+          "name": "James Bond",
+          "institution": "Broward College (all campuses)",
+          "external_ref": "rmp:2038920",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1093171,
+          "name": "James Bond",
+          "institution": "Tulsa Community College",
+          "external_ref": "rmp:436283",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 645943,
+          "name": "James Gordon",
+          "institution": "Adelphi University",
+          "external_ref": "rmp:1324369",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 842614,
+          "name": "James Gordon",
+          "institution": "Arizona State University",
+          "external_ref": "rmp:2844149",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 935891,
+          "name": "James Gordon",
+          "institution": "University of Advancing Technology",
+          "external_ref": "rmp:2112884",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 950541,
+          "name": "James Gordon",
+          "institution": "Central Methodist University",
+          "external_ref": "rmp:2828578",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1314039,
+          "name": "James Gordon",
+          "institution": "Dalton State College",
+          "external_ref": "rmp:2361896",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1365985,
+          "name": "James Gordon",
+          "institution": "Wheaton College",
+          "external_ref": "rmp:1977319",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1471977,
+          "name": "James Gordon",
+          "institution": "Niagara County Community College",
+          "external_ref": "rmp:2143398",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1520161,
+          "name": "James Gordon",
+          "institution": "St. Johns River State College",
+          "external_ref": "rmp:2473746",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1592227,
+          "name": "James Gordon",
+          "institution": "Ivy Tech Community College: Lafayette",
+          "external_ref": "rmp:2181789",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1689761,
+          "name": "James Gordon",
+          "institution": "The Schulich School of Business - York",
+          "external_ref": "rmp:2660215",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 435683,
+          "name": "James Kirk",
+          "institution": "Winona State University",
+          "external_ref": "rmp:1778477",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 458060,
+          "name": "James Kirk",
+          "institution": "University of Northern Iowa",
+          "external_ref": "rmp:1580133",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 650370,
+          "name": "James Kirk",
+          "institution": "Edinboro University",
+          "external_ref": "rmp:193545",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 820890,
+          "name": "James Kirk",
+          "institution": "University of Phoenix Online",
+          "external_ref": "rmp:1359328",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 972125,
+          "name": "James Kirk",
+          "institution": "DeVry University - South Florida",
+          "external_ref": "rmp:1191736",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1238783,
+          "name": "James Kirk",
+          "institution": "Dallas College - Richland Campus",
+          "external_ref": "rmp:517331",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1269764,
+          "name": "James Kirk",
+          "institution": "Pikes Peak State College",
+          "external_ref": "rmp:1143381",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1639829,
+          "name": "James Kirk",
+          "institution": "Westwood College - Los Angeles",
+          "external_ref": "rmp:801993",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 692216,
+          "name": "James Moriarty",
+          "institution": "Western New England University",
+          "external_ref": "rmp:1008412",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1520026,
+          "name": "James Moriarty",
+          "institution": "Massachusetts College of Liberal Arts",
+          "external_ref": "rmp:384748",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 15530,
+          "name": "James Potter",
+          "institution": "University of California Santa Barbara",
+          "external_ref": "rmp:290333",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 45782,
+          "name": "James Sullivan",
+          "institution": "The University of Tennessee Knoxville",
+          "external_ref": "rmp:2148156",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 310290,
+          "name": "James Sullivan",
+          "institution": "Saginaw Valley State University",
+          "external_ref": "rmp:25727",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 355504,
+          "name": "James Sullivan",
+          "institution": "University of Texas Rio Grande Valley (all campuses)",
+          "external_ref": "rmp:669781",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 404987,
+          "name": "James Sullivan",
+          "institution": "Minnesota State University, Mankato",
+          "external_ref": "rmp:2302482",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 413468,
+          "name": "James Sullivan",
+          "institution": "University of North Dakota",
+          "external_ref": "rmp:3100698",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 627964,
+          "name": "James Sullivan",
+          "institution": "California State University Monterey Bay",
+          "external_ref": "rmp:3036882",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 682447,
+          "name": "James Sullivan",
+          "institution": "University of Notre Dame",
+          "external_ref": "rmp:2360499",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 974497,
+          "name": "James Sullivan",
+          "institution": "Mount Marty University",
+          "external_ref": "rmp:130472",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 975305,
+          "name": "James Sullivan",
+          "institution": "University of Cincinnati-OCAS",
+          "external_ref": "rmp:1257064",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 981654,
+          "name": "James Sullivan",
+          "institution": "Miami Dade College (all)",
+          "external_ref": "rmp:3093510",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1102947,
+          "name": "James Sullivan",
+          "institution": "Palm Beach State College (all campuses)",
+          "external_ref": "rmp:1436978",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1138077,
+          "name": "James Sullivan",
+          "institution": "Sierra College",
+          "external_ref": "rmp:268979",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1193168,
+          "name": "James Sullivan",
+          "institution": "Modesto Junior College",
+          "external_ref": "rmp:3115362",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1285622,
+          "name": "James Sullivan",
+          "institution": "Emerson College",
+          "external_ref": "rmp:2870653",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1323179,
+          "name": "James Sullivan",
+          "institution": "Illinois Central College",
+          "external_ref": "rmp:1941336",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1405507,
+          "name": "James Sullivan",
+          "institution": "Merrimack College",
+          "external_ref": "rmp:2637107",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1485749,
+          "name": "James Sullivan",
+          "institution": "Northern Essex Community College",
+          "external_ref": "rmp:303315",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1514947,
+          "name": "James Sullivan",
+          "institution": "Diablo Valley College",
+          "external_ref": "rmp:2439754",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1554597,
+          "name": "James Sullivan",
+          "institution": "Alamance Community College",
+          "external_ref": "rmp:2214819",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1556949,
+          "name": "James Sullivan",
+          "institution": "Columbia College",
+          "external_ref": "rmp:3124300",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1664156,
+          "name": "James Sullivan",
+          "institution": "Fashion Institute of Technology",
+          "external_ref": "rmp:1469614",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1424896,
+          "name": "Jane Doe",
+          "institution": "Forsyth Technical Community College",
+          "external_ref": "rmp:1915943",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 361919,
+          "name": "Jason Todd",
+          "institution": "Southeastern Louisiana University",
+          "external_ref": "rmp:919204",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 447131,
+          "name": "Jason Todd",
+          "institution": "Duke University",
+          "external_ref": "rmp:2611168",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 821979,
+          "name": "Jason Todd",
+          "institution": "Xavier University of Louisiana",
+          "external_ref": "rmp:1056947",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1679513,
+          "name": "Jason Todd",
+          "institution": "Michigan Institute of Aviation and Technology",
+          "external_ref": "rmp:2940790",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1691630,
+          "name": "Jean Grey",
+          "institution": "Xavier's School for Gifted Youngsters",
+          "external_ref": "rmp:1799412",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 32517,
+          "name": "Jessica Jones",
+          "institution": "East Carolina University",
+          "external_ref": "rmp:1860865",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 43978,
+          "name": "Jessica Jones",
+          "institution": "The University of Tennessee Knoxville",
+          "external_ref": "rmp:2824185",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 141445,
+          "name": "Jessica Jones",
+          "institution": "University of Delaware",
+          "external_ref": "rmp:2426593",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 176061,
+          "name": "Jessica Jones",
+          "institution": "University of Louisiana at Lafayette",
+          "external_ref": "rmp:1197219",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 225890,
+          "name": "Jessica Jones",
+          "institution": "University of New Mexico",
+          "external_ref": "rmp:2115394",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 227911,
+          "name": "Jessica Jones",
+          "institution": "Miami University",
+          "external_ref": "rmp:3140808",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 308279,
+          "name": "Jessica Jones",
+          "institution": "Boise State University",
+          "external_ref": "rmp:2295266",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 348872,
+          "name": "Jessica Jones",
+          "institution": "Western Carolina University",
+          "external_ref": "rmp:1257040",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 451007,
+          "name": "Jessica Jones",
+          "institution": "Tennessee Tech University",
+          "external_ref": "rmp:1530426",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 478420,
+          "name": "Jessica Jones",
+          "institution": "University of Northern Colorado",
+          "external_ref": "rmp:1811258",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 597483,
+          "name": "Jessica Jones",
+          "institution": "Georgetown University",
+          "external_ref": "rmp:2588501",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 649924,
+          "name": "Jessica Jones",
+          "institution": "University of Montana - Missoula",
+          "external_ref": "rmp:1724792",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 826820,
+          "name": "Jessica Jones",
+          "institution": "University of the Cumberlands",
+          "external_ref": "rmp:2163052",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 882600,
+          "name": "Jessica Jones",
+          "institution": "Kent State University: Stark Regional",
+          "external_ref": "rmp:2230211",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 894178,
+          "name": "Jessica Jones",
+          "institution": "La Sierra University",
+          "external_ref": "rmp:2183267",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 944442,
+          "name": "Jessica Jones",
+          "institution": "St. John's University - Staten Island",
+          "external_ref": "rmp:780770",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1036583,
+          "name": "Jessica Jones",
+          "institution": "College of DuPage",
+          "external_ref": "rmp:2329657",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1177790,
+          "name": "Jessica Jones",
+          "institution": "Washtenaw Community College",
+          "external_ref": "rmp:1466557",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1188413,
+          "name": "Jessica Jones",
+          "institution": "Mesa Community College",
+          "external_ref": "rmp:1546294",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1203765,
+          "name": "Jessica Jones",
+          "institution": "Tallahassee State College",
+          "external_ref": "rmp:2221671",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1252630,
+          "name": "Jessica Jones",
+          "institution": "Snow College",
+          "external_ref": "rmp:2246847",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1419042,
+          "name": "Jessica Jones",
+          "institution": "The College of Wooster",
+          "external_ref": "rmp:1562544",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1452807,
+          "name": "Jessica Jones",
+          "institution": "Fayetteville Technical Community College",
+          "external_ref": "rmp:3141890",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1467854,
+          "name": "Jessica Jones",
+          "institution": "Saint Vincent College",
+          "external_ref": "rmp:2759165",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1584484,
+          "name": "Jessica Jones",
+          "institution": "Jefferson Community College",
+          "external_ref": "rmp:650321",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1639837,
+          "name": "John  Doe",
+          "institution": "Davis College",
+          "external_ref": "rmp:2990487",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 94866,
+          "name": "John Connor",
+          "institution": "University of Southern California",
+          "external_ref": "rmp:2722591",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 482014,
+          "name": "John Connor",
+          "institution": "Stockton University",
+          "external_ref": "rmp:1025411",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 733690,
+          "name": "John Connor",
+          "institution": "New Jersey City University",
+          "external_ref": "rmp:2234719",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 735008,
+          "name": "John Connor",
+          "institution": "Colgate University",
+          "external_ref": "rmp:1552315",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1041476,
+          "name": "John Connor",
+          "institution": "City College of New York",
+          "external_ref": "rmp:2475281",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1089840,
+          "name": "John Connor",
+          "institution": "Brooklyn College",
+          "external_ref": "rmp:2031718",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1319438,
+          "name": "John Connor",
+          "institution": "Daytona State College",
+          "external_ref": "rmp:364063",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1595249,
+          "name": "John Connor",
+          "institution": "Daytona State College - DeLand",
+          "external_ref": "rmp:1714537",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 261753,
+          "name": "John Doe",
+          "institution": "Indiana University-Purdue University Indianapolis",
+          "external_ref": "rmp:872900",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 749927,
+          "name": "John Doe",
+          "institution": "Southern Adventist University",
+          "external_ref": "rmp:2682367",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 857861,
+          "name": "John Doe",
+          "institution": "California State University Long Beach",
+          "external_ref": "rmp:2985842",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 868624,
+          "name": "John Doe",
+          "institution": "North Park University and Theological Seminary",
+          "external_ref": "rmp:3014858",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 966505,
+          "name": "John Doe",
+          "institution": "DeVry University",
+          "external_ref": "rmp:1252601",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 969828,
+          "name": "John Doe",
+          "institution": "Abraham Lincoln University",
+          "external_ref": "rmp:1766235",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1086302,
+          "name": "John Doe",
+          "institution": "New York City College of Technology",
+          "external_ref": "rmp:2983647",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1139311,
+          "name": "John Doe",
+          "institution": "Sierra College",
+          "external_ref": "rmp:1321016",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1256163,
+          "name": "John Doe",
+          "institution": "Oklahoma City Community College",
+          "external_ref": "rmp:1628416",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1465867,
+          "name": "John Doe",
+          "institution": "Yakima Valley College",
+          "external_ref": "rmp:1985656",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1472594,
+          "name": "John Doe",
+          "institution": "Los Angeles Southwest College",
+          "external_ref": "rmp:822366",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1527244,
+          "name": "John Doe",
+          "institution": "Merritt College",
+          "external_ref": "rmp:2027991",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 14449,
+          "name": "John Watson",
+          "institution": "The University of Texas at Dallas",
+          "external_ref": "rmp:984445",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 51446,
+          "name": "John Watson",
+          "institution": "University of California San Diego",
+          "external_ref": "rmp:971364",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 57514,
+          "name": "John Watson",
+          "institution": "Kent State University",
+          "external_ref": "rmp:211364",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 123628,
+          "name": "John Watson",
+          "institution": "University of Kansas",
+          "external_ref": "rmp:3027176",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 177324,
+          "name": "John Watson",
+          "institution": "University of Louisiana at Lafayette",
+          "external_ref": "rmp:594820",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 238183,
+          "name": "John Watson",
+          "institution": "The University of North Carolina at Chapel Hill",
+          "external_ref": "rmp:2302545",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 255808,
+          "name": "John Watson",
+          "institution": "University of Illinois Chicago",
+          "external_ref": "rmp:2435884",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 259803,
+          "name": "John Watson",
+          "institution": "Indiana University-Purdue University Indianapolis",
+          "external_ref": "rmp:188572",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 311743,
+          "name": "John Watson",
+          "institution": "American University",
+          "external_ref": "rmp:11049",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 670900,
+          "name": "John Watson",
+          "institution": "Pepperdine University",
+          "external_ref": "rmp:1824877",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 690184,
+          "name": "John Watson",
+          "institution": "Arkansas Tech University",
+          "external_ref": "rmp:202245",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 789839,
+          "name": "John Watson",
+          "institution": "Webster University",
+          "external_ref": "rmp:1188572",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 832332,
+          "name": "John Watson",
+          "institution": "National University",
+          "external_ref": "rmp:794268",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 873784,
+          "name": "John Watson",
+          "institution": "Miami University: Hamilton Campus",
+          "external_ref": "rmp:2579122",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1477238,
+          "name": "John Watson",
+          "institution": "Tidewater Community College",
+          "external_ref": "rmp:2246016",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1574397,
+          "name": "John Watson",
+          "institution": "Central Carolina Technical College",
+          "external_ref": "rmp:1314772",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1585238,
+          "name": "John Watson",
+          "institution": "Pearl River Community College",
+          "external_ref": "rmp:1108758",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1514481,
+          "name": "Jon Snow",
+          "institution": "Brazosport College",
+          "external_ref": "rmp:2137524",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 36116,
+          "name": "Jordan Baker",
+          "institution": "Northern Arizona University",
+          "external_ref": "rmp:1889793",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 44345,
+          "name": "Jordan Baker",
+          "institution": "The University of Tennessee Knoxville",
+          "external_ref": "rmp:2109581",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1431284,
+          "name": "Jordan Baker",
+          "institution": "Guilford Technical Community College",
+          "external_ref": "rmp:1742054",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1544609,
+          "name": "Jordan Baker",
+          "institution": "York Technical College",
+          "external_ref": "rmp:1913783",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1699101,
+          "name": "Jordan Baker",
+          "institution": "American Musical and Dramatic Academy",
+          "external_ref": "rmp:2778889",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 209673,
+          "name": "Kakashi Hatake",
+          "institution": "University of Connecticut",
+          "external_ref": "rmp:2023796",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1663643,
+          "name": "Kam Mak",
+          "institution": "Fashion Institute of Technology",
+          "external_ref": "rmp:854700",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 761639,
+          "name": "Kok Kok",
+          "institution": "Community College of Baltimore County",
+          "external_ref": "rmp:2601963",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 1691639,
+          "name": "Kurt Wagner",
+          "institution": "Xavier's School for Gifted Youngsters",
+          "external_ref": "rmp:2174242",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 822545,
+          "name": "Leonard McCoy",
+          "institution": "Savannah State University",
+          "external_ref": "rmp:1520174",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 623525,
+          "name": "Leonard Mccoy",
+          "institution": "Georgia Southern University - Armstrong",
+          "external_ref": "rmp:2050323",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1691629,
+          "name": "Logan Howlett",
+          "institution": "Xavier's School for Gifted Youngsters",
+          "external_ref": "rmp:1917928",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1226713,
+          "name": "Lois Lane",
+          "institution": "Rio Hondo College",
+          "external_ref": "rmp:2432000",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1681941,
+          "name": "Luna Lovegood",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:2621905",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1124449,
+          "name": "Mah Pham",
+          "institution": "Orange Coast College",
+          "external_ref": "rmp:2949968",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 218186,
+          "name": "Mike Hunt",
+          "institution": "Northeastern University",
+          "external_ref": "rmp:2993416",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 233264,
+          "name": "Mike Hunt",
+          "institution": "Metropolitan State University of Denver",
+          "external_ref": "rmp:1524095",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 251983,
+          "name": "Mike Hunt",
+          "institution": "University of Wisconsin - Milwaukee",
+          "external_ref": "rmp:876150",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 370410,
+          "name": "Mike Hunt",
+          "institution": "University of Hawaii at Manoa",
+          "external_ref": "rmp:724280",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 799589,
+          "name": "Mike Hunt",
+          "institution": "Texas A&M International University",
+          "external_ref": "rmp:1890620",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1284538,
+          "name": "Mike Hunt",
+          "institution": "Waubonsee Community College",
+          "external_ref": "rmp:732240",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1373406,
+          "name": "Mike Hunt",
+          "institution": "Suffolk County Community College",
+          "external_ref": "rmp:689068",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1484131,
+          "name": "Mike Hunt",
+          "institution": "Sarah Lawrence College",
+          "external_ref": "rmp:2981173",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 264840,
+          "name": "Mike Rotch",
+          "institution": "Oregon State University",
+          "external_ref": "rmp:1418722",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1681930,
+          "name": "Minerva McGonagall",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:1122398",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1681948,
+          "name": "Molly Weasley",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:2621904",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1221131,
+          "name": "Nah  Han",
+          "institution": "Georgia College",
+          "external_ref": "rmp:2881601",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 444671,
+          "name": "Nan Nan",
+          "institution": "Louisiana Tech University",
+          "external_ref": "rmp:3092324",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 464447,
+          "name": "Naruto Uzumaki",
+          "institution": "The University of Texas at El Paso",
+          "external_ref": "rmp:2179175",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 818021,
+          "name": "Naruto Uzumaki",
+          "institution": "St. Lawrence University",
+          "external_ref": "rmp:552297",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1272106,
+          "name": "Naruto Uzumaki",
+          "institution": "Edmonds College",
+          "external_ref": "rmp:1756809",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1120887,
+          "name": "Nate Tan",
+          "institution": "De Anza College",
+          "external_ref": "rmp:3110520",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 502434,
+          "name": "Nathan Drake",
+          "institution": "Mississippi State University",
+          "external_ref": "rmp:1941553",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 887366,
+          "name": "Nathan Drake",
+          "institution": "Oklahoma Baptist University",
+          "external_ref": "rmp:2461499",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1681937,
+          "name": "Neville Longbottom",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:1406334",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1691638,
+          "name": "Ororo Munroe",
+          "institution": "Xavier's School for Gifted Youngsters",
+          "external_ref": "rmp:2355300",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 483965,
+          "name": "Patrick Bateman",
+          "institution": "Vanderbilt University",
+          "external_ref": "rmp:654104",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 503190,
+          "name": "Patrick Bateman",
+          "institution": "Youngstown State University",
+          "external_ref": "rmp:1196752",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 102089,
+          "name": "Peggy Olson",
+          "institution": "Towson University",
+          "external_ref": "rmp:1999254",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1019504,
+          "name": "Peggy Olson",
+          "institution": "Portland Community College",
+          "external_ref": "rmp:1700001",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 113267,
+          "name": "Peter Parker",
+          "institution": "Western Michigan University",
+          "external_ref": "rmp:836785",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1492720,
+          "name": "Peter Parker",
+          "institution": "Borough of Manhattan Community College",
+          "external_ref": "rmp:2496940",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 389651,
+          "name": "Phil McCracken",
+          "institution": "University of Minnesota Duluth",
+          "external_ref": "rmp:2725030",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 857989,
+          "name": "Phil McCracken",
+          "institution": "California State University Long Beach",
+          "external_ref": "rmp:745324",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 1681947,
+          "name": "Pomona Sprout",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:1146874",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1681929,
+          "name": "Remus Lupin",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:825876",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1691632,
+          "name": "Remy LeBeau",
+          "institution": "Xavier's School for Gifted Youngsters",
+          "external_ref": "rmp:2383015",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1681957,
+          "name": "Rubeus Hagrid",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:3116148",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 59395,
+          "name": "Sam Wilson",
+          "institution": "Old Dominion University",
+          "external_ref": "rmp:2746755",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 73138,
+          "name": "Sam Wilson",
+          "institution": "University of Texas at Austin",
+          "external_ref": "rmp:1317296",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 84828,
+          "name": "Sam Wilson",
+          "institution": "University of Utah",
+          "external_ref": "rmp:354635",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 947417,
+          "name": "Sam Wilson",
+          "institution": "University of Rio Grande",
+          "external_ref": "rmp:696684",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1191867,
+          "name": "Sam Wilson",
+          "institution": "Bakersfield College",
+          "external_ref": "rmp:1136623",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 790187,
+          "name": "Sasuke Uchiha",
+          "institution": "Stanford University",
+          "external_ref": "rmp:2382313",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 380950,
+          "name": "Scott Lang",
+          "institution": "Northern Kentucky University",
+          "external_ref": "rmp:666901",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 488130,
+          "name": "Scott Summers",
+          "institution": "University of Wisconsin - Platteville",
+          "external_ref": "rmp:1478158",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 535566,
+          "name": "Scott Summers",
+          "institution": "University of Wisconsin Oshkosh",
+          "external_ref": "rmp:1885326",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1691634,
+          "name": "Scott Summers",
+          "institution": "Xavier's School for Gifted Youngsters",
+          "external_ref": "rmp:1799429",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1049255,
+          "name": "Semaj James",
+          "institution": "College of Southern Nevada (all campuses)",
+          "external_ref": "rmp:2293202",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 1681928,
+          "name": "Severus  Snape",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:3160834",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 58098,
+          "name": "Seymour Butz",
+          "institution": "Kent State University",
+          "external_ref": "rmp:1655676",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 234458,
+          "name": "Steve Rogers",
+          "institution": "The University of North Carolina at Chapel Hill",
+          "external_ref": "rmp:858620",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 462660,
+          "name": "Steve Rogers",
+          "institution": "Eastern Washington University",
+          "external_ref": "rmp:2300036",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 608154,
+          "name": "Steve Rogers",
+          "institution": "Xavier University",
+          "external_ref": "rmp:1146806",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 992336,
+          "name": "Steve Rogers",
+          "institution": "Lone Star College (all)",
+          "external_ref": "rmp:622440",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1598357,
+          "name": "Steve Rogers",
+          "institution": "Cerro Coso Community College",
+          "external_ref": "rmp:1084638",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1681934,
+          "name": "Test Test",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:2980452",
+          "reasons": [
+            "joke_name"
+          ]
+        },
+        {
+          "id": 974188,
+          "name": "Tim Drake",
+          "institution": "University of Phoenix",
+          "external_ref": "rmp:1025856",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1249942,
+          "name": "Tim Drake",
+          "institution": "Ithaca College",
+          "external_ref": "rmp:2582777",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 191255,
+          "name": "Tim Smit",
+          "institution": "University of Oregon",
+          "external_ref": "rmp:1486267",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 1681927,
+          "name": "Tom  Riddle",
+          "institution": "Hogwarts School of Witchcraft & Wizardry",
+          "external_ref": "rmp:3086117",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 356892,
+          "name": "Tom Buchanan",
+          "institution": "University of Tennessee - Chattanooga",
+          "external_ref": "rmp:226604",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 696309,
+          "name": "Tom Buchanan",
+          "institution": "University of Arkansas at Fort Smith",
+          "external_ref": "rmp:202139",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 924446,
+          "name": "Tom Riddle",
+          "institution": "West Virginia University",
+          "external_ref": "rmp:1666963",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1431039,
+          "name": "Tom Riddle",
+          "institution": "Guilford Technical Community College",
+          "external_ref": "rmp:622129",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1248831,
+          "name": "Tony Soprano",
+          "institution": "Chandler-Gilbert Community College",
+          "external_ref": "rmp:2370828",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 574499,
+          "name": "Tony Stark",
+          "institution": "Lamar University",
+          "external_ref": "rmp:1441272",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 956198,
+          "name": "Victor Stone",
+          "institution": "University of Illinois Urbana Champaign Law School",
+          "external_ref": "rmp:754261",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1691633,
+          "name": "Wade Wilson",
+          "institution": "Xavier's School for Gifted Youngsters",
+          "external_ref": "rmp:2164203",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 227569,
+          "name": "Walter White",
+          "institution": "University of New Mexico",
+          "external_ref": "rmp:3017690",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 528411,
+          "name": "Walter White",
+          "institution": "Sonoma State University",
+          "external_ref": "rmp:1374955",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 627486,
+          "name": "Walter White",
+          "institution": "California State University Monterey Bay",
+          "external_ref": "rmp:421411",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1387951,
+          "name": "Walter White",
+          "institution": "Monterey Peninsula College",
+          "external_ref": "rmp:1062366",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1653849,
+          "name": "Walter White",
+          "institution": "Central Alabama Community College",
+          "external_ref": "rmp:834075",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1391478,
+          "name": "Will Turner",
+          "institution": "Southwest Tennessee Community College (all campuses)",
+          "external_ref": "rmp:1606789",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 266446,
+          "name": "aaa aaa",
+          "institution": "San Jose State University",
+          "external_ref": "rmp:1",
+          "reasons": [
+            "palindrome"
+          ]
+        },
+        {
+          "id": 1511926,
+          "name": "james sullivan",
+          "institution": "Columbia College",
+          "external_ref": "rmp:3124304",
+          "reasons": [
+            "fictional_character"
+          ]
+        },
+        {
+          "id": 1621058,
+          "name": "james sullivan",
+          "institution": "Sierra College - Nevada County Campus",
+          "external_ref": "rmp:2597858",
+          "reasons": [
+            "fictional_character"
+          ]
+        }
+      ],
+      "duration_seconds": 9.35
+    },
+    "l2": {
+      "sampled": 500,
+      "queried": 335,
+      "errors": 165,
+      "flagged": [
+        {
+          "id": 1277539,
+          "name": "Jay Beker",
+          "institution": "Chattahoochee Technical College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 455752,
+          "name": "Ronald Mauno",
+          "institution": "Michigan Technological University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 833100,
+          "name": "Robert Delcamp",
+          "institution": "Sewanee: The University of the South",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1610263,
+          "name": "Jesus Gonzalez",
+          "institution": "Los Medanos College -  Brentwood",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Clinica Universidad de Navarra",
+            "University of Iowa",
+            "Universidad de Oviedo"
+          ]
+        },
+        {
+          "id": 1581211,
+          "name": "Dr. Dan Morgan",
+          "institution": "Scott Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of Michigan",
+            "Defense Logistics Agency"
+          ]
+        },
+        {
+          "id": 550383,
+          "name": "Constance Eichenlaub",
+          "institution": "Southern New Hampshire University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Prescott College",
+            ""
+          ]
+        },
+        {
+          "id": 1648799,
+          "name": "Linda  Shipley",
+          "institution": "Welch College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of Nebraska–Lincoln",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 680577,
+          "name": "Andrew Presley",
+          "institution": "Fairfield University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1585225,
+          "name": "David Barber",
+          "institution": "Pearl River Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Leiden University",
+            "Heart of England NHS Foundation Trust"
+          ]
+        },
+        {
+          "id": 372201,
+          "name": "Quentin Hollis",
+          "institution": "Western Kentucky University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1642940,
+          "name": "John Trow",
+          "institution": "Central Christian College of Kansas",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Applied Materials (United States)",
+            ""
+          ]
+        },
+        {
+          "id": 1548906,
+          "name": "Linda Menard",
+          "institution": "Quincy College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "International Institute for Applied Systems Analysis"
+          ]
+        },
+        {
+          "id": 821187,
+          "name": "Amy Novoa",
+          "institution": "University of Phoenix Online",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 72476,
+          "name": "Anne McCreary",
+          "institution": "University of Texas at Austin",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Loyola University Chicago",
+            "Loyola University Chicago"
+          ]
+        },
+        {
+          "id": 1011786,
+          "name": "Nicole Amador",
+          "institution": "Hunter College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "The Graduate Center, CUNY",
+            "",
+            "Universidad de Los Andes"
+          ]
+        },
+        {
+          "id": 531039,
+          "name": "Jolene Creighton",
+          "institution": "University of Southern Mississippi",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1113942,
+          "name": "Barbra Heaton",
+          "institution": "Hillsborough Community College (all campuses)",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1449520,
+          "name": "Robert Towle",
+          "institution": "Ivy Tech Community College: Indianapolis",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of Iowa",
+            "Tripler Army Medical Center",
+            ""
+          ]
+        },
+        {
+          "id": 982028,
+          "name": "Amanda Garza",
+          "institution": "Miami Dade College (all)",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Broad Institute",
+            "",
+            "Universidad Autónoma de Nuevo León"
+          ]
+        },
+        {
+          "id": 1630138,
+          "name": "Gwen Kelly",
+          "institution": "Tri-County Technical College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Cornell University",
+            "",
+            "Charles Sturt University"
+          ]
+        },
+        {
+          "id": 397512,
+          "name": "Mary Levesque",
+          "institution": "University of Nebraska Omaha",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 16406,
+          "name": "Harold Winter",
+          "institution": "Ohio University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1350220,
+          "name": "Kurt Arndorfer",
+          "institution": "Clackamas Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 642674,
+          "name": "Enayati Samira-Fatemeh",
+          "institution": "St. Edward's University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 419144,
+          "name": "Merrill Feitell",
+          "institution": "University of Maryland",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Henry Morrison Flagler Museum",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1637473,
+          "name": "Phillip Allen",
+          "institution": "Trenholm State Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Duke University",
+            "University of Oxford",
+            "Medical University of South Carolina"
+          ]
+        },
+        {
+          "id": 877170,
+          "name": "Cara Will",
+          "institution": "Tiffin University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1313369,
+          "name": "Dan Ungurianu",
+          "institution": "Vassar College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1641230,
+          "name": "Christopher Curtis",
+          "institution": "Career College of Northern Nevada",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "State University of Physical Education and Sport",
+            "University of Georgia",
+            "Barrow Neurological Institute"
+          ]
+        },
+        {
+          "id": 683778,
+          "name": "Ronald Haight",
+          "institution": "Seattle Pacific University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 724649,
+          "name": "Melanie Snyder",
+          "institution": "Stevenson University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1272331,
+          "name": "Maureen Miller",
+          "institution": "Edmonds College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "New York City Department of Health and Mental Hygiene",
+            "National Institutes of Health Clinical Center",
+            ""
+          ]
+        },
+        {
+          "id": 1530698,
+          "name": "Zach Bennett",
+          "institution": "Lake Superior College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of Notre Dame",
+            ""
+          ]
+        },
+        {
+          "id": 1163004,
+          "name": "Robert Spencer",
+          "institution": "Community College of Philadelphia",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Florida State University",
+            "University of Colorado Boulder",
+            "Southwest Research Institute"
+          ]
+        },
+        {
+          "id": 624750,
+          "name": "Alex Johns",
+          "institution": "University of North Georgia - Gainesville",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Newcastle University",
+            "Monash University"
+          ]
+        },
+        {
+          "id": 1352433,
+          "name": "Robert Howell",
+          "institution": "Southwestern Illinois College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Bowral & District Hospital",
+            "Northrop Grumman (United States)",
+            ""
+          ]
+        },
+        {
+          "id": 649395,
+          "name": "David Barrett",
+          "institution": "University of Montana - Missoula",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Children's Hospital of Philadelphia",
+            "University of Nottingham",
+            "Stellenbosch University"
+          ]
+        },
+        {
+          "id": 676134,
+          "name": "Dr. Abolfazl Mollalo",
+          "institution": "Baldwin Wallace University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1652336,
+          "name": "Maria Rivera",
+          "institution": "Long Island College Hospital School of Nursing",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Virginia Commonwealth University",
+            "University of North Carolina at Chapel Hill",
+            "TRIUMF"
+          ]
+        },
+        {
+          "id": 1499942,
+          "name": "Will Curley",
+          "institution": "Front Range Community College - Larimer Campus",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 31737,
+          "name": "Laura Mazzow",
+          "institution": "East Carolina University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 947632,
+          "name": "Darlene Young",
+          "institution": "Pennsylvania State University - Schuylkill",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 313481,
+          "name": "Elaine Povich",
+          "institution": "American University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1560765,
+          "name": "Vanessa  Permaul",
+          "institution": "Seminole State College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1466409,
+          "name": "Lenora Sheppard",
+          "institution": "Atlantic Cape Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1051723,
+          "name": "Alexa Enamorado",
+          "institution": "Pasadena City College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1183841,
+          "name": "Chris Krause",
+          "institution": "Glendale Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Council for Scientific and Industrial Research",
+            "Minot State University"
+          ]
+        },
+        {
+          "id": 487367,
+          "name": "Diane Wood",
+          "institution": "University of North Georgia - Dahlonega",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "The University of Western Australia",
+            "",
+            "Aston University"
+          ]
+        },
+        {
+          "id": 1119317,
+          "name": "Christopher Papouchis",
+          "institution": "American River College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "California State University, Sacramento"
+          ]
+        },
+        {
+          "id": 314056,
+          "name": "Nasim Rahmani",
+          "institution": "University of Rhode Island",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Shiraz University of Medical Sciences",
+            "",
+            "Iran University of Medical Sciences"
+          ]
+        },
+        {
+          "id": 65385,
+          "name": "Luis Herrera",
+          "institution": "University at Buffalo (SUNY Buffalo)",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Texas Tech University",
+            "Universidad Estatal de Milagro",
+            "Orlando Health"
+          ]
+        },
+        {
+          "id": 1413340,
+          "name": "Lou Pierozzi",
+          "institution": "Oakton Community College - Des Plaines",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 533375,
+          "name": "Riley Smith",
+          "institution": "University of Alaska Anchorage",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Centre National de la Recherche Scientifique",
+            "University of Wisconsin System",
+            ""
+          ]
+        },
+        {
+          "id": 1250214,
+          "name": "Niel Christensen",
+          "institution": "Citrus College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1371797,
+          "name": "Victor Kenyon",
+          "institution": "Occidental College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1430118,
+          "name": "Denis Kissounko",
+          "institution": "Arapahoe Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1356218,
+          "name": "Jeff Cormier",
+          "institution": "Mission College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Czech Technical University in Prague"
+          ]
+        },
+        {
+          "id": 1436697,
+          "name": "William Stewart",
+          "institution": "Eastern Florida State College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of Notre Dame",
+            "Central Texas Veterans Health Care System",
+            "Cleveland Clinic"
+          ]
+        },
+        {
+          "id": 624765,
+          "name": "Brooke Ayars",
+          "institution": "University of North Georgia - Gainesville",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1109960,
+          "name": "Bruce Clayton",
+          "institution": "Sinclair Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Deakin University",
+            "The University of Melbourne",
+            "Sandia National Laboratories"
+          ]
+        },
+        {
+          "id": 221421,
+          "name": "Jane Cler",
+          "institution": "Illinois State University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 38045,
+          "name": "Chris Nielsen",
+          "institution": "California State University Fullerton",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Technical University of Denmark",
+            "University of Charleston"
+          ]
+        },
+        {
+          "id": 1632899,
+          "name": "Matt Wilkerson",
+          "institution": "Galen College of Nursing -- Louisville",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Carson Newman University",
+            "George Fox University",
+            "Southern Illinois University Edwardsville"
+          ]
+        },
+        {
+          "id": 970909,
+          "name": "Gabriella Irwin",
+          "institution": "Kent State University: Ashtabula Regional Campus",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1577106,
+          "name": "Dan Shagena",
+          "institution": "NHTI, Concord's Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 716712,
+          "name": "Michael Bukowski",
+          "institution": "Pennsylvania State University - Altoona",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Agricultural Research Service",
+            "",
+            "Berlin Heart (Germany)"
+          ]
+        },
+        {
+          "id": 590985,
+          "name": "Sheila Rotelli",
+          "institution": "University of Maryland Global Campus",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 986161,
+          "name": "Candice Hunter",
+          "institution": "Miami Dade College (all)",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of British Columbia"
+          ]
+        },
+        {
+          "id": 581593,
+          "name": "Sally McIntosh",
+          "institution": "Murray State University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 103865,
+          "name": "Yoan Bakalov",
+          "institution": "University of Nevada Las Vegas",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 882331,
+          "name": "Carol Nigro",
+          "institution": "Eastern University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1066183,
+          "name": "William Rhoades",
+          "institution": "Columbus State Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Oakland University",
+            "University of Southampton",
+            "Xerox (United States)"
+          ]
+        },
+        {
+          "id": 1188719,
+          "name": "Matthew Littlefield",
+          "institution": "Mesa Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 405269,
+          "name": "Amber Graves",
+          "institution": "Minnesota State University, Mankato",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of Georgia",
+            "Marshall University",
+            "University of Washington"
+          ]
+        },
+        {
+          "id": 867610,
+          "name": "James Turner",
+          "institution": "University of Hawaii West Oahu",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of Birmingham",
+            "",
+            "The Francis Crick Institute"
+          ]
+        },
+        {
+          "id": 884310,
+          "name": "Tung Lam",
+          "institution": "Cal Poly Pomona",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Chinese University of Hong Kong",
+            "University of Vienna",
+            "Education University of Hong Kong"
+          ]
+        },
+        {
+          "id": 965589,
+          "name": "Bozidar Dangubic",
+          "institution": "Strayer University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 585379,
+          "name": "Alan Cavaiola",
+          "institution": "Monmouth University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 270528,
+          "name": "Christine Larsen-Britt",
+          "institution": "Rowan University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1641574,
+          "name": "Noel Figueroa",
+          "institution": "Briarcliffe College - Patchogue",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "National University of Engineering",
+            "",
+            "National University of San Marcos"
+          ]
+        },
+        {
+          "id": 662436,
+          "name": "Kyle Fredrick",
+          "institution": "California University of Pennsylvania",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Lawrence Livermore National Security",
+            "Sandia National Laboratories"
+          ]
+        },
+        {
+          "id": 1522281,
+          "name": "Janet Ochs",
+          "institution": "Tompkins Cortland Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1452618,
+          "name": "Latasha Stabler",
+          "institution": "Fayetteville Technical Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 150068,
+          "name": "Joey Tipton",
+          "institution": "Louisiana State University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1577068,
+          "name": "Amanda Smerdel",
+          "institution": "Ivy Tech Community College: Fort Wayne",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 179276,
+          "name": "Edward Baranowski",
+          "institution": "California State University - Sacramento",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1261871,
+          "name": "Patricia Wallace-Little",
+          "institution": "Wayne County Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 392182,
+          "name": "Brian Barsanti",
+          "institution": "University of Alabama at Birmingham",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 310167,
+          "name": "Farhana Kahn",
+          "institution": "Saginaw Valley State University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1221002,
+          "name": "MaKayla McLeod",
+          "institution": "Georgia College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 158517,
+          "name": "Gina Zupsich",
+          "institution": "University of California Berkeley",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 602511,
+          "name": "Jessica Noonan",
+          "institution": "Eastern Connecticut State University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Pacific Northwest National Laboratory"
+          ]
+        },
+        {
+          "id": 168620,
+          "name": "Sean Mooney-Leber",
+          "institution": "Wayne State University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1218806,
+          "name": "Aimee Vargas",
+          "institution": "Marist College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Universidade Estadual de Feira de Santana",
+            "Texas A&M University",
+            "Instituto Nacional de Enfermedades Respiratorias"
+          ]
+        },
+        {
+          "id": 1066290,
+          "name": "Laura Jeffries",
+          "institution": "Florida State College at Jacksonville",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Western Sydney University",
+            "National Bureau of Economic Research",
+            "Missouri State University"
+          ]
+        },
+        {
+          "id": 1634809,
+          "name": "Richard Koshgarian",
+          "institution": "Bethany College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1378205,
+          "name": "Jeanie Cassity",
+          "institution": "Georgia Highlands College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 416972,
+          "name": "Progyan Basu",
+          "institution": "University of Maryland",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Howard University"
+          ]
+        },
+        {
+          "id": 1047508,
+          "name": "Stephan Kaplan",
+          "institution": "Broward College (all campuses)",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "George Washington University"
+          ]
+        },
+        {
+          "id": 290526,
+          "name": "Justin Reinhart",
+          "institution": "University of Dayton",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Sandia National Laboratories",
+            "Innovative Scientific Solutions (United States)",
+            ""
+          ]
+        },
+        {
+          "id": 540892,
+          "name": "Kaleab Gorfu",
+          "institution": "California State University Dominguez Hills",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1292390,
+          "name": "Tynnetta Kelley",
+          "institution": "HACC, Central Pennsylvania's Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 440787,
+          "name": "Michael Roeschlein",
+          "institution": "Marquette University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 500800,
+          "name": "Adam Chacksfield",
+          "institution": "Western Illinois University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1387748,
+          "name": "Linda Wills",
+          "institution": "Monterey Peninsula College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Universities UK",
+            "",
+            "Michael E. DeBakey VA Medical Center"
+          ]
+        },
+        {
+          "id": 272240,
+          "name": "Linda Burroughs",
+          "institution": "Rowan University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Department of Physiological Sciences"
+          ]
+        },
+        {
+          "id": 1031137,
+          "name": "Lanora McNeil",
+          "institution": "Houston Community College (all campuses)",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 566552,
+          "name": "Jami Ake",
+          "institution": "Washington University in St. Louis",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1619429,
+          "name": "Charolette Martin",
+          "institution": "St. John's College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1027835,
+          "name": "Irma Llorens",
+          "institution": "CUNY Queens College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Universitat Politècnica de Catalunya"
+          ]
+        },
+        {
+          "id": 1171869,
+          "name": "Rebecca Glenn",
+          "institution": "Brookdale Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "National Institute of Allergy and Infectious Diseases",
+            "Atrium Health Wake Forest Baptist",
+            "Bristol-Myers Squibb (United States)"
+          ]
+        },
+        {
+          "id": 1681877,
+          "name": "Rebecca Weaver",
+          "institution": "North Florida Institute",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Foxconn (United Kingdom)",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 80455,
+          "name": "Xu Guo",
+          "institution": "Rutgers - State University of New Jersey",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Ningbo University",
+            "Liaoning Normal University",
+            "Ningbo University"
+          ]
+        },
+        {
+          "id": 1193881,
+          "name": "William Ryan",
+          "institution": "Howard Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Baylor Medical Center at Garland",
+            "American Cancer Society"
+          ]
+        },
+        {
+          "id": 827031,
+          "name": "Jason Vannest",
+          "institution": "University of the Cumberlands",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Pioneer (United States)"
+          ]
+        },
+        {
+          "id": 938625,
+          "name": "Peter Nkhoma",
+          "institution": "University of Texas Arlington ",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Delta College"
+          ]
+        },
+        {
+          "id": 1348387,
+          "name": "Jane Shoop",
+          "institution": "Seattle Central College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1449359,
+          "name": "Ryan Wilhite",
+          "institution": "Ivy Tech Community College: Indianapolis",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 486970,
+          "name": "Julie Steen",
+          "institution": "University of North Georgia - Dahlonega",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of Central Florida",
+            "Amager Hospital",
+            "Technical University of Denmark"
+          ]
+        },
+        {
+          "id": 463852,
+          "name": "Vincent Burke",
+          "institution": "The University of Texas at El Paso",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Yale University",
+            "Trinity College Dublin"
+          ]
+        },
+        {
+          "id": 536077,
+          "name": "Andrew Borodin",
+          "institution": "University of Wisconsin Oshkosh",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of Memphis"
+          ]
+        },
+        {
+          "id": 1443223,
+          "name": "Casey Estorga",
+          "institution": "Gavilan College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 170393,
+          "name": "Nicole Bliven",
+          "institution": "University of Missouri - Columbia",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 988996,
+          "name": "Angel Castelan",
+          "institution": "Lone Star College (all)",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Universidad del Noreste",
+            "Universidad del Noreste",
+            ""
+          ]
+        },
+        {
+          "id": 1593906,
+          "name": "Janet Braley",
+          "institution": "National Park Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 832221,
+          "name": "Andrea Vaz  Antunes",
+          "institution": "National University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 760261,
+          "name": "Nancy Grigg",
+          "institution": "Eastern Michigan University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1257817,
+          "name": "Lorraine Portman",
+          "institution": "Flagler College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1005446,
+          "name": "Ibrahima Bah",
+          "institution": "Baruch College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Donka Hospital",
+            "Ministry of Health and Public Hygiene"
+          ]
+        },
+        {
+          "id": 44618,
+          "name": "Ashley Poindexter",
+          "institution": "The University of Tennessee Knoxville",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 380423,
+          "name": "Gary Eippert",
+          "institution": "Northern Kentucky University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1034746,
+          "name": "Jane Furgonsen",
+          "institution": "Houston Community College (all campuses)",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1262696,
+          "name": "Mallory Nanny",
+          "institution": "Central Piedmont Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1008714,
+          "name": "Doreen  Barnard",
+          "institution": "Hunter College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1206564,
+          "name": "Thuong Trieu",
+          "institution": "Cerritos College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "California State University, Long Beach",
+            "FPT University",
+            ""
+          ]
+        },
+        {
+          "id": 1282728,
+          "name": "Richard Sumliner",
+          "institution": "Raritan Valley Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1302935,
+          "name": "Richter Sundeen",
+          "institution": "Dallas College - Eastfield Campus",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1416658,
+          "name": "Kim Forcier",
+          "institution": "Northeast Lakeview College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 791593,
+          "name": "Nicholas Kenney",
+          "institution": "Hampton University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1385350,
+          "name": "R Kushner",
+          "institution": "Muhlenberg College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Northwestern University",
+            "University of Georgia",
+            "University of California, Irvine Medical Center"
+          ]
+        },
+        {
+          "id": 480081,
+          "name": "Sujata Krishna",
+          "institution": "University of Houston Downtown",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of Florida",
+            "",
+            "Tata Memorial Hospital"
+          ]
+        },
+        {
+          "id": 1599311,
+          "name": "Stephanie Burgher",
+          "institution": "Kaskaskia College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 923118,
+          "name": "Deepa Sukumaran",
+          "institution": "University of Dubuque",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1655883,
+          "name": "Eric Ottman",
+          "institution": "Rochester Institute of Technology",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1573360,
+          "name": "Lavida Dickinson",
+          "institution": "Chadron State College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 639170,
+          "name": "Judd Johnson",
+          "institution": "California State University Bakersfield (CSUB)",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 963171,
+          "name": "Jamie Thomas",
+          "institution": "University of Wisconsin - Manitowoc",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "University of Bath",
+            "University of California, San Francisco"
+          ]
+        },
+        {
+          "id": 592209,
+          "name": "Adam Sharrits",
+          "institution": "University of Maryland Global Campus",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1501570,
+          "name": "Tracy Kaminer",
+          "institution": "Laurel Ridge Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1168694,
+          "name": "Colleen Shipkowski",
+          "institution": "Southwestern College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 581130,
+          "name": "Micheal Seibold",
+          "institution": "Murray State University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1118689,
+          "name": "Cliff Butler",
+          "institution": "Bellevue College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Fitzsimons Army Medical Center",
+            "Capella University"
+          ]
+        },
+        {
+          "id": 808927,
+          "name": "Jess Dubie",
+          "institution": "University of Wisconsin - Madison",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1504588,
+          "name": "William D. Schleicher William D. Schleicher",
+          "institution": "Montgomery College - Takoma Park/Silver Spring Campus",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 8256,
+          "name": "Dan Dupre",
+          "institution": "University of North Carolina at Charlotte",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1416300,
+          "name": "Karla Kosub-Coronado",
+          "institution": "Northeast Lakeview College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1486148,
+          "name": "Constantine Gianoukos",
+          "institution": "Northern Essex Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1445851,
+          "name": "Jonathan Honda",
+          "institution": "Leeward Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1016534,
+          "name": "Robert Petrella",
+          "institution": "Santa Monica College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Western University",
+            "University of British Columbia",
+            ""
+          ]
+        },
+        {
+          "id": 766727,
+          "name": "Howard Zohr",
+          "institution": "University of Arkansas - Pulaski Technical",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1476140,
+          "name": "David Byrd",
+          "institution": "San Jacinto College - North",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Weber State University",
+            "University of Rhode Island",
+            "Government of the United States of America"
+          ]
+        },
+        {
+          "id": 1451413,
+          "name": "Regina Goodwin",
+          "institution": "Middlesex Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Walden University"
+          ]
+        },
+        {
+          "id": 150873,
+          "name": "James Nordlund",
+          "institution": "Louisiana State University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1308425,
+          "name": "Rebecca Garcia-Franco",
+          "institution": "San Jacinto College South",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Universidade Federal da Bahia"
+          ]
+        },
+        {
+          "id": 728227,
+          "name": "Thor Wagstrom",
+          "institution": "Metropolitan State University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1076347,
+          "name": "Karina Parlato",
+          "institution": "Austin Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 641484,
+          "name": "William K Newsom-Stewart",
+          "institution": "Western Connecticut State University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1114158,
+          "name": "Jane Golden",
+          "institution": "Hillsborough Community College (all campuses)",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Pfizer (United States)",
+            "",
+            "University of the Arts"
+          ]
+        },
+        {
+          "id": 1211239,
+          "name": "Danica Schroeder",
+          "institution": "Cuyahoga Community College (all campuses)",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 958846,
+          "name": "Kristi Morris",
+          "institution": "Southwestern Christian University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1350219,
+          "name": "Anson Hancock",
+          "institution": "Clackamas Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 36463,
+          "name": "Patrick Battles",
+          "institution": "Northern Arizona University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1526379,
+          "name": "Rex Beulin",
+          "institution": "Mitchell Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1000960,
+          "name": "Julie Roberts",
+          "institution": "Salt Lake Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Glasgow Caledonian University",
+            "",
+            "Cleveland Clinic"
+          ]
+        },
+        {
+          "id": 269694,
+          "name": "Nadia Colon",
+          "institution": "San Jose State University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1357066,
+          "name": "Robert Rodgers",
+          "institution": "Stonehill College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Creative Victoria",
+            "",
+            "Eastern Virginia Medical School"
+          ]
+        },
+        {
+          "id": 494123,
+          "name": "Sharon Devine",
+          "institution": "University of Colorado Denver",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Carle Foundation Hospital",
+            ""
+          ]
+        },
+        {
+          "id": 188543,
+          "name": "Drew Nobile",
+          "institution": "University of Oregon",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1529508,
+          "name": "Stacey Gorski",
+          "institution": "Hampden-Sydney College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Carter Center",
+            "Victoria Police",
+            ""
+          ]
+        },
+        {
+          "id": 402210,
+          "name": "Casie Szalapski",
+          "institution": "University of St. Thomas",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1367792,
+          "name": "Jon Mrowiec",
+          "institution": "Carthage College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 620637,
+          "name": "Odoo McCallum",
+          "institution": "Nova Southeastern University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 887101,
+          "name": "Kyle Bourque",
+          "institution": "Louisiana State University at Eunice",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Houston Methodist"
+          ]
+        },
+        {
+          "id": 326743,
+          "name": "Emily Teising",
+          "institution": "Northern Illinois University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Fondation pour la Recherche Stratégique"
+          ]
+        },
+        {
+          "id": 514737,
+          "name": "Ruixuan Hu",
+          "institution": "Fordham University - Rose Hill",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Cornell University",
+            "Northwestern Polytechnical University",
+            "Yangzhou University"
+          ]
+        },
+        {
+          "id": 1141824,
+          "name": "Syed Rizvi",
+          "institution": "Middlesex County College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of Allahabad",
+            "Cornell University",
+            ""
+          ]
+        },
+        {
+          "id": 1251342,
+          "name": "Joanna Robledo",
+          "institution": "Santa Ana College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Andalusian Health Service"
+          ]
+        },
+        {
+          "id": 1629868,
+          "name": "Gene Sowels",
+          "institution": "Ivy Tech Community College: Madison",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1379094,
+          "name": "Gurdal Arslan",
+          "institution": "Dallas College - North Lake Campus",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of Hawaii System",
+            ""
+          ]
+        },
+        {
+          "id": 905807,
+          "name": "Kimberly Westmoreland",
+          "institution": "Woodbury University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 379540,
+          "name": "Jonathan Salter",
+          "institution": "University of North Carolina at Greensboro",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of British Columbia",
+            "",
+            "Kırıkkale University"
+          ]
+        },
+        {
+          "id": 1519491,
+          "name": "Amanda Kuker",
+          "institution": "Amarillo College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of South Carolina"
+          ]
+        },
+        {
+          "id": 1273757,
+          "name": "Sandra Suarez",
+          "institution": "Ramapo College of New Jersey",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Mexican Social Security Institute",
+            "Simulations Plus (United States)",
+            "Escuela Superior Politecnica del Litoral"
+          ]
+        },
+        {
+          "id": 1308885,
+          "name": "Anahita Khoshtinat",
+          "institution": "San Jacinto College South",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 958771,
+          "name": "Howard Storfer",
+          "institution": "Western International University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1382279,
+          "name": "Rebeca Moran",
+          "institution": "Los Medanos College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Universidad Autónoma del Estado de México",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 798920,
+          "name": "Jim Prugh",
+          "institution": "University of Cincinnati Blue Ash College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 75592,
+          "name": "Alwyn Dias",
+          "institution": "Rutgers - State University of New Jersey",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "DRG Undersea Consulting (United States)"
+          ]
+        },
+        {
+          "id": 369949,
+          "name": "Matthew Eng",
+          "institution": "University of Hawaii at Manoa",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Louisiana State University Health Sciences Center New Orleans",
+            "IBM Research - Thomas J. Watson Research Center",
+            "National University of Singapore"
+          ]
+        },
+        {
+          "id": 310711,
+          "name": "Gary Hensley",
+          "institution": "Saginaw Valley State University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "St. Mary Medical Center",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 236756,
+          "name": "Rachael Tobbin-Dodd",
+          "institution": "The University of North Carolina at Chapel Hill",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1584169,
+          "name": "Laurece Abraham",
+          "institution": "Wayne County Community College - Downriver",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "National Academy of Governance"
+          ]
+        },
+        {
+          "id": 217751,
+          "name": "Seth Mulliken",
+          "institution": "Northeastern University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1534928,
+          "name": "Holly Ross",
+          "institution": "Jefferson College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "American Academy of Pediatrics",
+            "Johns Hopkins University",
+            ""
+          ]
+        },
+        {
+          "id": 566259,
+          "name": "Eli Snir",
+          "institution": "Washington University in St. Louis",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1215214,
+          "name": "Anthony Annese",
+          "institution": "Grand Rapids Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1249314,
+          "name": "Michael Cauvel",
+          "institution": "Ithaca College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of Southern Maine"
+          ]
+        },
+        {
+          "id": 1657288,
+          "name": "Rebecca Rogers",
+          "institution": "Rochester Institute of Technology",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "National Institute of Allergy and Infectious Diseases",
+            "University of Cape Town",
+            "Library of Congress"
+          ]
+        },
+        {
+          "id": 637439,
+          "name": "Bryanna Nyenhuis",
+          "institution": "California Baptist University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1281172,
+          "name": "Silvia Castellini-Patel",
+          "institution": "West Valley College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 515756,
+          "name": "Susan Alessandri",
+          "institution": "Suffolk University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1148524,
+          "name": "Luis Vega-Maldonado",
+          "institution": "San Antonio College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1054336,
+          "name": "Brittany Tulla",
+          "institution": "College of Charleston",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1020498,
+          "name": "Barb Smith",
+          "institution": "Portland Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "US Forest Service",
+            "University of Florida",
+            ""
+          ]
+        },
+        {
+          "id": 1512143,
+          "name": ". Panoff",
+          "institution": "Touro College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Université de Caen Normandie",
+            "",
+            "Baptist Hospital of Miami"
+          ]
+        },
+        {
+          "id": 1611053,
+          "name": "Richard Waters",
+          "institution": "San Juan College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "University of Houston - Downtown",
+            "University of North Carolina at Chapel Hill"
+          ]
+        },
+        {
+          "id": 389278,
+          "name": "Dale Wolf",
+          "institution": "University of Minnesota Duluth",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Institute of Crop Science",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1307997,
+          "name": "Claudio Carra",
+          "institution": "San Jacinto College South",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1199825,
+          "name": "Alexander Radison",
+          "institution": "Suffolk County Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1154706,
+          "name": "Ben Allen",
+          "institution": "City College of San Francisco",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Leibniz University Hannover",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1160354,
+          "name": "Donna Megenniss",
+          "institution": "Pima Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1153265,
+          "name": "Angela Calloway",
+          "institution": "Riverside City College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of Louisville",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 196661,
+          "name": "James LaBillois",
+          "institution": "Boston University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 327597,
+          "name": "Gail McCormick",
+          "institution": "University of Wisconsin - La Crosse",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Pennsylvania State University",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 1366482,
+          "name": "Lesley Gale",
+          "institution": "Cosumnes River College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1107872,
+          "name": "Jasmine Ng",
+          "institution": "El Camino College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of Technology Sydney",
+            "",
+            "Western University"
+          ]
+        },
+        {
+          "id": 513031,
+          "name": "Bill Ugh",
+          "institution": "University of San Diego",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1257889,
+          "name": "Robert Moser",
+          "institution": "Flagler College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "The University of Texas at Austin",
+            "",
+            ""
+          ]
+        },
+        {
+          "id": 946318,
+          "name": "Randall Bazell",
+          "institution": "Ohio University Southern",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 285969,
+          "name": "Rusty Robison",
+          "institution": "California State University Fresno",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 79921,
+          "name": "Patricia Wilson",
+          "institution": "Rutgers - State University of New Jersey",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "The Royal Free Hospital",
+            "University of Kent",
+            "Sunshine Coast University Hospital"
+          ]
+        },
+        {
+          "id": 1582908,
+          "name": "Dana Ragouzeos",
+          "institution": "California College of the Arts",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of California, San Francisco"
+          ]
+        },
+        {
+          "id": 343858,
+          "name": "Marjorie Ames",
+          "institution": "George Washington University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1487156,
+          "name": "Alva Welch",
+          "institution": "Pitt Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 660245,
+          "name": "Robert Fay",
+          "institution": "University of South Florida St. Petersburg",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Westat (United States)",
+            "University of Liverpool",
+            "Cornell University"
+          ]
+        },
+        {
+          "id": 16364,
+          "name": "Gary Sarver",
+          "institution": "Ohio University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 438154,
+          "name": "Barry Mehler",
+          "institution": "Ferris State University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 1411816,
+          "name": "Harry Young",
+          "institution": "Mercer County Community College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "",
+            "Stanford University",
+            "Sandia National Laboratories"
+          ]
+        },
+        {
+          "id": 1230413,
+          "name": "E Ndukewe",
+          "institution": "Schoolcraft College - (ALL)",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 470274,
+          "name": "Chad Clark",
+          "institution": "Indiana State University",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Oak Ridge National Laboratory",
+            "Mayo Clinic",
+            "Oak Ridge National Laboratory"
+          ]
+        },
+        {
+          "id": 1509525,
+          "name": "Uma Ajjarapu",
+          "institution": "Des Moines Area Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1587595,
+          "name": "Lisa Grant",
+          "institution": "Lackawanna College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Children's Hospital of Philadelphia",
+            "",
+            "University of Wisconsin–Madison"
+          ]
+        },
+        {
+          "id": 1628863,
+          "name": "Annie Harden",
+          "institution": "Richmond Community College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1433179,
+          "name": "Ellen Borden",
+          "institution": "Community College of Rhode Island",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1371466,
+          "name": "Alexandra Fine",
+          "institution": "Occidental College",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "NOAA Office of National Marine Sanctuaries",
+            ""
+          ]
+        },
+        {
+          "id": 1476881,
+          "name": "Richard Difilippo",
+          "institution": "D'Youville College",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1534413,
+          "name": "Alisa Aronson",
+          "institution": "Massachusetts College of Art and Design",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 655698,
+          "name": "Jennifer Branton-Desris",
+          "institution": "East Stroudsburg University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 1060122,
+          "name": "Richard Green",
+          "institution": "Northern Virginia Community College (all campuses)",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "University of California, Santa Cruz",
+            "Barking, Havering And Redbridge University Hospitals NHS Trust",
+            "University of Arizona"
+          ]
+        },
+        {
+          "id": 472462,
+          "name": "Sean Nemetz",
+          "institution": "Saint Louis University",
+          "reason": "no_openalex_match"
+        },
+        {
+          "id": 548428,
+          "name": "Megan McDrew",
+          "institution": "University of California Merced",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        },
+        {
+          "id": 155359,
+          "name": "Melanie Abrams",
+          "institution": "University of California Berkeley",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            "Arsenal Medical (United States)"
+          ]
+        },
+        {
+          "id": 879476,
+          "name": "Ernie Bursey",
+          "institution": "AdventHealth University (was Adventist University of Health Sciences)",
+          "reason": "openalex_institution_mismatch",
+          "openalex_top_affiliations": [
+            ""
+          ]
+        }
+      ],
+      "duration_seconds": 461.53
+    },
+    "l3": {
+      "checked": 5301,
+      "queried": 1000,
+      "errors": 4263,
+      "affected_professors": 92634,
+      "flagged": [
+        {
+          "institution": "St. John's University - Jamaica/Queens",
+          "cleaned_query": "St. John's University - Jamaica/Queens",
+          "professor_count": 3060,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Fordham University - Rose Hill",
+          "cleaned_query": "Fordham University - Rose Hill",
+          "professor_count": 2492,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Montgomery College: Rockville Campus",
+          "cleaned_query": "Montgomery College: Rockville Campus",
+          "professor_count": 2227,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "West Chester University of Pennsylvania",
+          "cleaned_query": "West Chester University of Pennsylvania",
+          "professor_count": 1959,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "SMU - Southern Methodist University",
+          "cleaned_query": "SMU - Southern Methodist University",
+          "professor_count": 1941,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Dallas College - Richland Campus",
+          "cleaned_query": "Dallas College - Richland Campus",
+          "professor_count": 1809,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Georgia State University Perimeter College - Decatur",
+          "cleaned_query": "Georgia State University Perimeter College - Decatur",
+          "professor_count": 1805,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "HACC, Central Pennsylvania's Community College",
+          "cleaned_query": "HACC, Central Pennsylvania's Community College",
+          "professor_count": 1801,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "University of Phoenix Online",
+          "cleaned_query": "University of Phoenix Online",
+          "professor_count": 1638,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Tallahassee State College",
+          "cleaned_query": "Tallahassee State College",
+          "professor_count": 1512,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "San Jacinto College - Central",
+          "cleaned_query": "San Jacinto College - Central",
+          "professor_count": 1476,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Fordham University at Lincoln Center",
+          "cleaned_query": "Fordham University at Lincoln Center",
+          "professor_count": 1354,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "San Jacinto College South",
+          "cleaned_query": "San Jacinto College South",
+          "professor_count": 1325,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Pikes Peak State College",
+          "cleaned_query": "Pikes Peak State College",
+          "professor_count": 1253,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Texas A&M University at Corpus Christi",
+          "cleaned_query": "Texas AandM University at Corpus Christi",
+          "professor_count": 1240,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Johnson and Wales University",
+          "cleaned_query": "Johnson and Wales University",
+          "professor_count": 1220,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Ramapo College of New Jersey",
+          "cleaned_query": "Ramapo College of New Jersey",
+          "professor_count": 1151,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Valencia College - Osceola Campus",
+          "cleaned_query": "Valencia College - Osceola Campus",
+          "professor_count": 1130,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Dallas College - El Centro Campus",
+          "cleaned_query": "Dallas College - El Centro Campus",
+          "professor_count": 1106,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Molloy University",
+          "cleaned_query": "Molloy University",
+          "professor_count": 1099,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Parsons The New School For Design",
+          "cleaned_query": "Parsons The New School For Design",
+          "professor_count": 1087,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Cal Polytechnic Humboldt",
+          "cleaned_query": "Cal Polytechnic Humboldt",
+          "professor_count": 1085,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "University of North Georgia - Dahlonega",
+          "cleaned_query": "University of North Georgia - Dahlonega",
+          "professor_count": 1078,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Community College of Baltimore County - Essex",
+          "cleaned_query": "Community College of Baltimore County - Essex",
+          "professor_count": 1075,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Texas A&M University at Commerce",
+          "cleaned_query": "Texas AandM University at Commerce",
+          "professor_count": 1060,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Owens Community College: Toledo",
+          "cleaned_query": "Owens Community College: Toledo",
+          "professor_count": 1049,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Oakton Community College - Des Plaines",
+          "cleaned_query": "Oakton Community College - Des Plaines",
+          "professor_count": 1040,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Dallas College - Brookhaven Campus",
+          "cleaned_query": "Dallas College - Brookhaven Campus",
+          "professor_count": 1032,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "University of North Georgia - Gainesville",
+          "cleaned_query": "University of North Georgia - Gainesville",
+          "professor_count": 1031,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Ivy Tech Community College: Indianapolis",
+          "cleaned_query": "Ivy Tech Community College: Indianapolis",
+          "professor_count": 1030,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Dallas College - Eastfield Campus",
+          "cleaned_query": "Dallas College - Eastfield Campus",
+          "professor_count": 997,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Long Island University - Post",
+          "cleaned_query": "Long Island University - Post",
+          "professor_count": 982,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "University of Montana - Missoula",
+          "cleaned_query": "University of Montana - Missoula",
+          "professor_count": 979,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Montgomery College - Takoma Park/Silver Spring Campus",
+          "cleaned_query": "Montgomery College - Takoma Park/Silver Spring Campus",
+          "professor_count": 944,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Georgia Southern University - Armstrong",
+          "cleaned_query": "Georgia Southern University - Armstrong",
+          "professor_count": 890,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Middle Georgia State University (all campuses)",
+          "cleaned_query": "Middle Georgia State University",
+          "professor_count": 880,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Dallas College - North Lake Campus",
+          "cleaned_query": "Dallas College - North Lake Campus",
+          "professor_count": 850,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "St. Louis Community College at Meramec",
+          "cleaned_query": "St. Louis Community College at Meramec",
+          "professor_count": 844,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Iona University",
+          "cleaned_query": "Iona University",
+          "professor_count": 830,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Rowan College of South Jersey - Gloucester Campus",
+          "cleaned_query": "Rowan College of South Jersey - Gloucester Campus",
+          "professor_count": 828,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Montgomery College - Germantown Campus",
+          "cleaned_query": "Montgomery College - Germantown Campus",
+          "professor_count": 808,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Elmhurst University",
+          "cleaned_query": "Elmhurst University",
+          "professor_count": 787,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Collin College - Preston Ridge",
+          "cleaned_query": "Collin College - Preston Ridge",
+          "professor_count": 782,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "San Jacinto College - North",
+          "cleaned_query": "San Jacinto College - North",
+          "professor_count": 775,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Fairleigh Dickinson University - Metropolitan",
+          "cleaned_query": "Fairleigh Dickinson University - Metropolitan",
+          "professor_count": 770,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "University of Hawaii: Kapiolani Community College",
+          "cleaned_query": "University of Hawaii: Kapiolani Community College",
+          "professor_count": 767,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Prairie View A&M University",
+          "cleaned_query": "Prairie View AandM University",
+          "professor_count": 763,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Oakland Community College - Auburn Hills",
+          "cleaned_query": "Oakland Community College - Auburn Hills",
+          "professor_count": 759,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Pennsylvania State University - Harrisburg",
+          "cleaned_query": "Pennsylvania State University - Harrisburg",
+          "professor_count": 749,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Dallas College - Mountain View Campus",
+          "cleaned_query": "Dallas College - Mountain View Campus",
+          "professor_count": 739,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "University of Arkansas at Fort Smith",
+          "cleaned_query": "University of Arkansas at Fort Smith",
+          "professor_count": 737,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Texas A&M International University",
+          "cleaned_query": "Texas AandM International University",
+          "professor_count": 735,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Northwestern State University of Louisiana - Natchitoches",
+          "cleaned_query": "Northwestern State University of Louisiana - Natchitoches",
+          "professor_count": 726,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "University of Cincinnati Blue Ash College",
+          "cleaned_query": "University of Cincinnati Blue Ash College",
+          "professor_count": 715,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Eastern Florida State College - Melbourne Campus",
+          "cleaned_query": "Eastern Florida State College - Melbourne Campus",
+          "professor_count": 706,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Pennsylvania State University - Abington",
+          "cleaned_query": "Pennsylvania State University - Abington",
+          "professor_count": 704,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Fairleigh Dickinson University - Florham",
+          "cleaned_query": "Fairleigh Dickinson University - Florham",
+          "professor_count": 702,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Moreno Valley College - Riverside CCD",
+          "cleaned_query": "Moreno Valley College - Riverside CCD",
+          "professor_count": 699,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "NYU Tandon School of Engineering",
+          "cleaned_query": "NYU Tandon School of Engineering",
+          "professor_count": 695,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Front Range Community College - Larimer Campus",
+          "cleaned_query": "Front Range Community College - Larimer Campus",
+          "professor_count": 684,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Pennsylvania College of Technology",
+          "cleaned_query": "Pennsylvania College of Technology",
+          "professor_count": 681,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "West Texas A&M University",
+          "cleaned_query": "West Texas AandM University",
+          "professor_count": 674,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Pennsylvania State University - Altoona",
+          "cleaned_query": "Pennsylvania State University - Altoona",
+          "professor_count": 667,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "University of Arkansas - Pulaski Technical",
+          "cleaned_query": "University of Arkansas - Pulaski Technical",
+          "professor_count": 649,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Texas A&M University-San Antonio",
+          "cleaned_query": "Texas AandM University-San Antonio",
+          "professor_count": 635,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Germanna Community College - Fredericksburg Campus",
+          "cleaned_query": "Germanna Community College - Fredericksburg Campus",
+          "professor_count": 619,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Texas A&M University at Kingsville",
+          "cleaned_query": "Texas AandM University at Kingsville",
+          "professor_count": 619,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Oakland Community College - Orchard Ridge",
+          "cleaned_query": "Oakland Community College - Orchard Ridge",
+          "professor_count": 617,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "CT State Community College - Housatonic",
+          "cleaned_query": "CT State Community College - Housatonic",
+          "professor_count": 615,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Colorado Technical University Online",
+          "cleaned_query": "Colorado Technical University Online",
+          "professor_count": 605,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Contra Costa College - San Pablo",
+          "cleaned_query": "Contra Costa College - San Pablo",
+          "professor_count": 602,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Ashford University - Clinton",
+          "cleaned_query": "Ashford University - Clinton",
+          "professor_count": 600,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Georgia State University Perimeter College - Dunwoody",
+          "cleaned_query": "Georgia State University Perimeter College - Dunwoody",
+          "professor_count": 596,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Pennsylvania State University - Erie",
+          "cleaned_query": "Pennsylvania State University - Erie",
+          "professor_count": 582,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "College of Western Idaho - Nampa",
+          "cleaned_query": "College of Western Idaho - Nampa",
+          "professor_count": 579,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Massasoit Community College-Brockton Campus",
+          "cleaned_query": "Massasoit Community College-Brockton Campus",
+          "professor_count": 574,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "University of Cincinnati: Clermont College",
+          "cleaned_query": "University of Cincinnati: Clermont College",
+          "professor_count": 559,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Purdue University Global",
+          "cleaned_query": "Purdue University Global",
+          "professor_count": 548,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Franklin and Marshall College",
+          "cleaned_query": "Franklin and Marshall College",
+          "professor_count": 547,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Metropolitan Community College-Longview",
+          "cleaned_query": "Metropolitan Community College-Longview",
+          "professor_count": 546,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Oakland Community College - Royal Oak",
+          "cleaned_query": "Oakland Community College - Royal Oak",
+          "professor_count": 543,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Arizona State University - West",
+          "cleaned_query": "Arizona State University - West",
+          "professor_count": 534,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "St. John Fisher University",
+          "cleaned_query": "St. John Fisher University",
+          "professor_count": 534,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Metropolitan Community College: Maple Woods",
+          "cleaned_query": "Metropolitan Community College: Maple Woods",
+          "professor_count": 532,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Fashion Institute of Design and Merchandising",
+          "cleaned_query": "Fashion Institute of Design and Merchandising",
+          "professor_count": 517,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "College of Marin - Kentfield",
+          "cleaned_query": "College of Marin - Kentfield",
+          "professor_count": 509,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Harvard University Extension School",
+          "cleaned_query": "Harvard University Extension School",
+          "professor_count": 509,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Oakton Community College - Skokie",
+          "cleaned_query": "Oakton Community College - Skokie",
+          "professor_count": 504,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Georgia State University Perimeter College - Clarkston",
+          "cleaned_query": "Georgia State University Perimeter College - Clarkston",
+          "professor_count": 497,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Metropolitan Community College-Penn Valley",
+          "cleaned_query": "Metropolitan Community College-Penn Valley",
+          "professor_count": 493,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Mount Saint Mary's University",
+          "cleaned_query": "Mount Saint Mary's University",
+          "professor_count": 492,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "St. Louis Community College at Forest Park",
+          "cleaned_query": "St. Louis Community College at Forest Park",
+          "professor_count": 490,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Miami University: Hamilton Campus",
+          "cleaned_query": "Miami University: Hamilton Campus",
+          "professor_count": 482,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "The Citadel - The Military College of South Carolina",
+          "cleaned_query": "Citadel - The Military College of South Carolina",
+          "professor_count": 480,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "St. Louis Community College at Florissant Valley",
+          "cleaned_query": "St. Louis Community College at Florissant Valley",
+          "professor_count": 479,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Pennsylvania Western University - Clarion",
+          "cleaned_query": "Pennsylvania Western University - Clarion",
+          "professor_count": 471,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Southeast Community College: Lincoln Campus",
+          "cleaned_query": "Southeast Community College: Lincoln Campus",
+          "professor_count": 469,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Erie Community College: North Campus",
+          "cleaned_query": "Erie Community College: North Campus",
+          "professor_count": 461,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Horry-Georgetown Technical College",
+          "cleaned_query": "Horry-Georgetown Technical College",
+          "professor_count": 455,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Troy University E-Campus",
+          "cleaned_query": "Troy University E-Campus",
+          "professor_count": 454,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Laurel Ridge Community College",
+          "cleaned_query": "Laurel Ridge Community College",
+          "professor_count": 446,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Massachusetts College of Pharmacy & Health Science",
+          "cleaned_query": "Massachusetts College of Pharmacy and Health Science",
+          "professor_count": 446,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "CUNY School of Professional Studies",
+          "cleaned_query": "CUNY School of Professional Studies",
+          "professor_count": 424,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "University of California Los Angeles Extension",
+          "cleaned_query": "University of California Los Angeles Extension",
+          "professor_count": 423,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Oakland Community College - Highland Lakes",
+          "cleaned_query": "Oakland Community College - Highland Lakes",
+          "professor_count": 419,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Texas A&M University at College Station",
+          "cleaned_query": "Texas AandM University at College Station",
+          "professor_count": 409,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "New York University - School of Professional Studies",
+          "cleaned_query": "New York University - School of Professional Studies",
+          "professor_count": 406,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Purdue University Global (was Kaplan University)",
+          "cleaned_query": "Purdue University Global",
+          "professor_count": 372,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Johnson & Wales University",
+          "cleaned_query": "Johnson and Wales University",
+          "professor_count": 248,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Purdue University Global (was Kaplan College)",
+          "cleaned_query": "Purdue University Global",
+          "professor_count": 19,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        },
+        {
+          "institution": "Purdue University Global  (was Hagerstown Business College)",
+          "cleaned_query": "Purdue University Global",
+          "professor_count": 12,
+          "best_match_name": "",
+          "best_match_score": 0.0,
+          "openalex_top_names": []
+        }
+      ],
+      "duration_seconds": 9843.6
+    }
+  }
+}

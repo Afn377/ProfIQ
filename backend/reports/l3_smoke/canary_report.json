@@ -1,0 +1,23 @@
+{
+  "scan_time": "2026-04-18T23:45:15.338674+00:00",
+  "layers_requested": [
+    "l3"
+  ],
+  "config": {
+    "limit": null,
+    "sample_size": 500,
+    "rate": 6.0,
+    "openalex_mailto_set": true,
+    "fuzzy_threshold": 0.65
+  },
+  "findings": {
+    "l3": {
+      "checked": 25,
+      "queried": 25,
+      "errors": 0,
+      "affected_professors": 0,
+      "flagged": [],
+      "duration_seconds": 8.73
+    }
+  }
+}
