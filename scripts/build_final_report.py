@@ -335,6 +335,56 @@ def add_title_page(doc):
         add_bullet(doc, item)
 
 
+SCHEMA_ROWS = [
+    ("Source", "id", "BigAutoField / integer primary key", "Django-generated identifier."),
+    ("Source", "name", "CharField(64), unique", "Review platform name such as RateMyProfessors or Reddit."),
+    ("Source", "base_url", "URLField / varchar(200), blank allowed", "Base website URL for the source."),
+    ("Department", "id", "BigAutoField / integer primary key", "Django-generated identifier."),
+    ("Department", "name", "CharField(128), unique", "Department name used for filtering and grouping."),
+    ("Department", "code", "CharField(16), blank allowed", "Optional short department code."),
+    ("Professor", "id", "BigAutoField / integer primary key", "Django-generated identifier."),
+    ("Professor", "name", "CharField(128), indexed", "Professor display/search name."),
+    ("Professor", "department_id", "ForeignKey to Department, nullable", "Optional department relationship; SET_NULL on delete."),
+    ("Professor", "institution", "CharField(128), indexed, blank allowed", "School or institution name."),
+    ("Professor", "bio", "TextField, blank allowed", "Optional free-text biography field."),
+    ("Professor", "external_ref", "CharField(64), indexed, unique when nonblank", "External source id such as rmp:12345."),
+    ("Professor", "source_avg_rating", "FloatField, nullable", "Profile-level rating from the source crawl."),
+    ("Professor", "source_num_ratings", "IntegerField", "Profile-level rating count from the source crawl."),
+    ("Professor", "created_at", "DateTimeField", "Set automatically when the row is created."),
+    ("Course", "id", "BigAutoField / integer primary key", "Django-generated identifier."),
+    ("Course", "code", "CharField(32), indexed, unique", "Course code such as CS101."),
+    ("Course", "title", "CharField(200), blank allowed", "Optional course title."),
+    ("Course", "department_id", "ForeignKey to Department, nullable", "Optional department relationship; SET_NULL on delete."),
+    ("Course.professors join table", "id", "BigAutoField / integer primary key", "Django-created table for the Course-Professor many-to-many relationship."),
+    ("Course.professors join table", "course_id", "ForeignKey to Course", "One side of the many-to-many relationship."),
+    ("Course.professors join table", "professor_id", "ForeignKey to Professor", "Other side of the many-to-many relationship."),
+    ("Review", "id", "BigAutoField / integer primary key", "Django-generated identifier."),
+    ("Review", "professor_id", "ForeignKey to Professor", "Required professor; CASCADE on delete."),
+    ("Review", "course_id", "ForeignKey to Course, nullable", "Optional course; SET_NULL on delete."),
+    ("Review", "source_id", "ForeignKey to Source", "Required source; PROTECT on delete."),
+    ("Review", "text", "TextField", "Persisted review text for seed/demo data."),
+    ("Review", "rating", "FloatField, nullable", "Optional 1-5 rating; Reddit comments usually have none."),
+    ("Review", "source_url", "URLField / varchar(200), blank allowed", "Unique with source when nonblank to avoid duplicate imports."),
+    ("Review", "posted_at", "DateTimeField, nullable", "Original review timestamp when available."),
+    ("Review", "ingested_at", "DateTimeField", "Set automatically during ingest."),
+    ("SentimentResult", "id", "BigAutoField / integer primary key", "Django-generated identifier."),
+    ("SentimentResult", "review_id", "OneToOneField to Review", "One sentiment row per persisted review; CASCADE on delete."),
+    ("SentimentResult", "compound", "FloatField", "Final sentiment score in the VADER-style -1 to 1 range."),
+    ("SentimentResult", "positive / neutral / negative", "FloatField", "Raw VADER distribution components."),
+    ("SentimentResult", "label", "CharField(10)", "positive, neutral, or negative."),
+    ("SentimentResult", "themes", "JSONField list", "Detected theme names for the review."),
+    ("SentimentResult", "analyzed_at", "DateTimeField", "Updated automatically when analysis is saved."),
+    ("ProfessorStats", "id", "BigAutoField / integer primary key", "Django-generated identifier."),
+    ("ProfessorStats", "professor_id", "OneToOneField to Professor", "One aggregate dashboard row per professor; CASCADE on delete."),
+    ("ProfessorStats", "review_count", "IntegerField", "Number of analyzed reviews/comments."),
+    ("ProfessorStats", "avg_compound", "FloatField", "Mean compound sentiment score."),
+    ("ProfessorStats", "positive_count / neutral_count / negative_count", "IntegerField", "Sentiment label counts."),
+    ("ProfessorStats", "theme_counts", "JSONField object", "Map from theme name to frequency."),
+    ("ProfessorStats", "recommendation_score", "FloatField", "Computed 0-100 recommendation score."),
+    ("ProfessorStats", "updated_at", "DateTimeField", "Updated automatically when stats are saved."),
+]
+
+
 def build_report():
     model_chart, purity_chart = build_figures()
     doc = setup_document()
@@ -386,6 +436,14 @@ def build_report():
         doc,
         "The relational schema separates entities that would otherwise be duplicated in raw review data. Professor belongs to an optional Department and has many Courses; Review links a professor, optional course, and Source; SentimentResult stores one NLP result per persisted Review; ProfessorStats stores denormalized aggregates for dashboard queries. Unique constraints on professor identity, external references, course codes, source names, and review source URLs support idempotent ingestion.",
     )
+    add_para(doc, "Database tables and datatypes", bold=True, size=12, after=4)
+    add_table(
+        doc,
+        ["Table", "Field", "Datatype", "Purpose / notes"],
+        SCHEMA_ROWS,
+        widths=[1.25, 1.55, 1.75, 1.95],
+        font_size=6.8,
+    )
     add_table(
         doc,
         ["Stage", "Persistent writes", "Intentionally not written", "Reason"],
@@ -404,17 +462,38 @@ def build_report():
     )
 
     add_heading(doc, "4. Sentiment and Recommendation Methods", 1)
+    add_para(doc, "Hypothesis", bold=True, size=12, after=4)
+    add_para(
+        doc,
+        "The ML hypothesis is that review text contains enough signal to predict whether a professor review is negative, neutral, or positive, and that a trained classifier should outperform a purely rule-based VADER baseline on held-out RateMyProfessors reviews. A second recommendation hypothesis is that professors whose reviews use similar language about clarity, workload, grading, and helpfulness will be meaningfully close in sentence-embedding space.",
+    )
+    add_para(doc, "Training data and target variable", bold=True, size=12, after=4)
+    add_para(
+        doc,
+        "The supervised sentiment models are trained on the ML corpus built from live RateMyProfessors review pages. Each training row represents one review and includes the professor external id, professor name, institution, department, course, review text, helpfulness/clarity-derived rating, would-take-again flag when available, difficulty, posted date, and source URL. The input feature for sentiment classification is the review text. The target variable is a three-class sentiment label derived from the 1-5 rating: ratings <= 2.0 are labeled negative, ratings > 2.0 and <= 3.5 are labeled neutral, and ratings > 3.5 are labeled positive.",
+    )
+    add_para(
+        doc,
+        "The source URL is used to create stable train/validation/test splits through hashing, so the same review always lands in the same split across repeated runs and across different models. This prevents accidental split drift when comparing VADER, TF-IDF + Logistic Regression, and DistilBERT.",
+    )
+    add_para(doc, "Sentiment pipeline", bold=True, size=12, after=4)
     add_para(
         doc,
         "The baseline sentiment analyzer extends NLTK VADER with an academic-review lexicon, idiom rules, and a star-rating blend. The lexicon adds terms such as 'avoid', 'useless', 'helpful', and 'engaging'; the idiom layer catches multi-word phrases like 'avoid like the plague' and 'would not recommend'; the rating blend maps 1-5 star scores to the VADER compound scale as a secondary signal. Each review is also tagged for teaching themes: clarity, fairness, workload, helpfulness, engagement, and grading.",
     )
     add_para(
         doc,
-        "The supervised ML classifier labels RMP reviews using averaged helpfulness and clarity ratings: ratings <= 2.0 are negative, 2.0-3.5 are neutral, and > 3.5 are positive. Splits are hash-stratified by source URL so repeated runs place the same review in the same train/validation/test bucket. TF-IDF + Logistic Regression is the live default because it is fast and compact; DistilBERT is kept as a deeper offline comparison.",
+        "The learned pipeline has two model paths. The live model is TF-IDF + Logistic Regression: text is lowercased, converted into unigram/bigram TF-IDF features, and passed into a class-weighted logistic regression classifier. This model is small enough to load during app runtime. The deeper comparison model fine-tunes DistilBERT on the same target labels. DistilBERT is used for offline evaluation because it is larger and slower, while Logistic Regression is better suited to the app's live sentiment augmentation path.",
     )
+    add_para(doc, "Recommendation pipeline", bold=True, size=12, after=4)
     add_para(
         doc,
-        "For similar-professor search, ProfIQ builds one MiniLM embedding per professor by concatenating review text, normalizing vectors, and using cosine similarity. Runtime lookup is a matrix-vector product followed by DB hydration and optional department/institution filtering.",
+        "For similar-professor search, the pipeline groups the ML corpus by professor, concatenates a bounded amount of review text per professor, encodes that text with the all-MiniLM-L6-v2 sentence-transformer model, L2-normalizes each vector, and stores the resulting professor embedding matrix. At runtime, ProfIQ finds nearest neighbors by cosine similarity, hydrates those neighbors from the database, and then prefers same-department or same-institution matches when possible.",
+    )
+    add_para(doc, "Results", bold=True, size=12, after=4)
+    add_para(
+        doc,
+        "The results support the main sentiment hypothesis. Both learned models improve over the VADER baseline on the held-out reviews. VADER is useful because it is transparent and always available, but it struggles with neutral reviews and domain-specific professor language. TF-IDF + Logistic Regression gives the strongest macro-F1 in the saved results, which means it handles the minority neutral class better. DistilBERT gives the highest accuracy and weighted-F1, showing that a deeper language model can capture more review phrasing, though it is less practical as the default live model. The recommender evaluation also supports the embedding hypothesis: nearest-neighbor matches have higher department and institution purity than a random baseline, meaning review-text embeddings are capturing teaching-style similarity better than chance.",
     )
 
     add_heading(doc, "5. API and Frontend Implementation", 1)

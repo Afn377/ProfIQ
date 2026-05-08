@@ -152,6 +152,56 @@ def header_footer(canvas, doc):
 S = styles()
 
 
+SCHEMA_ROWS = [
+    ("Source", "id", "BigAutoField / integer primary key", "Django-generated identifier."),
+    ("Source", "name", "CharField(64), unique", "Review platform name."),
+    ("Source", "base_url", "URLField / varchar(200), blank allowed", "Base website URL."),
+    ("Department", "id", "BigAutoField / integer primary key", "Django-generated identifier."),
+    ("Department", "name", "CharField(128), unique", "Department name."),
+    ("Department", "code", "CharField(16), blank allowed", "Optional department code."),
+    ("Professor", "id", "BigAutoField / integer primary key", "Django-generated identifier."),
+    ("Professor", "name", "CharField(128), indexed", "Professor name."),
+    ("Professor", "department_id", "ForeignKey to Department, nullable", "Optional department; SET_NULL on delete."),
+    ("Professor", "institution", "CharField(128), indexed", "School/institution."),
+    ("Professor", "bio", "TextField", "Optional bio."),
+    ("Professor", "external_ref", "CharField(64), indexed, unique when nonblank", "External id such as rmp:12345."),
+    ("Professor", "source_avg_rating", "FloatField, nullable", "Profile rating from source crawl."),
+    ("Professor", "source_num_ratings", "IntegerField", "Profile rating count."),
+    ("Professor", "created_at", "DateTimeField", "Auto-created timestamp."),
+    ("Course", "id", "BigAutoField / integer primary key", "Django-generated identifier."),
+    ("Course", "code", "CharField(32), indexed, unique", "Course code."),
+    ("Course", "title", "CharField(200)", "Optional title."),
+    ("Course", "department_id", "ForeignKey to Department, nullable", "Optional department."),
+    ("Course.professors join table", "id", "BigAutoField / integer primary key", "Django-created many-to-many row id."),
+    ("Course.professors join table", "course_id", "ForeignKey to Course", "Course side of relation."),
+    ("Course.professors join table", "professor_id", "ForeignKey to Professor", "Professor side of relation."),
+    ("Review", "id", "BigAutoField / integer primary key", "Django-generated identifier."),
+    ("Review", "professor_id", "ForeignKey to Professor", "Required; CASCADE on delete."),
+    ("Review", "course_id", "ForeignKey to Course, nullable", "Optional course."),
+    ("Review", "source_id", "ForeignKey to Source", "Required source; PROTECT on delete."),
+    ("Review", "text", "TextField", "Persisted seed/demo review text."),
+    ("Review", "rating", "FloatField, nullable", "Optional 1-5 rating."),
+    ("Review", "source_url", "URLField / varchar(200)", "Unique with source when nonblank."),
+    ("Review", "posted_at", "DateTimeField, nullable", "Original timestamp."),
+    ("Review", "ingested_at", "DateTimeField", "Auto-ingest timestamp."),
+    ("SentimentResult", "id", "BigAutoField / integer primary key", "Django-generated identifier."),
+    ("SentimentResult", "review_id", "OneToOneField to Review", "One sentiment row per review."),
+    ("SentimentResult", "compound", "FloatField", "Final -1 to 1 sentiment score."),
+    ("SentimentResult", "positive / neutral / negative", "FloatField", "Raw VADER components."),
+    ("SentimentResult", "label", "CharField(10)", "positive, neutral, or negative."),
+    ("SentimentResult", "themes", "JSONField list", "Detected themes."),
+    ("SentimentResult", "analyzed_at", "DateTimeField", "Auto-updated timestamp."),
+    ("ProfessorStats", "id", "BigAutoField / integer primary key", "Django-generated identifier."),
+    ("ProfessorStats", "professor_id", "OneToOneField to Professor", "One aggregate row per professor."),
+    ("ProfessorStats", "review_count", "IntegerField", "Number of analyzed reviews/comments."),
+    ("ProfessorStats", "avg_compound", "FloatField", "Mean sentiment score."),
+    ("ProfessorStats", "positive_count / neutral_count / negative_count", "IntegerField", "Sentiment label counts."),
+    ("ProfessorStats", "theme_counts", "JSONField object", "Theme frequency map."),
+    ("ProfessorStats", "recommendation_score", "FloatField", "Computed 0-100 score."),
+    ("ProfessorStats", "updated_at", "DateTimeField", "Auto-updated timestamp."),
+]
+
+
 def build():
     story = []
     story.append(p("ProfIQ: Professor Recommendation System", "title"))
@@ -204,6 +254,12 @@ def build():
 
     story.append(p("3. Database and Pipeline Methodology", "h1"))
     story.append(p("The relational schema separates entities that would otherwise be duplicated in raw review data. Professor belongs to an optional Department and has many Courses; Review links a professor, optional course, and Source; SentimentResult stores one NLP result per persisted Review; ProfessorStats stores denormalized aggregates for dashboard queries. Unique constraints on professor identity, external references, course codes, source names, and review source URLs support idempotent ingestion."))
+    story.append(p("<b>Database tables and datatypes.</b>"))
+    story.append(table(
+        ["Table", "Field", "Datatype", "Purpose / notes"],
+        SCHEMA_ROWS,
+        [1.2 * inch, 1.45 * inch, 1.6 * inch, 1.75 * inch],
+    ))
     story.append(table(
         ["Stage", "Persistent writes", "Intentionally not written", "Reason"],
         [
@@ -217,8 +273,11 @@ def build():
     story.append(p("A grader inspecting the production-scale SQLite database may see zero rows in Review and SentimentResult after a directory crawl; that is expected. The large catalog stores professor metadata and source summaries, while raw review text is fetched live, analyzed in memory, and discarded."))
 
     story.append(p("4. Sentiment and Recommendation Methods", "h1"))
-    story.append(p("The baseline sentiment analyzer extends NLTK VADER with an academic-review lexicon, idiom rules, and a star-rating blend. Each review is also tagged for teaching themes: clarity, fairness, workload, helpfulness, engagement, and grading."))
-    story.append(p("The supervised ML classifier labels RMP reviews using averaged helpfulness and clarity ratings: ratings <= 2.0 are negative, 2.0-3.5 are neutral, and > 3.5 are positive. TF-IDF + Logistic Regression is the live default because it is fast and compact; DistilBERT is kept as a deeper offline comparison. For similar-professor search, ProfIQ builds one MiniLM embedding per professor and ranks neighbors by cosine similarity."))
+    story.append(p("<b>Hypothesis.</b> The ML hypothesis is that review text contains enough signal to predict whether a professor review is negative, neutral, or positive, and that a trained classifier should outperform a purely rule-based VADER baseline on held-out RateMyProfessors reviews. A second recommendation hypothesis is that professors whose reviews use similar language about clarity, workload, grading, and helpfulness will be close in sentence-embedding space."))
+    story.append(p("<b>Training data and target variable.</b> The supervised sentiment models are trained on the ML corpus built from live RateMyProfessors review pages. Each row is one review with professor metadata, course, review text, helpfulness/clarity-derived rating, would-take-again flag when available, difficulty, posted date, and source URL. The input feature is the review text. The target variable is a three-class sentiment label derived from the 1-5 rating: ratings <= 2.0 are negative, > 2.0 and <= 3.5 are neutral, and > 3.5 are positive. The source URL is hashed to create stable train/validation/test splits."))
+    story.append(p("<b>Sentiment pipeline.</b> The baseline extends VADER with an academic-review lexicon, idiom rules, and a star-rating blend, then tags themes such as clarity, fairness, workload, helpfulness, engagement, and grading. The learned live model converts text into unigram/bigram TF-IDF features and trains class-weighted Logistic Regression. The deeper comparison model fine-tunes DistilBERT on the same labels; it is kept mainly for offline evaluation because of runtime cost."))
+    story.append(p("<b>Recommendation pipeline.</b> For similar-professor search, the corpus is grouped by professor, a bounded amount of review text is concatenated per professor, all-MiniLM-L6-v2 encodes that text, vectors are L2-normalized, and nearest neighbors are ranked by cosine similarity. Runtime results are hydrated from the database and filtered toward same-department or same-institution matches when possible."))
+    story.append(p("<b>Results.</b> The results support the sentiment hypothesis: both learned models improve over VADER on held-out reviews. TF-IDF + Logistic Regression gives the strongest macro-F1, mainly because it handles the minority neutral class better. DistilBERT gives the highest accuracy and weighted-F1, showing stronger language understanding but higher runtime cost. The recommender results also support the embedding hypothesis because nearest-neighbor matches have higher department and institution purity than a random baseline."))
 
     story.append(p("5. API and Frontend Implementation", "h1"))
     story.append(p("The backend exposes REST endpoints for the user workflows. The frontend is a React/Vite app that calls those endpoints and renders search results, professor detail pages, comparison views, sentiment distributions, theme charts, live reviews, and similar-professor recommendations."))
