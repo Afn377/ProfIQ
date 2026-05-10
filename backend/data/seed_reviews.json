@@ -1,0 +1,134 @@
+{
+  "sources": [
+    {"name": "RateMyProfessors", "base_url": "https://www.ratemyprofessors.com"},
+    {"name": "Reddit", "base_url": "https://www.reddit.com"}
+  ],
+  "departments": [
+    {"name": "Computer Science", "code": "CS"},
+    {"name": "Mathematics", "code": "MATH"},
+    {"name": "Physics", "code": "PHYS"},
+    {"name": "Economics", "code": "ECON"},
+    {"name": "Psychology", "code": "PSY"},
+    {"name": "English", "code": "ENG"}
+  ],
+  "courses": [
+    {"code": "CS 101", "title": "Intro to Programming", "department": "Computer Science"},
+    {"code": "CS 210", "title": "Data Management for Data Science", "department": "Computer Science"},
+    {"code": "CS 350", "title": "Operating Systems", "department": "Computer Science"},
+    {"code": "MATH 120", "title": "Calculus I", "department": "Mathematics"},
+    {"code": "MATH 230", "title": "Linear Algebra", "department": "Mathematics"},
+    {"code": "PHYS 101", "title": "Physics I", "department": "Physics"},
+    {"code": "ECON 201", "title": "Microeconomics", "department": "Economics"},
+    {"code": "PSY 101", "title": "Intro to Psychology", "department": "Psychology"},
+    {"code": "ENG 205", "title": "Modern Literature", "department": "English"}
+  ],
+  "professors": [
+    {
+      "name": "Dr. Amara Khan",
+      "department": "Computer Science",
+      "institution": "State University",
+      "bio": "Researches databases and data-intensive systems. Teaches CS 210 and CS 350.",
+      "courses": ["CS 210", "CS 350"],
+      "reviews": [
+        {"source": "RateMyProfessors", "course": "CS 210", "rating": 4.5, "text": "Dr. Khan explains SQL and relational algebra so clearly. Her lectures are engaging and she is incredibly helpful during office hours. The assignments are fair and well-structured."},
+        {"source": "RateMyProfessors", "course": "CS 210", "rating": 5.0, "text": "Best professor I've had in the CS department. Clear explanations, fair grading, and genuinely cares about students. Highly recommend."},
+        {"source": "Reddit", "course": "CS 210", "text": "Took CS 210 with Khan last semester. Workload was manageable, the projects were actually interesting, and she was very responsive on Piazza."},
+        {"source": "Reddit", "course": "CS 350", "text": "Khan is one of the good ones. Her OS class is hard but fair — you will actually learn a ton if you put in the effort."},
+        {"source": "RateMyProfessors", "course": "CS 350", "rating": 4.0, "text": "Lectures can be dense but she's approachable and supportive. Exams were tough but graded fairly."},
+        {"source": "Reddit", "course": "CS 210", "text": "Honestly one of the best lecturers in the department. She makes database theory feel intuitive."}
+      ]
+    },
+    {
+      "name": "Prof. Daniel Morrison",
+      "department": "Mathematics",
+      "institution": "State University",
+      "bio": "Algebraic topology; teaches Calculus I and Linear Algebra.",
+      "courses": ["MATH 120", "MATH 230"],
+      "reviews": [
+        {"source": "RateMyProfessors", "course": "MATH 120", "rating": 2.0, "text": "Lectures are monotone and confusing. He rushes through examples and the homework is overwhelming. Not a great experience."},
+        {"source": "Reddit", "course": "MATH 120", "text": "Morrison's exams are unfair. Nothing on them looks like what we did in class. Workload is heavy and grading is strict."},
+        {"source": "RateMyProfessors", "course": "MATH 230", "rating": 3.0, "text": "He knows the material deeply but his teaching style is dry. If you're motivated you'll be fine, otherwise it's rough."},
+        {"source": "Reddit", "course": "MATH 230", "text": "Honestly a boring professor. Lectures feel disorganized. You're better off studying from the textbook."},
+        {"source": "RateMyProfessors", "course": "MATH 120", "rating": 2.5, "text": "Unhelpful during office hours — he seems annoyed when you ask questions. Grading is harsh."}
+      ]
+    },
+    {
+      "name": "Dr. Priya Raman",
+      "department": "Computer Science",
+      "institution": "State University",
+      "bio": "Machine learning and AI applications.",
+      "courses": ["CS 101"],
+      "reviews": [
+        {"source": "RateMyProfessors", "course": "CS 101", "rating": 5.0, "text": "Incredible professor. She is enthusiastic, inspiring, and genuinely invested in her students' success. Office hours are extremely helpful."},
+        {"source": "Reddit", "course": "CS 101", "text": "Raman is a gem. Her explanations are crystal clear and her assignments are actually fun. The best intro class I've taken."},
+        {"source": "RateMyProfessors", "course": "CS 101", "rating": 4.5, "text": "Fair grader, engaging lectures, supportive TA team. Workload is reasonable and you learn a lot."},
+        {"source": "Reddit", "course": "CS 101", "text": "She's passionate about teaching and it shows. Highly recommend taking her section."},
+        {"source": "RateMyProfessors", "course": "CS 101", "rating": 4.8, "text": "Extremely approachable and clear. I felt comfortable asking questions. Exams were fair."}
+      ]
+    },
+    {
+      "name": "Prof. George Whittaker",
+      "department": "Physics",
+      "institution": "State University",
+      "bio": "Experimental particle physics.",
+      "courses": ["PHYS 101"],
+      "reviews": [
+        {"source": "RateMyProfessors", "course": "PHYS 101", "rating": 3.5, "text": "Mixed experience. Lectures are engaging when he's prepared but some days feel rushed. Assignments are heavy but fair."},
+        {"source": "Reddit", "course": "PHYS 101", "text": "Whittaker is fine. Not the best, not the worst. The workload is manageable if you start early."},
+        {"source": "RateMyProfessors", "course": "PHYS 101", "rating": 3.0, "text": "Grading is a bit strict but exams are predictable. He's helpful during office hours."},
+        {"source": "Reddit", "course": "PHYS 101", "text": "Dry lectures but he knows his stuff. You'll pass if you do the problem sets."}
+      ]
+    },
+    {
+      "name": "Dr. Mei Lin",
+      "department": "Economics",
+      "institution": "State University",
+      "bio": "Behavioral economics.",
+      "courses": ["ECON 201"],
+      "reviews": [
+        {"source": "RateMyProfessors", "course": "ECON 201", "rating": 4.5, "text": "Lin is engaging and explains complex microeconomic models with clarity. Very fair grader and supportive."},
+        {"source": "Reddit", "course": "ECON 201", "text": "Took ECON 201 with her and loved it. Her lectures tie theory to real-world examples in a way that's genuinely interesting."},
+        {"source": "RateMyProfessors", "course": "ECON 201", "rating": 4.0, "text": "Clear, organized, and approachable. Homework is light but meaningful."},
+        {"source": "Reddit", "course": "ECON 201", "text": "Honestly one of the better profs in the department. Responsive to emails and office hours are actually helpful."}
+      ]
+    },
+    {
+      "name": "Prof. Henry Bellamy",
+      "department": "English",
+      "institution": "State University",
+      "bio": "20th-century American literature.",
+      "courses": ["ENG 205"],
+      "reviews": [
+        {"source": "RateMyProfessors", "course": "ENG 205", "rating": 1.5, "text": "Condescending and unapproachable. Grading feels biased — comments are harsh and not constructive."},
+        {"source": "Reddit", "course": "ENG 205", "text": "Avoid if you can. Lectures are dull, grading is unfair, and he's dismissive of questions in class."},
+        {"source": "RateMyProfessors", "course": "ENG 205", "rating": 2.0, "text": "Workload is heavy and the rubrics are vague. Feedback is minimal."},
+        {"source": "Reddit", "course": "ENG 205", "text": "Not helpful during office hours. The class itself is not worth the stress."}
+      ]
+    },
+    {
+      "name": "Dr. Sarah Okafor",
+      "department": "Psychology",
+      "institution": "State University",
+      "bio": "Cognitive neuroscience.",
+      "courses": ["PSY 101"],
+      "reviews": [
+        {"source": "RateMyProfessors", "course": "PSY 101", "rating": 4.0, "text": "Engaging lectures with lots of real-world examples. Fair exams and a supportive TA team."},
+        {"source": "Reddit", "course": "PSY 101", "text": "Okafor is great. Her enthusiasm for the material is contagious. Assignments are reasonable."},
+        {"source": "RateMyProfessors", "course": "PSY 101", "rating": 4.5, "text": "Clear explanations, approachable, and genuinely caring. Office hours are very helpful."}
+      ]
+    },
+    {
+      "name": "Prof. Leonardo Rossi",
+      "department": "Computer Science",
+      "institution": "State University",
+      "bio": "Distributed systems.",
+      "courses": ["CS 350"],
+      "reviews": [
+        {"source": "RateMyProfessors", "course": "CS 350", "rating": 3.5, "text": "Brilliant but disorganized. The material is interesting, but the pacing is inconsistent and the project specs are vague."},
+        {"source": "Reddit", "course": "CS 350", "text": "Rossi knows his stuff but expect a heavy workload. Grading was a bit strict on me but I learned a lot."},
+        {"source": "RateMyProfessors", "course": "CS 350", "rating": 3.0, "text": "Lectures are engaging when he's on topic. Assignments are challenging and time-consuming."},
+        {"source": "Reddit", "course": "CS 350", "text": "Fair overall. He'll help you if you show up to office hours prepared."}
+      ]
+    }
+  ]
+}
