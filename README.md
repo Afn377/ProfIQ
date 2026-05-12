@@ -108,13 +108,6 @@ cd frontend
 npm run build
 ```
 
-Rebuild the project report:
-
-```bash
-python scripts/build_final_report.py
-python scripts/build_final_report_pdf.py
-```
-
 ## Demo and Report
 
 Demo video:
