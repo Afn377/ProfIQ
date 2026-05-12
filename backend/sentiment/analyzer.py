@@ -297,3 +297,58 @@ def analyze_text(text: str, rating: float | None = None) -> dict:
     }
 
 
+def compute_recommendation_score(
+    avg_compound: float,
+    positive_ratio: float,
+    review_count: int,
+) -> float:
+    """Combine sentiment and review volume into a 0-100 score."""
+    sentiment_component = (avg_compound + 1) * 50  # -1..1 -> 0..100
+    ratio_component = positive_ratio * 100
+
+    base = 0.6 * sentiment_component + 0.4 * ratio_component
+
+    # Shrink low-sample professors toward the middle.
+    k = 10
+    confidence = review_count / (review_count + k) if review_count >= 0 else 0
+    shrunk = confidence * base + (1 - confidence) * 50
+    return max(0.0, min(100.0, round(shrunk, 2)))
+
+
+def aggregate_stats(sentiments: Iterable[dict]) -> dict:
+    """Aggregate a collection of per-review sentiment dicts into summary stats."""
+    sentiments = list(sentiments)
+    n = len(sentiments)
+    if n == 0:
+        return {
+            "review_count": 0,
+            "avg_compound": 0.0,
+            "positive_count": 0,
+            "neutral_count": 0,
+            "negative_count": 0,
+            "theme_counts": {},
+            "recommendation_score": 0.0,
+        }
+
+    avg_compound = sum(s["compound"] for s in sentiments) / n
+    pos = sum(1 for s in sentiments if s["label"] == "positive")
+    neu = sum(1 for s in sentiments if s["label"] == "neutral")
+    neg = sum(1 for s in sentiments if s["label"] == "negative")
+
+    theme_counts: dict[str, int] = {}
+    for s in sentiments:
+        for t in s.get("themes", []):
+            theme_counts[t] = theme_counts.get(t, 0) + 1
+
+    positive_ratio = pos / n
+    score = compute_recommendation_score(avg_compound, positive_ratio, n)
+
+    return {
+        "review_count": n,
+        "avg_compound": round(avg_compound, 4),
+        "positive_count": pos,
+        "neutral_count": neu,
+        "negative_count": neg,
+        "theme_counts": theme_counts,
+        "recommendation_score": score,
+    }
