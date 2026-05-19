@@ -1,0 +1,6 @@
+# Stores ML artifacts produced by sentiment.ml.* training scripts.
+# Tracked by .gitkeep so the directory survives a clean checkout.
+# Files generated here (corpus.parquet, sentiment_clf.joblib,
+# sentiment_bert/, prof_embeddings.npz, *_metrics.json) are NOT
+# committed - they are reproducible from the scripts in
+# backend/sentiment/ml/ and the README's quickstart.
