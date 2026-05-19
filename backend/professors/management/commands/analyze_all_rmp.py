@@ -171,3 +171,79 @@ class Command(BaseCommand):
 
     # ---------------------------------------------------------------- helpers
 
+    def _analyze_one(
+        self,
+        client: RMPClient,
+        prof: Professor,
+        max_reviews: int,
+    ) -> tuple[int, dict | None]:
+        """Fetch and analyze one professor's reviews."""
+        legacy_id = _legacy_id_from_ref(prof.external_ref)
+        if legacy_id is None:
+            return 0, None
+
+        gid = teacher_gid_from_legacy(legacy_id)
+        sentiments: list[dict] = []
+        ratings_seen = 0
+        try:
+            for rating in client.iter_ratings(gid, page_size=20, max_reviews=max_reviews):
+                ratings_seen += 1
+                comment = (rating.get("comment") or "").strip()
+                if not comment:
+                    continue
+                sentiments.append(analyze_text(comment, rating=_quality_rating(rating)))
+        except Exception as exc:
+            logger.warning(
+                "RMP fetch failed for %s (rmp:%s): %s",
+                prof.name, legacy_id, exc,
+            )
+            if not sentiments:
+                return 0, None
+            # Keep partial results when available.
+
+        if not sentiments:
+            return ratings_seen, None
+        return len(sentiments), aggregate_stats(sentiments)
+
+    def _install_signal_handlers(self, ckpt: dict) -> None:
+        def _on_term(signum, frame):  # noqa: ARG001
+            _save_checkpoint(ckpt)
+            self.stdout.write(self.style.WARNING(
+                "\nReceived SIGTERM — checkpoint saved."
+            ))
+            sys.exit(143)
+        signal.signal(signal.SIGTERM, _on_term)
+
+
+def _legacy_id_from_ref(external_ref: str) -> int | None:
+    """Extract the legacy ID from ``"rmp:<legacy_id>"`` refs."""
+    if not external_ref.startswith("rmp:"):
+        return None
+    try:
+        # Use the first numeric chunk.
+        parts = external_ref.split(":")
+        return int(parts[1])
+    except (IndexError, ValueError):
+        return None
+
+
+# ---------------------------------------------------------------------------
+# Checkpoint helpers
+
+
+def _fresh_checkpoint() -> dict:
+    return {"done_prof_ids": [], "written": 0}
+
+
+def _load_checkpoint() -> dict:
+    if not CHECKPOINT_PATH.exists():
+        return _fresh_checkpoint()
+    try:
+        return json.loads(CHECKPOINT_PATH.read_text())
+    except json.JSONDecodeError:
+        return _fresh_checkpoint()
+
+
+def _save_checkpoint(ckpt: dict) -> None:
+    CHECKPOINT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    CHECKPOINT_PATH.write_text(json.dumps(ckpt))
