@@ -724,3 +724,58 @@ function ReviewsSection({ professor }) {
   );
 }
 
+function ReviewItem({ source, rating, course, text, sentiment, sourceUrl }) {
+  return (
+    <div className="review">
+      <div className="review-head">
+        <span className={"source-chip " + sourceChipClass(source)}>
+          {source}
+        </span>
+        {course && <span className="pill">{course}</span>}
+        {rating != null && (
+          <span className="pill">★ {Number(rating).toFixed(1)}</span>
+        )}
+        <span
+          className={"sentiment-chip " + sentimentLabel(sentiment?.label)}
+          title="Rule-based VADER sentiment (compound score)"
+        >
+          VADER · {sentiment?.label || "neutral"} ·{" "}
+          {(sentiment?.compound ?? 0).toFixed(2)}
+        </span>
+        {sentiment?.ml_label && (
+          <span
+            className={"sentiment-chip " + sentimentLabel(sentiment.ml_label)}
+            title={`Trained ${sentiment.ml_model || "ML"} classifier prediction`}
+            style={{ opacity: 0.9, borderStyle: "dashed" }}
+          >
+            ML · {sentiment.ml_label}
+            {typeof sentiment.ml_confidence === "number"
+              ? ` · ${(sentiment.ml_confidence * 100).toFixed(0)}%`
+              : ""}
+          </span>
+        )}
+        {sourceUrl && (
+          <a
+            href={sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="pill"
+            style={{ marginLeft: "auto" }}
+          >
+            source ↗
+          </a>
+        )}
+      </div>
+      <div className="review-body">{text}</div>
+      {sentiment?.themes?.length > 0 && (
+        <div className="review-themes">
+          {sentiment.themes.map((t) => (
+            <span key={t} className="pill accent">
+              {t}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
