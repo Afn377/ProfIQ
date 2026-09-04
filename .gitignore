@@ -40,6 +40,9 @@ dist/
 # Deploy artifacts
 backend/staticfiles/
 backend/.env.deploy
+backend/deploy.sh
+frontend/deploy.sh
+backend/migrate-remote.sh
 
 # Local-only project description (never tracked)
 /[Dd]escription.[Mm][Dd]
