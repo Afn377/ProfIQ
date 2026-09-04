@@ -37,5 +37,9 @@ dist/
 .idea/
 .vscode/
 
+# Deploy artifacts
+backend/staticfiles/
+backend/.env.deploy
+
 # Local-only project description (never tracked)
 /[Dd]escription.[Mm][Dd]
