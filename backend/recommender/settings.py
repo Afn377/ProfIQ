@@ -67,9 +67,9 @@ if os.environ.get("USE_POSTGRES") == "1":
             "HOST": os.environ.get("DB_HOST", "localhost"),
             "PORT": os.environ.get("DB_PORT", "26257"),
             "OPTIONS": {
-                "sslmode": os.environ.get("DB_SSLMODE", "verify-full"),
-                "sslrootcert": os.environ.get(
-                    "DB_SSLROOTCERT", str(BASE_DIR / "certs" / "cockroachdb-ca.crt")
+                "sslmode": os.environ.get("DB_SSLMODE") or "verify-full",
+                "sslrootcert": os.environ.get("DB_SSLROOTCERT") or str(
+                    BASE_DIR / "certs" / "cockroachdb-ca.crt"
                 ),
             },
         }
