@@ -1,21 +1,32 @@
 :root {
-  --bg: #0b0f1a;
-  --bg-2: #111728;
-  --surface: #161e33;
-  --surface-2: #1c2540;
-  --border: #26304d;
-  --border-strong: #374063;
-  --text: #e6e9f5;
-  --text-dim: #9aa3bf;
-  --text-muted: #6b7495;
-  --accent: #7c5cff;
-  --accent-2: #00d4ff;
+  --bg: #0a0b10;
+  --bg-2: #0d0f19;
+  --surface: #12131c;
+  --surface-2: #171827;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --text: #eceef6;
+  --text-dim: #a3a8c0;
+  --text-muted: #7d82a0;
+  --accent: #7c6bff;
+  /* Solid hover shade for accent fills (no gradient shift). */
+  --accent-hover: #8d7dff;
+  /* Muted secondary tone for sparing use (replaces the old cyan). */
+  --accent-2: #8e90bd;
   --positive: #2ecc8f;
   --negative: #ff5c7a;
   --neutral: #f0c75e;
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  /* Quiet resting elevation for cards/surfaces (hover uses --shadow). */
+  --elev-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   --radius: 14px;
   --radius-sm: 8px;
+  --font-heading: "Space Grotesk", "DM Sans", -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas,
+    monospace;
 }
 
 * {
@@ -30,22 +41,25 @@ body,
 
 body {
   margin: 0;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    sans-serif;
+  font-family: var(--font-body);
   background: radial-gradient(
-      1200px 700px at 10% -10%,
-      rgba(124, 92, 255, 0.18),
-      transparent 60%
-    ),
-    radial-gradient(
-      1000px 600px at 110% 10%,
-      rgba(0, 212, 255, 0.12),
-      transparent 55%
+      900px 520px at 50% -8%,
+      rgba(124, 107, 255, 0.08),
+      transparent 62%
     ),
     var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
 }
 
 a {
@@ -100,7 +114,8 @@ input {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: 800;
+  font-family: var(--font-heading);
+  font-weight: 700;
   letter-spacing: -0.02em;
   font-size: 18px;
 }
@@ -109,7 +124,7 @@ input {
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  background: var(--accent);
   display: grid;
   place-items: center;
   color: #0b0f1a;
@@ -141,6 +156,47 @@ input {
   background: var(--surface-2);
 }
 
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.school-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 13px;
+  max-width: 220px;
+}
+
+.school-chip-name {
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.school-chip-change {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 12px;
+  color: var(--accent-2);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.school-chip-change:hover {
+  color: var(--text);
+}
+
 /* ---------- Hero ---------- */
 
 .hero {
@@ -153,9 +209,11 @@ input {
   line-height: 1.05;
   margin: 0 0 18px;
   letter-spacing: -0.03em;
-  font-weight: 800;
+  font-weight: 700;
 }
 
+/* The single "signature" gradient in the app: a one-time hero moment.
+   Every other former accent gradient below is now a solid color. */
 .hero h1 .grad {
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
   -webkit-background-clip: text;
@@ -182,6 +240,7 @@ input {
 .stat-chip {
   background: var(--surface);
   border: 1px solid var(--border);
+  box-shadow: var(--elev-shadow);
   padding: 14px 22px;
   border-radius: 12px;
   min-width: 140px;
@@ -217,7 +276,7 @@ input {
 
 .search-bar:focus-within {
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.15);
+  box-shadow: 0 0 0 4px rgba(124, 107, 255, 0.15);
 }
 
 .search-bar input {
@@ -250,12 +309,17 @@ input {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  background: var(--accent);
   color: #0b0f1a;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .btn-primary:hover {
-  opacity: 0.92;
+  background: var(--accent-hover);
+}
+
+.btn-primary:active {
+  background: var(--accent);
 }
 
 .btn-ghost {
@@ -319,6 +383,7 @@ input {
 .prof-card {
   background: var(--surface);
   border: 1px solid var(--border);
+  box-shadow: var(--elev-shadow);
   border-radius: var(--radius);
   padding: 18px;
   display: flex;
@@ -353,62 +418,87 @@ input {
   margin-top: 2px;
 }
 
-.score-pill {
-  display: inline-flex;
+/* Nudge the ring down so it clears the compare toggle in the top-right
+   corner — without this it overlaps and looks like a bite out of the
+   circle. Scoped to the card's own row so the bigger rings elsewhere
+   (detail page, Compare) aren't affected. */
+.prof-card .row > .score-ring {
+  margin-top: 30px;
+}
+
+/* ---------- Score ring (slim circular progress) ---------- */
+
+.score-ring {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.score-ring svg {
+  display: block;
+  transform: rotate(-90deg);
+}
+
+.score-ring .ring-track {
+  stroke: var(--surface-2);
+}
+
+.score-ring .ring-value {
+  stroke: var(--text-muted);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Numeric value sits in the center, mono for that data-viz feel. */
+.score-ring .score-ring-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 58px;
-  height: 58px;
-  padding: 6px 8px;
-  border-radius: 14px;
-  font-weight: 800;
-  font-size: 18px;
-  letter-spacing: -0.01em;
-  background: linear-gradient(135deg, #1b2340, #22305b);
-  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-weight: 700;
   color: var(--text);
   line-height: 1;
+  letter-spacing: -0.02em;
+  /* Safety net: an over-long value clips at the circle edge instead of
+     spilling into the ring stroke. */
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-.score-pill.good {
-  background: linear-gradient(135deg, rgba(46, 204, 143, 0.2), rgba(46, 204, 143, 0.08));
-  border-color: rgba(46, 204, 143, 0.45);
-  color: #7fe9bd;
+.score-ring .score-ring-sub {
+  font-family: var(--font-body);
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  margin-top: 3px;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-.score-pill.meh {
-  background: linear-gradient(135deg, rgba(240, 199, 94, 0.18), rgba(240, 199, 94, 0.06));
-  border-color: rgba(240, 199, 94, 0.35);
-  color: #ffdd8a;
+/* Tier color drives the ring stroke — a solid color, never a gradient. */
+.score-ring.good .ring-value {
+  stroke: var(--positive);
 }
-
-.score-pill.bad {
-  background: linear-gradient(135deg, rgba(255, 92, 122, 0.18), rgba(255, 92, 122, 0.06));
-  border-color: rgba(255, 92, 122, 0.35);
-  color: #ff96a9;
+.score-ring.meh .ring-value {
+  stroke: var(--neutral);
 }
-
-.score-pill.unanalyzed {
-  background: linear-gradient(135deg, rgba(150, 160, 180, 0.14), rgba(150, 160, 180, 0.04));
-  border-color: rgba(150, 160, 180, 0.3);
-  color: #9aa4b8;
-  font-weight: 600;
+.score-ring.bad .ring-value {
+  stroke: var(--negative);
+}
+.score-ring.unanalyzed .ring-value {
+  stroke: var(--text-muted);
 }
 
 .unanalyzed-footer {
   color: var(--text-muted);
   font-style: italic;
   font-size: 12px;
-}
-
-.score-pill small {
-  font-size: 10px;
-  font-weight: 500;
-  color: inherit;
-  opacity: 0.8;
-  letter-spacing: 0.08em;
-  margin-top: 2px;
 }
 
 .sentiment-bar {
@@ -445,14 +535,28 @@ input {
   border-radius: 999px;
   background: var(--surface-2);
   color: var(--text-dim);
-  border: 1px solid var(--border);
+  border: 1px solid transparent;
   font-weight: 600;
 }
 
 .pill.accent {
   color: #c9bffd;
-  border-color: rgba(124, 92, 255, 0.4);
-  background: rgba(124, 92, 255, 0.12);
+  background: rgba(124, 107, 255, 0.12);
+}
+
+.pill.good {
+  color: #7fe9bd;
+  background: rgba(46, 204, 143, 0.12);
+}
+
+.pill.meh {
+  color: #ffdd8a;
+  background: rgba(240, 199, 94, 0.12);
+}
+
+.pill.bad {
+  color: #ff96a9;
+  background: rgba(255, 92, 122, 0.12);
 }
 
 .prof-card-footer {
@@ -487,7 +591,7 @@ input {
 
 .compare-toggle.active {
   color: #0b0f1a;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  background: var(--accent);
   border-color: transparent;
 }
 
@@ -524,16 +628,6 @@ input {
   border-radius: 18px;
 }
 
-.big-score .val {
-  font-size: 38px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
 .big-score .lbl {
   font-size: 11px;
   color: var(--text-muted);
@@ -546,6 +640,7 @@ input {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  box-shadow: var(--elev-shadow);
   padding: 22px;
 }
 
@@ -616,7 +711,8 @@ input {
   font-size: 11px;
   padding: 3px 10px;
   border-radius: 999px;
-  border: 1px solid var(--border);
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -624,15 +720,13 @@ input {
 }
 
 .source-chip.reddit {
-  border-color: rgba(255, 92, 122, 0.4);
   color: #ff9fb0;
   background: rgba(255, 92, 122, 0.08);
 }
 
 .source-chip.rmp {
-  border-color: rgba(0, 212, 255, 0.4);
-  color: #7de2ff;
-  background: rgba(0, 212, 255, 0.08);
+  color: #c5c6e0;
+  background: rgba(142, 144, 189, 0.12);
 }
 
 .sentiment-chip {
@@ -710,13 +804,13 @@ input {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--surface);
+  background: rgba(18, 19, 28, 0.78);
   border: 1px solid var(--border-strong);
   padding: 10px 12px 10px 18px;
   border-radius: 999px;
   box-shadow: var(--shadow);
   z-index: 30;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px) saturate(140%);
 }
 
 .compare-bar .count {
@@ -726,11 +820,41 @@ input {
 }
 
 .footer {
-  margin-top: auto;
   padding: 24px 0 36px;
   color: var(--text-muted);
   font-size: 13px;
   text-align: center;
   border-top: 1px solid var(--border);
   margin-top: 60px;
+}
+
+/* ---------- Reduced motion ---------- */
+
+/* Respect users who ask for less animation: keep state changes instant
+   (or near-instant) rather than removing feedback entirely. */
+@media (prefers-reduced-motion: reduce) {
+  .nav-link,
+  .search-bar,
+  .btn,
+  .prof-card,
+  .compare-toggle,
+  .compare-bar {
+    transition-duration: 0.01ms;
+  }
+
+  .prof-card:hover {
+    transform: none;
+  }
+
+  .btn:active {
+    transform: none;
+  }
+
+  .score-ring .ring-value {
+    transition: stroke-dashoffset 0.01ms;
+  }
+
+  .spinner {
+    animation-duration: 1.6s;
+  }
 }

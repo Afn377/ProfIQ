@@ -20,6 +20,7 @@ import {
   sentimentLabel,
 } from "../lib/format.js";
 import { useCompare } from "../lib/compareStore.jsx";
+import ScoreRing from "../components/ScoreRing.jsx";
 
 const COLORS = {
   positive: "#2ecc8f",
@@ -169,7 +170,13 @@ export default function ProfessorDetail() {
           </div>
         </div>
         <div className={"big-score"}>
-          <div className="val">{formatScore(score)}</div>
+          <ScoreRing
+            value={score}
+            max={100}
+            tier={bucket}
+            label={analyzed ? "/100" : "RMP"}
+            size={128}
+          />
           <div className="lbl">
             {analyzed ? "Recommendation" : "RMP rating"}
           </div>

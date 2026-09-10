@@ -17,9 +17,10 @@ import {
 } from "recharts";
 import { api } from "../lib/api.js";
 import { useCompare } from "../lib/compareStore.jsx";
-import { formatScore, scoreBucket } from "../lib/format.js";
+import ScoreRing from "../components/ScoreRing.jsx";
+import { scoreBucket } from "../lib/format.js";
 
-const LINE_COLORS = ["#7c5cff", "#00d4ff", "#2ecc8f", "#f0c75e"];
+const LINE_COLORS = ["var(--accent)", "var(--accent-2)", "#2ecc8f", "#f0c75e"];
 
 export default function Compare() {
   const [params] = useSearchParams();
@@ -117,10 +118,13 @@ export default function Compare() {
                     {p.department || "—"}
                   </div>
                 </div>
-                <div className={"score-pill " + bucket}>
-                  {formatScore(p.recommendation_score)}
-                  <small>/100</small>
-                </div>
+                <ScoreRing
+                  value={p.recommendation_score}
+                  max={100}
+                  tier={bucket}
+                  label="/100"
+                  size={58}
+                />
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--text-dim)", marginTop: 12 }}>
                 <span>{p.review_count} reviews</span>

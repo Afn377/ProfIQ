@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import SentimentBar from "./SentimentBar.jsx";
-import { formatScore, scoreBucket, topThemes } from "../lib/format.js";
+import ScoreRing from "./ScoreRing.jsx";
+import { scoreBucket, topThemes } from "../lib/format.js";
 import { useCompare } from "../lib/compareStore.jsx";
 
 export default function ProfessorCard({ prof }) {
@@ -41,17 +42,24 @@ export default function ProfessorCard({ prof }) {
           </div>
         </div>
         {analyzed ? (
-          <div className={"score-pill " + bucket}>
-            {formatScore(prof.recommendation_score)}
-            <small>/100</small>
-          </div>
+          <ScoreRing
+            value={prof.recommendation_score}
+            max={100}
+            tier={bucket}
+            label="/100"
+            size={58}
+          />
         ) : prof.source_avg_rating != null ? (
-          <div className="score-pill unanalyzed" title="RateMyProfessors summary — not yet analyzed locally">
-            {prof.source_avg_rating.toFixed(1)}
-            <small>RMP</small>
-          </div>
+          <ScoreRing
+            value={prof.source_avg_rating}
+            max={5}
+            tier="unanalyzed"
+            label="RMP"
+            size={58}
+            title="RateMyProfessors summary — not yet analyzed locally"
+          />
         ) : (
-          <div className="score-pill unanalyzed">—</div>
+          <ScoreRing size={58} />
         )}
       </div>
 
