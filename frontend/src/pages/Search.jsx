@@ -1,10 +1,12 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { api } from "../lib/api.js";
+import { useUniversity } from "../lib/universityStore.jsx";
 import ProfessorCard from "../components/ProfessorCard.jsx";
 import AddProfessorModal from "../components/AddProfessorModal.jsx";
 
 export default function Search() {
+  const { institution: savedInstitution } = useUniversity();
   const [params, setParams] = useSearchParams();
   const q = params.get("q") || "";
   const department = params.get("department") || "";
@@ -42,13 +44,30 @@ export default function Search() {
   }, [schoolInput]);
 
   useEffect(() => {
+    // Guard against out-of-order responses: a stale request (superseded because
+    // this effect re-ran for newer deps, e.g. the institution param being seeded
+    // from the saved university right after mount) must never overwrite state
+    // owned by the latest-issued request.
+    let ignore = false;
     setLoading(true);
     setError(null);
     api
       .searchProfessors({ q, department, institution, sort })
-      .then((data) => setResults(data.results || data))
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+      .then((data) => {
+        if (ignore) return;
+        setResults(data.results || data);
+      })
+      .catch((e) => {
+        if (ignore) return;
+        setError(e.message);
+      })
+      .finally(() => {
+        if (ignore) return;
+        setLoading(false);
+      });
+    return () => {
+      ignore = true;
+    };
   }, [q, department, institution, sort]);
 
   useEffect(() => setInput(q), [q]);
@@ -60,6 +79,17 @@ export default function Search() {
     else next.delete(key);
     setParams(next, { replace: true });
   };
+
+  // Seed the school filter from the user's saved university on first arrival,
+  // but only when the URL doesn't already carry an institution param. A one-shot
+  // ref guard means later clears/changes by the user are left untouched.
+  const seededSchoolRef = useRef(false);
+  useEffect(() => {
+    if (seededSchoolRef.current) return;
+    seededSchoolRef.current = true;
+    if (!institution && savedInstitution) updateParam("institution", savedInstitution);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSubmit = (e) => {
     e.preventDefault();

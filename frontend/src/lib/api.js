@@ -21,7 +21,12 @@ async function request(path, opts = {}) {
 }
 
 export const api = {
-  summary: () => request("/summary/"),
+  summary: ({ institution = "" } = {}) => {
+    const p = new URLSearchParams();
+    if (institution) p.set("institution", institution);
+    const qs = p.toString();
+    return request(`/summary/${qs ? `?${qs}` : ""}`);
+  },
   searchProfessors: ({ q = "", department = "", institution = "", sort = "score" } = {}) => {
     const p = new URLSearchParams();
     if (q) p.set("q", q);
