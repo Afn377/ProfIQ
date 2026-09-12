@@ -82,6 +82,24 @@ else:
         }
     }
 
+# Optional second connection used by manage.py push_to_remote to copy data
+# into production CockroachDB. Only added when DB_HOST is set.
+if os.environ.get("DB_HOST"):
+    DATABASES["remote"] = {
+        "ENGINE": "django_cockroachdb",
+        "NAME": os.environ.get("DB_NAME", "recommender"),
+        "USER": os.environ.get("DB_USER", "postgres"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+        "HOST": os.environ.get("DB_HOST", "localhost"),
+        "PORT": os.environ.get("DB_PORT", "26257"),
+        "OPTIONS": {
+            "sslmode": os.environ.get("DB_SSLMODE") or "verify-full",
+            "sslrootcert": os.environ.get("DB_SSLROOTCERT") or str(
+                BASE_DIR / "certs" / "cockroachdb-ca.crt"
+            ),
+        },
+    }
+
 AUTH_PASSWORD_VALIDATORS = []
 
 LANGUAGE_CODE = "en-us"
