@@ -2,10 +2,11 @@ import logging
 import threading
 import time
 from collections import OrderedDict
+from datetime import datetime, timezone
 from threading import Lock, Semaphore
 
 from django.db import close_old_connections
-from django.db.models import Q, Prefetch
+from django.db.models import Q, Prefetch, Case, When, Value, IntegerField
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.decorators import api_view
@@ -26,6 +27,14 @@ from sentiment.analyzer import aggregate_stats, analyze_text
 from sentiment.ml import recommender as ml_recommender
 
 logger = logging.getLogger(__name__)
+
+# Cutoff separating genuinely-analyzed ProfessorStats rows from the one-time
+# demo/seed batch. Every seed-batch row was bulk-loaded on 2026-05-07/08 with an
+# empty theme_counts map; all real analysis (analyze_all_rmp / lazy pipeline)
+# happens on or after 2026-05-09. Ranking queries use this to make sure the
+# seed placeholder scores (which include implausible exact-ceiling values) can
+# never out-rank genuinely-analyzed professors.
+LIVE_ANALYSIS_CUTOFF = datetime(2026, 5, 9, tzinfo=timezone.utc)
 
 
 # Shared RMP client for live review requests.
@@ -271,6 +280,15 @@ class ProfessorSearchView(generics.ListCreateAPIView):
         qs = Professor.objects.select_related("department", "stats")
 
         q = self.request.query_params.get("q", "").strip()
+
+        # Hide the seed batch from the unfiltered Browse gallery, but let an
+        # explicit search still find those professors by name.
+        if not q:
+            qs = qs.exclude(
+                stats__isnull=False,
+                stats__updated_at__lt=LIVE_ANALYSIS_CUTOFF,
+            )
+
         if q:
             qs = qs.filter(
                 Q(name__icontains=q)
@@ -293,7 +311,23 @@ class ProfessorSearchView(generics.ListCreateAPIView):
         elif sort == "reviews":
             qs = qs.order_by("-stats__review_count", "name")
         else:  # score (default)
-            qs = qs.order_by("-stats__recommendation_score", "name")
+            # Rank genuinely-analyzed professors ahead of seed-batch rows
+            # (and professors with no stats row at all). The is_live_analysis
+            # flag is 1 only when stats.updated_at is at/after the cutoff.
+            qs = qs.annotate(
+                is_live_analysis=Case(
+                    When(
+                        stats__updated_at__gte=LIVE_ANALYSIS_CUTOFF,
+                        then=Value(1),
+                    ),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                )
+            ).order_by(
+                "-is_live_analysis",
+                "-stats__recommendation_score",
+                "name",
+            )
         return qs
 
 
@@ -721,19 +755,60 @@ def _warm_up_recommender(prof: Professor) -> bool:
 
 @api_view(["GET"])
 def platform_summary(request):
-    """GET /api/summary/ — lightweight landing-page stats."""
+    """GET /api/summary/ — lightweight landing-page stats.
+
+    ``?institution=<name>`` scopes every stat to that institution,
+    case-insensitively (same convention as ProfessorSearchView); absent/empty
+    returns the global summary.
+    """
     from django.db.models import Count, Avg
-    total_profs = Professor.objects.count()
-    total_reviews = Review.objects.count()
-    top = (
-        Professor.objects.select_related("department", "stats")
-        .filter(stats__review_count__gte=3)
-        .order_by("-stats__recommendation_score")[:5]
-    )
-    depts_with_counts = (
-        Department.objects.annotate(count=Count("professors"))
-        .order_by("-count")[:8]
-    )
+    institution = request.query_params.get("institution", "").strip()
+
+    if institution:
+        total_profs = Professor.objects.filter(
+            institution__iexact=institution
+        ).count()
+        total_reviews = Review.objects.filter(
+            professor__institution__iexact=institution
+        ).count()
+        top = (
+            Professor.objects.select_related("department", "stats")
+            .filter(
+                institution__iexact=institution,
+                stats__review_count__gte=3,
+                stats__updated_at__gte=LIVE_ANALYSIS_CUTOFF,
+            )
+            .order_by("-stats__recommendation_score")[:5]
+        )
+        # Department.name is globally unique (not institution-scoped), so the
+        # per-department count must be a filtered aggregate over just this
+        # institution's professors; annotate-then-filter(count__gt=0) drops the
+        # empty departments and keeps the join free of duplicates.
+        depts_with_counts = (
+            Department.objects.annotate(
+                count=Count(
+                    "professors",
+                    filter=Q(professors__institution__iexact=institution),
+                )
+            )
+            .filter(count__gt=0)
+            .order_by("-count")[:8]
+        )
+    else:
+        total_profs = Professor.objects.count()
+        total_reviews = Review.objects.count()
+        top = (
+            Professor.objects.select_related("department", "stats")
+            .filter(
+                stats__review_count__gte=3,
+                stats__updated_at__gte=LIVE_ANALYSIS_CUTOFF,
+            )
+            .order_by("-stats__recommendation_score")[:5]
+        )
+        depts_with_counts = (
+            Department.objects.annotate(count=Count("professors"))
+            .order_by("-count")[:8]
+        )
     return Response({
         "professor_count": total_profs,
         "review_count": total_reviews,
