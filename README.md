@@ -115,6 +115,28 @@ Demo video:
 https://youtu.be/o1A1l2W680g?si=4a1GuE1157LvYent
 ```
 
+## Deployment
+
+ProfIQ deploys manually (no CI/CD) to free-tier infrastructure: Vercel (frontend), Google Cloud
+Run (backend), Neon Postgres (database). Full design rationale in
+`docs/superpowers/specs/2026-09-13-hosting-design.md`.
+
+1. Copy `backend/.env.deploy.example` to `backend/.env.deploy` and fill in real values (Neon
+   credentials, a generated `DJANGO_SECRET_KEY`, your GCP project ID).
+2. Deploy the backend: `cd backend && ./deploy.sh`. Note the printed Cloud Run URL.
+3. Add that URL as `VITE_API_BASE_URL` in `backend/.env.deploy`, then deploy the frontend:
+   `cd frontend && ./deploy.sh`. Note the printed Vercel URL.
+4. Add the Vercel URL to `CORS_EXTRA_ORIGINS` in `backend/.env.deploy` (alongside
+   `smafnanhaider.com`), then re-run `cd backend && ./deploy.sh`.
+5. Run database migrations and seed data once: `cd backend && ./migrate-remote.sh`.
+6. In the Vercel dashboard, add `smafnanhaider.com` and `www.smafnanhaider.com` as custom
+   domains and point your registrar's DNS at Vercel per its instructions. The backend keeps its
+   default `*.run.app` URL — no custom domain needed there.
+
+`deploy.sh` (backend and frontend) and `migrate-remote.sh` are gitignored, local-only
+convenience scripts — see `backend/.env.deploy.example` for the full list of required
+environment variables.
+
 ## Notes
 
 The large professor catalog stores professor metadata and summary ratings. Review text is mainly fetched live or processed during bounded analysis jobs, so the database does not need to permanently store every scraped review.
