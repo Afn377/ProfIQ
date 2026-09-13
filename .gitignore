@@ -36,3 +36,6 @@ dist/
 # IDE
 .idea/
 .vscode/
+
+# Claude Code superpowers scratch workspace (ledgers, briefs, review packages)
+.superpowers/
