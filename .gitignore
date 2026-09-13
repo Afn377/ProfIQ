@@ -40,6 +40,9 @@ dist/
 # Deploy artifacts (see docs/superpowers/specs/2026-09-13-hosting-design.md)
 backend/staticfiles/
 backend/.env.deploy
+backend/deploy.sh
+frontend/deploy.sh
+backend/migrate-remote.sh
 
 # Claude Code superpowers scratch workspace (ledgers, briefs, review packages)
 .superpowers/
