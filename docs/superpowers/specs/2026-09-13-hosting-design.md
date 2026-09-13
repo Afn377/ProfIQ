@@ -1,6 +1,8 @@
 # ProfIQ Hosting — Design Spec
 
-Status: approved by user, not yet implemented (deploy scripts / .env.deploy not yet written).
+Status: approved by user. Dockerfile/.dockerignore committed and pushed; everything else
+(settings.py/requirements.txt/api.js/README edits, .env.deploy(.example), deploy scripts)
+still needs to be written — see "Actually implemented" below, corrected 2026-09-13.
 Classification: architectural (new deployment subsystem, no existing deploy flow in repo).
 
 ## Goal
@@ -11,10 +13,13 @@ and with zero hosting/deploy tooling committed to the remote GitHub repo.
 
 ## Standing constraint
 
-The user has explicitly and repeatedly asked that hosting/deploy scaffolding never reach the
-remote repo. This is the dominant constraint on the design — it rules out GitHub Actions CI/CD
-and shapes which new files get gitignored vs. committed. Treat this as durable, not a one-off
-for the initial round of changes.
+The user has asked that hosting/deploy *secrets and scripts* never reach the remote repo. This
+still rules out GitHub Actions CI/CD and any committed file containing real credentials. Revised
+2026-09-13: the Dockerfile/.dockerignore pair is explicitly exempted — the user confirmed they're
+fine committed on the public repo, no gitignoring needed. The constraint now applies specifically
+to: `.env.deploy` (real secrets, must never be committed) and the three deploy shell scripts
+(`deploy.sh`, `frontend/deploy.sh`, `migrate-remote.sh`) — kept local/gitignored since they're
+one-off convenience wrappers, not something the repo needs to document.
 
 ## Platform decisions (already researched + decided)
 
@@ -53,50 +58,50 @@ Transformers+DistilBERT footprint.
 | Initial data | Small demo seed (`ingest_seed --reset` against `backend/data/seed_reviews.json`), not a full RMP crawl. |
 | Domain | `smafnanhaider.com` (+ `www`) mapped to Vercel for the frontend — free, unmetered on Hobby, automatic Let's Encrypt SSL. Backend stays on its default `*.run.app` URL; not worth custom-domaining (Google's recommended path needs a paid Load Balancer, and Cloud Run's free native domain mapping is still preview-grade/not production-ready). Frontend already reads the backend URL via `VITE_API_BASE_URL` and CORS already allows arbitrary origins via `CORS_EXTRA_ORIGINS`, so the plain `run.app` URL costs nothing functionally. |
 
-## Already implemented (uncommitted, local-only — done in an earlier part of this session)
+## Actually implemented (verified 2026-09-13, corrects earlier stale claims in this doc)
 
-These exist on disk right now and were verified (`manage.py check`, `collectstatic`) but are
-**not committed**, per the standing constraint:
+This session's git history rewrites (report-generation purge, repo delete/recreate) reset the
+working tree to whatever was last actually committed, which turned out to be less than this spec
+previously claimed. Re-verified against the real files on disk:
 
-- `backend/Dockerfile` — python:3.12-slim, installs `requirements.txt` +
-  `requirements-postgres.txt`, runs `collectstatic`, serves via gunicorn on `$PORT`. Gitignored.
-- `backend/.dockerignore`. Gitignored.
-- `backend/recommender/settings.py` — added WhiteNoise middleware + `STORAGES` config,
-  `sslmode=require` for Postgres (Neon requires TLS), `CORS_EXTRA_ORIGINS` env var
-  (comma-separated) merged into `CORS_ALLOWED_ORIGINS`. **This file is tracked** — the edit is
-  an uncommitted working-tree change, left that way deliberately (see note below).
-- `backend/requirements.txt` — added `gunicorn`, `whitenoise`. Tracked, uncommitted.
-- `frontend/src/lib/api.js` — `BASE` now reads `import.meta.env.VITE_API_BASE_URL` at build
-  time instead of hardcoding `/api` (which only worked via the Vite dev-server proxy). Tracked,
-  uncommitted.
-- `README.md` — added a "Deployment" section documenting the `gcloud run deploy` / `vercel --prod`
-  commands and required env vars. Tracked, uncommitted.
-- `.gitignore` — added entries for `backend/staticfiles/`, `graphify-out/`, `backend/Dockerfile`,
-  `backend/.dockerignore`.
-
-Note on the tracked-file edits (`settings.py`, `requirements.txt`, `api.js`, `README.md`,
-`.gitignore`): these can't be gitignored since they're already tracked. They're being kept as
-plain uncommitted working-tree changes — safe, since nothing reaches the remote unless someone
-runs `git add`/`commit`/`push`. Whether to eventually commit these (they contain no secrets,
-just config plumbing) is an open question for the user to decide later; default so far has been
-"leave uncommitted, don't ask again mid-task."
+- `backend/Dockerfile` — exists, committed, pushed to the public repo. Per the revised standing
+  constraint above, this is fine as-is.
+- `backend/.dockerignore` — same: exists, committed, pushed. Fine as-is.
+- `backend/recommender/settings.py` — **NOT actually edited.** No WhiteNoise, no `STORAGES`
+  config, no `sslmode=require`, no `CORS_EXTRA_ORIGINS`. Still needs to be written.
+- `backend/requirements.txt` — **NOT actually edited.** No `gunicorn`, no `whitenoise`. Still
+  needs to be added.
+- `frontend/src/lib/api.js` — **NOT actually edited.** `BASE` is still hardcoded to `"/api"`.
+  Still needs the `VITE_API_BASE_URL` change.
+- `README.md` — **NOT actually edited.** No "Deployment" section exists. Still needs to be
+  written.
+- `.gitignore` — **NOT actually edited.** None of the previously-claimed entries exist.
 
 ## Still to build (not yet written)
 
+- `backend/recommender/settings.py` edits — WhiteNoise middleware + `STORAGES` config,
+  `sslmode=require` for Postgres (Neon requires TLS), `CORS_EXTRA_ORIGINS` env var
+  (comma-separated) merged into `CORS_ALLOWED_ORIGINS`. Tracked file, fine to commit (no secrets,
+  just config plumbing).
+- `backend/requirements.txt` — add `gunicorn`, `whitenoise`. Tracked, fine to commit.
+- `frontend/src/lib/api.js` — `BASE` reads `import.meta.env.VITE_API_BASE_URL` at build time
+  instead of hardcoding `/api`. Tracked, fine to commit.
+- `README.md` — add a "Deployment" section documenting the `gcloud run deploy` / `vercel --prod`
+  commands and required env vars. Tracked, fine to commit.
 - `backend/.env.deploy` — real secrets (Neon host/user/password/db name, a generated
   `DJANGO_SECRET_KEY`, the eventual Vercel URL for CORS). Gitignored, never committed.
-- `backend/.env.deploy.example` — a template with key names only, no values. Proposed as the
-  **one** file in this whole set that might actually get committed (so the repo documents what
-  env vars deploy needs) — flagged to the user as a suggestion, not yet confirmed. Default to
-  gitignoring this too, like everything else, unless the user says otherwise.
+- `backend/.env.deploy.example` — a template with key names only, no values. This one should be
+  committed, so the repo documents what env vars deploy needs.
 - `backend/deploy.sh` — sources `.env.deploy`, runs `gcloud run deploy profiq-backend --source .`
   with `--memory 2Gi --cpu 2 --timeout 300 --allow-unauthenticated` and the env vars from the
-  file.
+  file. Local-only, gitignored (one-off convenience wrapper, not documentation).
 - `frontend/deploy.sh` — runs `vercel --prod` with `VITE_API_BASE_URL` set to the Cloud Run URL.
+  Local-only, gitignored.
 - `backend/migrate-remote.sh` — sources `.env.deploy`, exports `USE_POSTGRES=1` + `DB_*`, runs
-  `manage.py migrate` then `manage.py ingest_seed --reset` against Neon.
-
-All three scripts: local-only, gitignored, same treatment as the Dockerfile.
+  `manage.py migrate` then `manage.py ingest_seed --reset` against Neon. Local-only, gitignored.
+- `.gitignore` — add entries for `backend/staticfiles/` (build artifact) and `backend/.env.deploy`
+  (secrets). `graphify-out/` is a separate tool's output, unrelated to hosting — leave it out of
+  this change unless the user asks.
 
 ## Verification checklist (post-deploy, in lieu of automated tests — this is infra, not app code)
 
