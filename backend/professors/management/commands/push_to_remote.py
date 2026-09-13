@@ -6,6 +6,8 @@ keys still line up. Requires DB_HOST (see recommender/settings.py) or fails
 fast. Safe to re-run — rows already on 'remote' are skipped by primary key,
 and --fix-timestamps repairs updated_at values an earlier run clobbered.
 """
+from contextlib import contextmanager
+
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
 
@@ -24,6 +26,37 @@ TABLES = [
     (Professor, "Professor", True),
     (ProfessorStats, "ProfessorStats", True),
 ]
+
+# (model, timestamp field) pairs repaired by --fix-timestamps. Only
+# updated_at matters functionally (views.py compares it against
+# LIVE_ANALYSIS_CUTOFF); Professor.created_at is cosmetic and left alone.
+REPAIR_TARGETS = [
+    (ProfessorStats, "updated_at"),
+]
+
+
+@contextmanager
+def _suspend_auto_now(model):
+    """Temporarily disable auto_now/auto_now_add on a model's fields.
+
+    bulk_create() runs pre_save() on every insert, which would otherwise
+    stamp copied timestamps with the current time instead of the original
+    value. Restores the original flags afterward, even if the write raises.
+    """
+    fields = [
+        f for f in model._meta.get_fields()
+        if hasattr(f, "auto_now") and (f.auto_now or f.auto_now_add)
+    ]
+    originals = [(f, f.auto_now, f.auto_now_add) for f in fields]
+    for field in fields:
+        field.auto_now = False
+        field.auto_now_add = False
+    try:
+        yield
+    finally:
+        for field, orig_auto_now, orig_auto_now_add in originals:
+            field.auto_now = orig_auto_now
+            field.auto_now_add = orig_auto_now_add
 
 
 class Command(BaseCommand):
@@ -44,6 +77,18 @@ class Command(BaseCommand):
                 "Perform the copy. Without this flag the command runs as a dry "
                 "run only: it prints each table's source and remote row counts "
                 "and writes nothing."
+            ),
+        )
+        parser.add_argument(
+            "--fix-timestamps",
+            action="store_true",
+            help=(
+                "Repair mode instead of copy mode: for every row of "
+                "ProfessorStats, copy the local 'default' updated_at value onto "
+                "the matching 'remote' row (matched by id), undoing the "
+                "auto_now override that stamped every remote row with the push "
+                "date. Requires --yes and writes nothing without it. No rows "
+                "are copied in this mode."
             ),
         )
 
@@ -85,23 +130,32 @@ class Command(BaseCommand):
         remote_mgr = model.objects.using("remote")
         written = 0
         batch = []
-        for row in src_qs.iterator(chunk_size=CHUNK_SIZE):
-            batch.append(model(**{name: getattr(row, name) for name in field_names}))
-            if len(batch) >= CHUNK_SIZE:
+        # Suspend auto_now/auto_now_add while inserting: bulk_create runs each
+        # field's pre_save(), which would otherwise overwrite the explicitly
+        # copied historical timestamps (Professor.created_at,
+        # ProfessorStats.updated_at) with "now".
+        with _suspend_auto_now(model):
+            for row in src_qs.iterator(chunk_size=CHUNK_SIZE):
+                batch.append(model(**{name: getattr(row, name) for name in field_names}))
+                if len(batch) >= CHUNK_SIZE:
+                    remote_mgr.bulk_create(
+                        batch, batch_size=CHUNK_SIZE, ignore_conflicts=True,
+                    )
+                    written += len(batch)
+                    batch = []
+                    if progress:
+                        self.stdout.write(
+                            f"{label}: {written}/{total} ({written / total:.1%})"
+                        )
+            if batch:
                 remote_mgr.bulk_create(
                     batch, batch_size=CHUNK_SIZE, ignore_conflicts=True,
                 )
                 written += len(batch)
-                batch = []
                 if progress:
                     self.stdout.write(
                         f"{label}: {written}/{total} ({written / total:.1%})"
                     )
-        if batch:
-            remote_mgr.bulk_create(batch, batch_size=CHUNK_SIZE, ignore_conflicts=True)
-            written += len(batch)
-            if progress:
-                self.stdout.write(f"{label}: {written}/{total} ({written / total:.1%})")
 
         after = self._count(model, "remote")
         inserted = after - before
@@ -110,6 +164,78 @@ class Command(BaseCommand):
             self.style.SUCCESS(
                 f"{label}: processed {written} source row(s); remote {before} -> "
                 f"{after} ({inserted} new, {skipped} skipped as already present)."
+            )
+        )
+
+    def _repair_timestamp_field(self, model, field_name):
+        """Copy one timestamp field from 'default' onto 'remote', matched by id.
+
+        Uses ``bulk_update`` so only that one column is touched; remote rows that
+        do not exist are skipped by the ``pk__in`` filter.
+        """
+        label = f"{model.__name__}.{field_name}"
+        src_qs = (
+            model.objects.using("default")
+            .order_by("pk")
+            .values_list("pk", field_name)
+        )
+        total = src_qs.count()
+        remote_mgr = model.objects.using("remote")
+
+        read = 0
+        repaired = 0
+        batch = []
+
+        # bulk_update reads each field's value with getattr(obj, field.attname)
+        # and never calls pre_save(), so auto_now should not clobber these
+        # values — but the toggle is applied unconditionally anyway so this path
+        # can never regress into the bulk_create-style overwrite.
+        with _suspend_auto_now(model):
+            for pk, value in src_qs.iterator(chunk_size=CHUNK_SIZE):
+                batch.append(model(pk=pk, **{field_name: value}))
+                if len(batch) >= CHUNK_SIZE:
+                    repaired += remote_mgr.bulk_update(
+                        batch, [field_name], batch_size=CHUNK_SIZE,
+                    )
+                    read += len(batch)
+                    batch = []
+                    if total:
+                        self.stdout.write(
+                            f"{label}: {read}/{total} ({read / total:.1%})"
+                        )
+                    else:
+                        self.stdout.write(f"{label}: {read} row(s) processed")
+            if batch:
+                repaired += remote_mgr.bulk_update(
+                    batch, [field_name], batch_size=CHUNK_SIZE,
+                )
+                read += len(batch)
+                if total:
+                    self.stdout.write(
+                        f"{label}: {read}/{total} ({read / total:.1%})"
+                    )
+
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"{label}: repaired {repaired} row(s) on 'remote' "
+                f"({read} source row(s) read, "
+                f"{read - repaired} had no matching remote row)."
+            )
+        )
+        return repaired
+
+    def _fix_timestamps(self):
+        """Repair timestamps already corrupted on 'remote' by an earlier copy."""
+        self.stdout.write(
+            "Repair mode (--fix-timestamps): writing local timestamp values "
+            "onto 'remote'. No rows are copied."
+        )
+        total_repaired = 0
+        for model, field_name in REPAIR_TARGETS:
+            total_repaired += self._repair_timestamp_field(model, field_name)
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Timestamp repair complete: {total_repaired} row(s) repaired."
             )
         )
 
