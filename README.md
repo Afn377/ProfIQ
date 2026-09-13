@@ -136,7 +136,7 @@ Run (backend), Neon Postgres (database). Full design rationale in
    domains and point your registrar's DNS at Vercel per its instructions. The backend keeps its
    default `*.run.app` URL — no custom domain needed there.
 
-`deploy.sh` (backend and frontend) and `migrate-remote.sh` are untracked, local-only
+`deploy.sh` (backend and frontend) and `migrate-remote.sh` are gitignored, local-only
 convenience scripts — see `backend/.env.deploy.example` for the full list of required
 environment variables.
 
