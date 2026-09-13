@@ -124,11 +124,14 @@ Run (backend), Neon Postgres (database). Full design rationale in
 1. Copy `backend/.env.deploy.example` to `backend/.env.deploy` and fill in real values (Neon
    credentials, a generated `DJANGO_SECRET_KEY`, your GCP project ID).
 2. Deploy the backend: `cd backend && ./deploy.sh`. Note the printed Cloud Run URL.
-3. Add that URL as `VITE_API_BASE_URL` in `backend/.env.deploy`, then deploy the frontend:
+3. Add that URL **plus `/api`** as `VITE_API_BASE_URL` in `backend/.env.deploy` (e.g.
+   `https://profiq-backend-xxxx.run.app/api`), then deploy the frontend:
    `cd frontend && ./deploy.sh`. Note the printed Vercel URL.
 4. Add the Vercel URL to `CORS_EXTRA_ORIGINS` in `backend/.env.deploy` (alongside
    `smafnanhaider.com`), then re-run `cd backend && ./deploy.sh`.
-5. Run database migrations and seed data once: `cd backend && ./migrate-remote.sh`.
+5. Run database migrations and seed data once: `cd backend && ./migrate-remote.sh` (requires
+   `pip install -r requirements-postgres.txt` in addition to `requirements.txt`, for the `psycopg`
+   Postgres driver).
 6. In the Vercel dashboard, add `smafnanhaider.com` and `www.smafnanhaider.com` as custom
    domains and point your registrar's DNS at Vercel per its instructions. The backend keeps its
    default `*.run.app` URL — no custom domain needed there.
