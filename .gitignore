@@ -37,5 +37,9 @@ dist/
 .idea/
 .vscode/
 
+# Deploy artifacts (see docs/superpowers/specs/2026-09-13-hosting-design.md)
+backend/staticfiles/
+backend/.env.deploy
+
 # Claude Code superpowers scratch workspace (ledgers, briefs, review packages)
 .superpowers/
