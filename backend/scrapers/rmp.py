@@ -448,6 +448,23 @@ class RMPClient:
                 return
             cursor = page_info.get("endCursor")
 
+    def get_teacher_count(self, school_id: str) -> int:
+        """Return RMP's current total teacher count for a school — one cheap request (first=1, resultCount only, no edges)."""
+        data = self._post(
+            """
+            query TeacherCountQuery($query: TeacherSearchQuery!) {
+              newSearch {
+                teachers(query: $query, first: 1) {
+                  resultCount
+                }
+              }
+            }
+            """,
+            {"query": {"text": "", "schoolID": school_id}},
+        )
+        teachers = (data.get("newSearch") or {}).get("teachers") or {}
+        return teachers.get("resultCount") or 0
+
     def iter_ratings(
         self,
         teacher_gid: str,
