@@ -118,7 +118,7 @@ https://youtu.be/o1A1l2W680g?si=4a1GuE1157LvYent
 ## Deployment
 
 ProfIQ deploys manually (no CI/CD) to free-tier infrastructure: Vercel (frontend), Google Cloud
-Run (backend), Neon Postgres (database). Full design rationale in
+Run (backend), CockroachDB Serverless (database). Full design rationale in
 `docs/superpowers/specs/2026-09-13-hosting-design.md`.
 
 1. Copy `backend/.env.deploy.example` to `backend/.env.deploy` and fill in real values
