@@ -130,13 +130,13 @@ Run (backend), CockroachDB Serverless (database). Full design rationale in
    `https://profiq-backend-xxxx.run.app/api`), then deploy the frontend:
    `cd frontend && ./deploy.sh`. Note the printed Vercel URL.
 4. Add the Vercel URL to `CORS_EXTRA_ORIGINS` in `backend/.env.deploy` (alongside
-   `smafnanhaider.com`), then re-run `cd backend && ./deploy.sh`.
+   `profiq.smafnanhaider.com`), then re-run `cd backend && ./deploy.sh`.
 5. Run database migrations and seed data once: `cd backend && ./migrate-remote.sh` (requires
    `pip install -r requirements-postgres.txt` in addition to `requirements.txt`, for the `psycopg`
    Postgres driver).
-6. In the Vercel dashboard, add `smafnanhaider.com` and `www.smafnanhaider.com` as custom
-   domains and point your registrar's DNS at Vercel per its instructions. The backend keeps its
-   default `*.run.app` URL — no custom domain needed there.
+6. In the Vercel dashboard, add `profiq.smafnanhaider.com` as a custom domain and point your
+   registrar's DNS at Vercel per its instructions (a CNAME record for the `profiq` subdomain).
+   The backend keeps its default `*.run.app` URL — no custom domain needed there.
 
 `deploy.sh` (backend and frontend) and `migrate-remote.sh` are gitignored, local-only
 convenience scripts — see `backend/.env.deploy.example` for the full list of required
