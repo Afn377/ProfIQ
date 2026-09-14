@@ -60,13 +60,18 @@ WSGI_APPLICATION = "recommender.wsgi.application"
 if os.environ.get("USE_POSTGRES") == "1":
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.postgresql",
+            "ENGINE": "django_cockroachdb",
             "NAME": os.environ.get("DB_NAME", "recommender"),
             "USER": os.environ.get("DB_USER", "postgres"),
             "PASSWORD": os.environ.get("DB_PASSWORD", ""),
             "HOST": os.environ.get("DB_HOST", "localhost"),
-            "PORT": os.environ.get("DB_PORT", "5432"),
-            "OPTIONS": {"sslmode": "require"},
+            "PORT": os.environ.get("DB_PORT", "26257"),
+            "OPTIONS": {
+                "sslmode": os.environ.get("DB_SSLMODE", "verify-full"),
+                "sslrootcert": os.environ.get(
+                    "DB_SSLROOTCERT", str(BASE_DIR / "certs" / "cockroachdb-ca.crt")
+                ),
+            },
         }
     }
 else:

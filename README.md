@@ -121,8 +121,10 @@ ProfIQ deploys manually (no CI/CD) to free-tier infrastructure: Vercel (frontend
 Run (backend), Neon Postgres (database). Full design rationale in
 `docs/superpowers/specs/2026-09-13-hosting-design.md`.
 
-1. Copy `backend/.env.deploy.example` to `backend/.env.deploy` and fill in real values (Neon
-   credentials, a generated `DJANGO_SECRET_KEY`, your GCP project ID).
+1. Copy `backend/.env.deploy.example` to `backend/.env.deploy` and fill in real values
+   (CockroachDB Serverless credentials, a generated `DJANGO_SECRET_KEY`, your GCP project ID).
+   Download the cluster's CA certificate from the CockroachDB Cloud console into
+   `backend/certs/cockroachdb-ca.crt` (public cert, safe to commit).
 2. Deploy the backend: `cd backend && ./deploy.sh`. Note the printed Cloud Run URL.
 3. Add that URL **plus `/api`** as `VITE_API_BASE_URL` in `backend/.env.deploy` (e.g.
    `https://profiq-backend-xxxx.run.app/api`), then deploy the frontend:
