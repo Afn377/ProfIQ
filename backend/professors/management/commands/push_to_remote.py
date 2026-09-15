@@ -10,6 +10,7 @@ from contextlib import contextmanager
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
+from django.db.models import Max
 
 from professors.models import Department, Professor, ProfessorStats, Source
 
@@ -111,14 +112,25 @@ class Command(BaseCommand):
         return model.objects.using(alias).count()
 
     def _copy_table(self, model, label, progress):
-        """Copy every row of ``model`` from 'default' to 'remote'.
+        """Copy rows of ``model`` from 'default' to 'remote' that aren't there yet.
 
-        Primary keys (and every other field, including nullable FKs such as
-        ``Professor.department_id``) are copied explicitly. Returns nothing;
-        prints a completion summary line.
+        Skips anything at or below remote's current max primary key, then
+        bulk_creates the rest in chunks. Prints a completion summary line.
         """
+        remote_mgr = model.objects.using("remote")
+
+        # Highest PK already present on 'remote' (None when it is empty). Every
+        # local row with pk <= this value is known to be on 'remote' already, so
+        # it can be skipped entirely.
+        remote_max_pk = remote_mgr.aggregate(Max("pk"))["pk__max"]
+
+        source_total = self._count(model, "default")
         src_qs = model.objects.using("default").order_by("pk")
+        if remote_max_pk is not None:
+            src_qs = src_qs.filter(pk__gt=remote_max_pk)
         total = src_qs.count()
+        # Rows the new pk filter skipped: entirely present on 'remote' already.
+        skipped_pre_synced = source_total - total
         before = self._count(model, "remote")
 
         # attname gives the DB column name: plain field name for normal fields
@@ -127,7 +139,6 @@ class Command(BaseCommand):
         # — including the primary key — so bulk_create keeps source PKs.
         field_names = [field.attname for field in model._meta.concrete_fields]
 
-        remote_mgr = model.objects.using("remote")
         written = 0
         batch = []
         # Suspend auto_now/auto_now_add while inserting: bulk_create runs each
@@ -159,11 +170,16 @@ class Command(BaseCommand):
 
         after = self._count(model, "remote")
         inserted = after - before
-        skipped = written - inserted
+        # "skipped" reflects the full picture of rows that were already present
+        # before this run: those excluded by the pk pre-filter plus any scanned
+        # rows ignore_conflicts caught inside the slice.
+        skipped = skipped_pre_synced + (written - inserted)
         self.stdout.write(
             self.style.SUCCESS(
-                f"{label}: processed {written} source row(s); remote {before} -> "
-                f"{after} ({inserted} new, {skipped} skipped as already present)."
+                f"{label}: processed {written} new source row(s) "
+                f"({skipped_pre_synced} pre-synced row(s) skipped by pk filter); "
+                f"remote {before} -> {after} ({inserted} new, {skipped} skipped "
+                f"as already present)."
             )
         )
 
@@ -256,6 +272,10 @@ class Command(BaseCommand):
                 dst = self._count(model, "remote")
                 self.stdout.write(f"  {label}: source={src}, remote={dst}")
             self.stdout.write("Dry run complete — no rows were written.")
+            return
+
+        if options["fix_timestamps"]:
+            self._fix_timestamps()
             return
 
         self.stdout.write("Starting copy: 'default' -> 'remote' (order: "
