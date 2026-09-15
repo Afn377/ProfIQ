@@ -14,12 +14,9 @@ logger = logging.getLogger(__name__)
 # Resolve relative to the backend/ working dir.
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CLF_PATH = ROOT / "data" / "ml" / "sentiment_clf.joblib"
-DEFAULT_BERT_DIR = ROOT / "data" / "ml" / "sentiment_bert"
 
 _LOCK = threading.Lock()
 _CLF = None        # sklearn Pipeline or False sentinel for "tried & failed"
-_BERT = None       # transformers pipeline or False sentinel
-_BERT_DISABLED = os.environ.get("ML_BERT_LIVE", "").strip() not in {"1", "true", "yes"}
 
 
 # Low-confidence predictions are treated as neutral.
@@ -116,39 +113,6 @@ def _load_classifier(path: Path | None = None):
     return _CLF
 
 
-def _load_bert(model_dir: Path | None = None):
-    global _BERT
-    if _BERT_DISABLED:
-        return None
-    if _BERT is not None:
-        return _BERT or None
-    if model_dir is None:
-        model_dir = DEFAULT_BERT_DIR
-    with _LOCK:
-        if _BERT is not None:
-            return _BERT or None
-        try:
-            if not model_dir.exists():
-                logger.info("BERT model dir not found at %s", model_dir)
-                _BERT = False
-                return None
-            from transformers import pipeline
-            _BERT = pipeline(
-                task="text-classification",
-                model=str(model_dir),
-                tokenizer=str(model_dir),
-                top_k=None,
-                truncation=True,
-                max_length=256,
-            )
-            logger.info("Loaded BERT classifier from %s", model_dir)
-        except Exception as exc:
-            logger.warning("Failed to load BERT classifier (%s)", exc)
-            _BERT = False
-            return None
-    return _BERT
-
-
 def predict(text: str) -> Optional[Prediction]:
     """Predict 3-class sentiment when the model is available."""
     if not text or not text.strip():
@@ -191,34 +155,12 @@ def predict(text: str) -> Optional[Prediction]:
         return None
 
 
-def predict_bert(text: str) -> Optional[Prediction]:
-    """Optional BERT prediction. Returns ``None`` when disabled or unavailable."""
-    if not text or not text.strip():
-        return None
-    pipe = _load_bert()
-    if pipe is None:
-        return None
-    try:
-        out = pipe(text)
-        scores = out[0] if (out and isinstance(out[0], list)) else out
-        best = max(scores, key=lambda s: s["score"])
-        return Prediction(
-            label=str(best["label"]).lower(),
-            confidence=float(best["score"]),
-            model="distilbert",
-        )
-    except Exception as exc:
-        logger.warning("BERT predict failed: %s", exc)
-        return None
-
-
 def is_available() -> bool:
     return _load_classifier() is not None
 
 
 def reset() -> None:
     """Test hook: drop cached models so subsequent calls reload."""
-    global _CLF, _BERT
+    global _CLF
     with _LOCK:
         _CLF = None
-        _BERT = None
