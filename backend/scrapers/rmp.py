@@ -192,7 +192,15 @@ class RMPTeacher:
 
     @property
     def full_name(self) -> str:
-        return f"{self.first_name} {self.last_name}".strip()
+        first = self.first_name.strip()
+        # RMP's source data sometimes has a lone "." as a placeholder for an
+        # unknown first name (some reviewers enter it when they don't know the
+        # professor's first name). Treat punctuation-only placeholders the same
+        # as an empty first name rather than joining them in literally as
+        # ". Lastname".
+        if not any(c.isalnum() for c in first):
+            first = ""
+        return f"{first} {self.last_name}".strip()
 
     @property
     def profile_url(self) -> str:
