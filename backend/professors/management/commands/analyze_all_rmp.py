@@ -9,7 +9,7 @@ from pathlib import Path
 from time import monotonic
 
 from django.conf import settings
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from professors.models import Professor, ProfessorStats
@@ -65,6 +65,14 @@ class Command(BaseCommand):
             "--dry-run", action="store_true",
             help="Fetch + analyze but do not write ProfessorStats.",
         )
+        parser.add_argument(
+            "--institutions-file", type=str, default=None,
+            help=(
+                "Path to a text file with one institution name per line (matched "
+                "exactly against Professor.institution). When given, only "
+                "professors at these institutions are analyzed."
+            ),
+        )
 
     # ------------------------------------------------------------------ main
 
@@ -76,6 +84,20 @@ class Command(BaseCommand):
         reset: bool = opts["reset"]
         resume: bool = opts["resume"]
         dry_run: bool = opts["dry_run"]
+        institutions_file = opts["institutions_file"]
+
+        institutions: list[str] = []
+        if institutions_file:
+            inst_path = Path(institutions_file)
+            if not inst_path.exists():
+                raise CommandError(
+                    f"--institutions-file path does not exist: {institutions_file}"
+                )
+            institutions = [
+                line.strip()
+                for line in inst_path.read_text().splitlines()
+                if line.strip()
+            ]
 
         ckpt = _load_checkpoint() if resume else _fresh_checkpoint()
         done_ids: set[int] = set(ckpt.get("done_prof_ids", []))
@@ -90,6 +112,8 @@ class Command(BaseCommand):
             qs = qs.filter(stats__isnull=True)
         if done_ids:
             qs = qs.exclude(id__in=done_ids)
+        if institutions_file:
+            qs = qs.filter(institution__in=institutions)
 
         total_to_process = qs.count()
         if limit:
@@ -102,6 +126,11 @@ class Command(BaseCommand):
             f"{'[RESET]' if reset else ''}"
             f"{'[RESUME]' if resume else ''}"
             f"{'[DRY-RUN]' if dry_run else ''}"
+            + (
+                f" [institutions from {institutions_file}: "
+                f"{len(institutions)} schools]"
+                if institutions_file else ""
+            )
         )
 
         if total_to_process == 0:

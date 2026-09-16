@@ -1,0 +1,177 @@
+American University
+Arizona State University
+Auburn University
+Baylor University
+Binghamton University (SUNY)
+Boston College
+Boston University
+Brandeis University
+Brigham Young University
+Brown University
+California Institute of Technology
+Carnegie Mellon University
+Case Western Reserve University
+The Catholic University of America
+Clemson University
+Colorado School of Mines
+Colorado State University
+Columbia University
+Cornell University
+Dartmouth College
+Drexel University
+Duke University
+East Carolina University
+Emory University
+Florida Atlantic University
+Florida International University
+Florida State University
+George Mason University
+George Washington University
+Georgetown University
+Georgia Institute of Technology
+Georgia State University
+Harvard University
+Howard University
+Indiana University Bloomington
+Indiana University-Purdue University Indianapolis
+Iowa State University
+Johns Hopkins University
+Kansas State University
+Kent State University
+Lehigh University
+Louisiana State University
+Loyola University Chicago
+Massachusetts Institute of Technology
+Medical University of South Carolina
+Michigan State University
+Michigan Technological University
+Mississippi State University
+Missouri University of Science and Technology
+Montana State University
+New Jersey Institute of Technology
+New Mexico State University
+New York University
+North Carolina State University
+North Dakota State University
+Northeastern University
+Northern Arizona University
+Northwestern University
+Nova Southeastern University
+The Ohio State University
+Ohio University
+Oklahoma State University
+Old Dominion University
+Oregon State University
+Princeton University
+Purdue University - West Lafayette
+Rensselaer Polytechnic Institute
+Rice University
+Rutgers - State University of New Jersey
+Saint Louis University
+San Diego State University
+Southern Illinois University - Carbondale
+SMU - Southern Methodist University
+Stanford University
+Stony Brook University (SUNY)
+Syracuse University
+Temple University
+Texas A&M University at College Station
+Texas Tech University
+University of Alabama
+University of Montana - Missoula
+The University of Tennessee Knoxville
+University of Texas at Arlington
+University of Texas at Austin
+The University of Texas at Dallas
+The University of Texas at El Paso
+University of Texas at San Antonio
+University of Texas Southwestern Medical Center
+Tufts University
+Tulane University
+University at Albany (SUNY Albany)
+University at Buffalo (SUNY Buffalo)
+University of Alabama at Birmingham
+University of Arizona
+University of Arkansas
+University of California Berkeley
+University of California Davis
+University of California Los Angeles (UCLA)
+University of California Merced
+University of California Riverside
+University of California San Diego
+University of California San Francisco
+University of California Santa Barbara
+University of California Santa Cruz
+University of Central Florida
+University of Chicago
+University of Cincinnati
+University of Colorado - Boulder
+University of Colorado Denver
+University of Connecticut
+University of Dayton
+University of Delaware
+University of Denver
+University of Florida
+University of Georgia
+University of Hawaii at Manoa
+University of Houston
+University of Idaho
+University of Illinois Chicago
+University Of Illinois at Urbana - Champaign
+University of Iowa
+University of Kansas
+University of Kentucky
+University of Louisiana at Lafayette
+University of Louisville
+University of Maine
+University of Maryland
+University of Maryland, Baltimore County
+University of Maryland - Baltimore
+University of Massachusetts - Amherst
+University of Massachusetts - Boston
+University of Massachusetts Lowell
+university of memphis 
+University of Miami
+University of Minnesota - Twin Cities
+University of Mississippi
+University of Missouri - Columbia
+University of Missouri - Kansas City
+University Of Nebraska Medical Center
+University of Nebraska - Lincoln
+University of Nevada Las Vegas
+University of Nevada - Reno
+University of New Hampshire (all campuses)
+University of New Mexico
+The University of North Carolina at Chapel Hill
+University of North Carolina at Charlotte
+University of North Dakota
+University of North Texas
+University of Notre Dame
+University of Oklahoma
+University of Oregon
+University of Pennsylvania
+University of Pittsburgh
+University of Rhode Island
+University of Rochester
+University of South Carolina
+University of South Florida
+University of Southern California
+University of Southern Mississippi
+University of Toledo
+University of Utah
+University of Vermont
+University of Virginia
+University of Washington
+University of Wisconsin - Madison
+University of Wisconsin - Milwaukee
+University of Wyoming
+Utah State University
+Vanderbilt University
+Virginia Commonwealth University
+Washington State University
+Washington University in St. Louis
+Wayne State University
+Weill Medical College of Cornell University
+West Virginia University
+Worcester Polytechnic Institute
+Yale University
