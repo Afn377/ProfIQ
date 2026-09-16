@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../lib/api.js";
+import { useUniversity } from "../lib/universityStore.jsx";
 import ProfessorCard from "../components/ProfessorCard.jsx";
 
 export default function Home() {
+  const { institution } = useUniversity();
   const [summary, setSummary] = useState(null);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
@@ -11,12 +13,14 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
     api
-      .summary()
+      .summary({ institution })
       .then(setSummary)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [institution]);
 
   const onSearch = (e) => {
     e.preventDefault();
@@ -74,7 +78,7 @@ export default function Home() {
       <section className="section container">
         <div className="section-head">
           <div>
-            <h2>Top recommended</h2>
+            <h2>Top recommended{institution ? ` at ${institution}` : ""}</h2>
             <div className="sub">Ranked by aggregated sentiment score</div>
           </div>
         </div>
