@@ -762,7 +762,7 @@ def platform_summary(request):
     case-insensitively with the same convention used by ProfessorSearchView.
     When the param is absent/empty the response is the unchanged global summary.
     """
-    from django.db.models import Count, Avg
+    from django.db.models import Count
     institution = request.query_params.get("institution", "").strip()
 
     if institution:
