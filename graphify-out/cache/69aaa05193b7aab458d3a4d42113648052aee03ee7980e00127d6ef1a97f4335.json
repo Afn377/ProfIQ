@@ -1,1 +1,0 @@
-{"nodes": [{"id": "labels_rating_to_label", "label": "Rating to sentiment label mapping", "file_type": "code", "source_file": "backend/sentiment/ml/labels.py", "source_location": null, "source_url": null, "captured_at": null, "author": null, "contributor": null}], "edges": [], "hyperedges": []}
