@@ -805,6 +805,10 @@ def platform_summary(request):
             )
             .order_by("-stats__recommendation_score")[:5]
         )
+        analyzed_count = institution_profs.filter(
+            stats__review_count__gte=3,
+            stats__updated_at__gte=LIVE_ANALYSIS_CUTOFF,
+        ).count()
         # Department.name is globally unique (not institution-scoped), so the
         # per-department count must be a filtered aggregate over professors at
         # this institution. Departments with no such professor are dropped via
@@ -831,6 +835,10 @@ def platform_summary(request):
             )
             .order_by("-stats__recommendation_score")[:5]
         )
+        analyzed_count = Professor.objects.filter(
+            stats__review_count__gte=3,
+            stats__updated_at__gte=LIVE_ANALYSIS_CUTOFF,
+        ).count()
         depts_with_counts = (
             Department.objects.annotate(count=Count("professors"))
             .order_by("-count")[:8]
@@ -838,6 +846,7 @@ def platform_summary(request):
     return Response({
         "professor_count": total_profs,
         "review_count": total_reviews,
+        "analyzed_count": analyzed_count,
         "top_professors": ProfessorListSerializer(top, many=True).data,
         "departments": [
             {"id": d.id, "name": d.name, "professor_count": d.count}
