@@ -1,5 +1,6 @@
 """Database models for ProfIQ."""
 from django.db import models
+from django.db.models.functions import Lower
 
 
 class Source(models.Model):
@@ -39,6 +40,9 @@ class Professor(models.Model):
 
     class Meta:
         ordering = ["name"]
+        indexes = [
+            models.Index(Lower("institution"), name="idx_prof_institution_lower"),
+        ]
         constraints = [
             models.UniqueConstraint(
                 fields=["name", "institution"],
