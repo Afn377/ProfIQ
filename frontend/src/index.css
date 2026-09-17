@@ -719,11 +719,6 @@ input {
   font-weight: 600;
 }
 
-.source-chip.reddit {
-  color: #ff9fb0;
-  background: rgba(255, 92, 122, 0.08);
-}
-
 .source-chip.rmp {
   color: #c5c6e0;
   background: rgba(142, 144, 189, 0.12);

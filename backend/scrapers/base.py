@@ -20,7 +20,7 @@ class ScrapedProfessor:
 @dataclasses.dataclass
 class ScrapedReview:
     professor: str            # must match ScrapedProfessor.name
-    source: str               # "RateMyProfessors" | "Reddit"
+    source: str               # "RateMyProfessors"
     text: str
     source_url: str = ""
     rating: float | None = None
@@ -89,7 +89,6 @@ def to_seed_format(
 def _source_base_url(name: str) -> str:
     return {
         "RateMyProfessors": "https://www.ratemyprofessors.com",
-        "Reddit": "https://www.reddit.com",
     }.get(name, "")
 
 

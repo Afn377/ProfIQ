@@ -224,8 +224,8 @@ export default function ProfessorDetail() {
                   Computing aggregate dashboard…
                 </strong>{" "}
                 First visit to this professor — we&apos;re pulling their
-                RateMyProfessors reviews and Reddit mentions, running
-                VADER sentiment on both, and aggregating in the
+                RateMyProfessors reviews, running
+                VADER sentiment on each, and aggregating in the
                 background. The charts and recommendation score will
                 appear here automatically when it&apos;s done (usually
                 10–30 seconds). Individual reviews below already include
@@ -672,9 +672,8 @@ function ReviewsSection({ professor }) {
         </span>
       </h3>
       <div className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
-        Live from RateMyProfessors and Reddit, analyzed on the fly.
-        Reddit comments appear at the top of the first page; scroll for
-        more RMP reviews — nothing is persisted.
+        Live from RateMyProfessors, analyzed on the fly. Scroll for
+        more reviews — nothing is persisted.
       </div>
 
       {reviews.map((r, idx) => (

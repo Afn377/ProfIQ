@@ -37,7 +37,7 @@ export default function Home() {
           <span className="grad">powered by real feedback.</span>
         </h1>
         <p>
-          ProfIQ aggregates reviews from RateMyProfessors and Reddit, runs NLP
+          ProfIQ aggregates reviews from RateMyProfessors, runs NLP
           sentiment analysis on every comment, and ranks instructors by an
           evidence-based recommendation score.
         </p>
@@ -68,7 +68,7 @@ export default function Home() {
               <div className="label">Departments</div>
             </div>
             <div className="stat-chip">
-              <div className="value">2</div>
+              <div className="value">1</div>
               <div className="label">Data sources</div>
             </div>
           </div>

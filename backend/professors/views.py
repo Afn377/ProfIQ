@@ -22,7 +22,6 @@ from .serializers import (
     DepartmentSerializer,
 )
 from scrapers.rmp import RMPClient, teacher_gid_from_legacy, _normalize_rmp_date
-from scrapers.reddit_lazy import fetch_for_professor as fetch_reddit_for_professor
 from sentiment.analyzer import aggregate_stats, analyze_text
 from sentiment.ml import recommender as ml_recommender
 
@@ -64,55 +63,6 @@ def _cache_put(key: tuple, value: dict) -> None:
             _page_cache.popitem(last=False)
 
 
-# Short-lived Reddit result cache.
-_REDDIT_CACHE_TTL_SECONDS = 30 * 60
-_REDDIT_CACHE_LIMIT = 512
-_reddit_cache: OrderedDict[int, tuple[float, list[dict]]] = OrderedDict()
-_reddit_cache_lock = Lock()
-
-
-def _reddit_cache_get(prof_id: int) -> list[dict] | None:
-    with _reddit_cache_lock:
-        entry = _reddit_cache.get(prof_id)
-        if entry is None:
-            return None
-        ts, value = entry
-        if time.monotonic() - ts > _REDDIT_CACHE_TTL_SECONDS:
-            _reddit_cache.pop(prof_id, None)
-            return None
-        _reddit_cache.move_to_end(prof_id)
-        return value
-
-
-def _reddit_cache_put(prof_id: int, value: list[dict]) -> None:
-    with _reddit_cache_lock:
-        _reddit_cache[prof_id] = (time.monotonic(), value)
-        _reddit_cache.move_to_end(prof_id)
-        while len(_reddit_cache) > _REDDIT_CACHE_LIMIT:
-            _reddit_cache.popitem(last=False)
-
-
-def _get_reddit_reviews(prof: Professor, max_comments: int = 25) -> list[dict]:
-    """Fetch cached Reddit comments for one professor."""
-    cached = _reddit_cache_get(prof.id)
-    if cached is not None:
-        return cached[:max_comments]
-    try:
-        results = fetch_reddit_for_professor(
-            prof.name,
-            prof.institution or None,
-            max_comments=max_comments,
-        )
-    except Exception as exc:
-        logger.warning(
-            "Reddit lazy fetch failed for prof=%d (%s @ %s): %s",
-            prof.id, prof.name, prof.institution, exc,
-        )
-        results = []
-    _reddit_cache_put(prof.id, results)
-    return results
-
-
 def _legacy_id_from_ref(external_ref: str) -> int | None:
     if not external_ref or not external_ref.startswith("rmp:"):
         return None
@@ -126,7 +76,6 @@ def _legacy_id_from_ref(external_ref: str) -> int | None:
 
 _LAZY_ANALYZE_MAX_CONCURRENT = 4
 _LAZY_ANALYZE_REVIEW_CAP = 100  # cap per prof to bound runtime
-_LAZY_ANALYZE_REDDIT_CAP = 25   # additional Reddit comments analyzed per prof
 
 _analyze_in_progress: set[int] = set()
 _analyze_in_progress_lock = Lock()
@@ -194,23 +143,6 @@ def _run_lazy_analyze(prof_id: int) -> None:
                     prof_id, legacy_id, exc,
                 )
 
-            # Reddit comments do not include star ratings.
-            reddit_count = 0
-            try:
-                reddit_reviews = _get_reddit_reviews(
-                    prof, max_comments=_LAZY_ANALYZE_REDDIT_CAP,
-                )
-                for r in reddit_reviews:
-                    text = (r.get("text") or "").strip()
-                    if text:
-                        sentiments.append(analyze_text(text))
-                        reddit_count += 1
-            except Exception as exc:
-                logger.warning(
-                    "Lazy analyze: Reddit fetch failed for prof=%d: %s",
-                    prof_id, exc,
-                )
-
             if not sentiments:
                 return
 
@@ -220,8 +152,8 @@ def _run_lazy_analyze(prof_id: int) -> None:
                 defaults=stats_dict,
             )
             logger.info(
-                "Lazy analyze: prof=%d stored — %d reviews (rmp=%d, reddit=%d), score=%.1f",
-                prof_id, len(sentiments), rmp_count, reddit_count,
+                "Lazy analyze: prof=%d stored — %d reviews (rmp=%d), score=%.1f",
+                prof_id, len(sentiments), rmp_count,
                 stats_dict["recommendation_score"],
             )
     except Exception:
@@ -491,30 +423,6 @@ def professor_live_reviews(request, pk: int):
         )
 
     results = []
-
-    # Reddit results are shown once at the top of the live feed.
-    if cursor is None:
-        for r in _get_reddit_reviews(prof, max_comments=15):
-            text = (r.get("text") or "").strip()
-            if not text:
-                continue
-            sentiment = analyze_text(text)
-            results.append({
-                "text": text,
-                "source": "reddit",
-                "rating": None,
-                "course": None,
-                "posted_at": r.get("posted_at"),
-                "source_url": r.get("source_url"),
-            "sentiment": {
-                "label": sentiment["label"],
-                "compound": sentiment["compound"],
-                "themes": sentiment["themes"],
-                "ml_label": sentiment.get("ml_label"),
-                "ml_confidence": sentiment.get("ml_confidence"),
-                "ml_model": sentiment.get("ml_model"),
-            },
-        })
 
     for n in nodes:
         comment = (n.get("comment") or "").strip()

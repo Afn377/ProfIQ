@@ -12,7 +12,6 @@ export function formatScore(score) {
 export function sourceChipClass(source) {
   if (!source) return "";
   const s = source.toLowerCase();
-  if (s.includes("reddit")) return "reddit";
   if (s.includes("rate")) return "rmp";
   return "";
 }
