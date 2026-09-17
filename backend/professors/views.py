@@ -773,7 +773,7 @@ def platform_summary(request):
     case-insensitively with the same convention used by ProfessorSearchView.
     When the param is absent/empty the response is the unchanged global summary.
     """
-    from django.db.models import Count
+    from django.db.models import Count, Sum
     institution = request.query_params.get("institution", "").strip()
 
     if institution:
@@ -785,9 +785,10 @@ def platform_summary(request):
         institution_prof_ids = list(institution_profs.values_list("id", flat=True))
 
         total_profs = institution_profs.count()
-        total_reviews = Review.objects.filter(
-            professor_id__in=institution_prof_ids
-        ).count()
+        total_reviews = institution_profs.filter(
+            stats__review_count__gte=3,
+            stats__updated_at__gte=LIVE_ANALYSIS_CUTOFF,
+        ).aggregate(total=Sum("stats__review_count"))["total"] or 0
         top = (
             institution_profs.select_related("department", "stats")
             .filter(
@@ -817,7 +818,10 @@ def platform_summary(request):
         )
     else:
         total_profs = Professor.objects.count()
-        total_reviews = Review.objects.count()
+        total_reviews = Professor.objects.filter(
+            stats__review_count__gte=3,
+            stats__updated_at__gte=LIVE_ANALYSIS_CUTOFF,
+        ).aggregate(total=Sum("stats__review_count"))["total"] or 0
         top = (
             Professor.objects.select_related("department", "stats")
             .filter(
