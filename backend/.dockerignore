@@ -7,6 +7,9 @@ data/ml/*
 !data/ml/sentiment_clf.joblib
 !data/ml/prof_embeddings.npz
 !data/ml/prof_embeddings_warm.npz
+!data/ml/hf_cache/
+data/ml/hf_cache/*
+!data/ml/hf_cache/models--sentence-transformers--all-MiniLM-L6-v2/
 data/scraped/
 data/logs/
 reports/
