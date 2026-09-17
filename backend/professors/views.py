@@ -789,10 +789,13 @@ def platform_summary(request):
         institution_profs = Professor.objects.alias(
             institution_lower=Lower("institution")
         ).filter(institution_lower=institution.lower())
+        # Materialize the ids — passing the queryset itself to __in makes
+        # CockroachDB fall back to a full scan instead of indexed lookups.
+        institution_prof_ids = list(institution_profs.values_list("id", flat=True))
 
         total_profs = institution_profs.count()
         total_reviews = Review.objects.filter(
-            professor__in=institution_profs
+            professor_id__in=institution_prof_ids
         ).count()
         top = (
             institution_profs.select_related("department", "stats")
@@ -808,9 +811,11 @@ def platform_summary(request):
         # the annotate-then-filter(count__gt=0) form, which also keeps the
         # aggregate join free of duplicates.
         depts_with_counts = (
-            Department.objects.filter(professors__in=institution_profs)
+            Department.objects.filter(professors__id__in=institution_prof_ids)
             .annotate(
-                count=Count("professors", filter=Q(professors__in=institution_profs))
+                count=Count(
+                    "professors", filter=Q(professors__id__in=institution_prof_ids)
+                )
             )
             .filter(count__gt=0)
             .order_by("-count")[:8]
