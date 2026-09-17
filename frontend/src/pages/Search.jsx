@@ -91,6 +91,17 @@ export default function Search() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Prompt to sync when the navbar switches schools out from under Browse.
+  const prevSavedRef = useRef(savedInstitution);
+  const [switchPrompt, setSwitchPrompt] = useState(null);
+  useEffect(() => {
+    const prev = prevSavedRef.current;
+    prevSavedRef.current = savedInstitution;
+    if (savedInstitution && savedInstitution !== prev && savedInstitution !== institution) {
+      setSwitchPrompt(savedInstitution);
+    }
+  }, [savedInstitution, institution]);
+
   const onSubmit = (e) => {
     e.preventDefault();
     const next = new URLSearchParams(params);
@@ -151,6 +162,47 @@ export default function Search() {
           </button>
         </div>
       </div>
+
+      {switchPrompt && (
+        <div
+          className="card"
+          style={{
+            marginBottom: 16,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 10,
+            padding: "12px 16px",
+          }}
+        >
+          <div style={{ fontSize: 13, color: "var(--text-dim)" }}>
+            You switched to{" "}
+            <strong style={{ color: "var(--text)" }}>{switchPrompt}</strong>{" "}
+            — update this search to match?
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => {
+                setSchoolInput(switchPrompt);
+                updateParam("institution", switchPrompt);
+                setSwitchPrompt(null);
+              }}
+            >
+              Update
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => setSwitchPrompt(null)}
+            >
+              Keep {institution || "current filter"}
+            </button>
+          </div>
+        </div>
+      )}
 
       <form
         className="search-bar"
