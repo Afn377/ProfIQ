@@ -2,7 +2,6 @@ import logging
 import threading
 import time
 from collections import OrderedDict
-from datetime import datetime, timezone
 from threading import Lock, Semaphore
 
 from django.db import close_old_connections
@@ -15,7 +14,7 @@ from rest_framework.response import Response
 
 from rest_framework.throttling import ScopedRateThrottle
 
-from .models import Professor, ProfessorStats, Review, Department
+from .models import Professor, ProfessorStats, Review, Department, LIVE_ANALYSIS_CUTOFF
 from .serializers import (
     ProfessorListSerializer,
     ProfessorCreateSerializer,
@@ -28,14 +27,6 @@ from sentiment.analyzer import aggregate_stats, analyze_text
 from sentiment.ml import recommender as ml_recommender
 
 logger = logging.getLogger(__name__)
-
-# Cutoff separating genuinely-analyzed ProfessorStats rows from the one-time
-# demo/seed batch. Every seed-batch row was bulk-loaded on 2026-05-07/08 with an
-# empty theme_counts map; all real analysis (analyze_all_rmp / lazy pipeline)
-# happens on or after 2026-05-09. Ranking queries use this to make sure the
-# seed placeholder scores (which include implausible exact-ceiling values) can
-# never out-rank genuinely-analyzed professors.
-LIVE_ANALYSIS_CUTOFF = datetime(2026, 5, 9, tzinfo=timezone.utc)
 
 
 # Shared RMP client for live review requests.

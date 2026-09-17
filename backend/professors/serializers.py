@@ -9,6 +9,7 @@ from .canary_data import (
 )
 from .models import (
     Department, Professor, Course, Source, Review, SentimentResult, ProfessorStats,
+    LIVE_ANALYSIS_CUTOFF,
 )
 
 
@@ -76,6 +77,15 @@ class ProfessorListSerializer(serializers.ModelSerializer):
     avg_compound = serializers.FloatField(
         source="stats.avg_compound", read_only=True, default=0.0
     )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        stats = getattr(instance, "stats", None)
+        if stats is not None and stats.updated_at < LIVE_ANALYSIS_CUTOFF:
+            data["recommendation_score"] = 0.0
+            data["review_count"] = 0
+            data["avg_compound"] = 0.0
+        return data
 
     class Meta:
         model = Professor
@@ -173,6 +183,13 @@ class ProfessorDetailSerializer(serializers.ModelSerializer):
     courses = CourseSerializer(many=True, read_only=True)
     stats = ProfessorStatsSerializer(read_only=True)
     reviews = ReviewSerializer(many=True, read_only=True)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        stats = getattr(instance, "stats", None)
+        if stats is not None and stats.updated_at < LIVE_ANALYSIS_CUTOFF:
+            data["stats"] = None
+        return data
 
     class Meta:
         model = Professor
