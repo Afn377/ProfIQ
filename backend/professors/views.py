@@ -7,6 +7,7 @@ from threading import Lock, Semaphore
 
 from django.db import close_old_connections
 from django.db.models import Q, Prefetch, Case, When, Value, IntegerField
+from django.db.models.functions import Lower
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.decorators import api_view
@@ -303,7 +304,9 @@ class ProfessorSearchView(generics.ListCreateAPIView):
 
         institution = self.request.query_params.get("institution", "").strip()
         if institution:
-            qs = qs.filter(institution__iexact=institution)
+            qs = qs.alias(institution_lower=Lower("institution")).filter(
+                institution_lower=institution.lower()
+            )
 
         sort = self.request.query_params.get("sort", "score")
         if sort == "name":
@@ -364,6 +367,18 @@ class DepartmentListView(generics.ListAPIView):
     pagination_class = None
 
 
+def _prefix_range_upper_bound(prefix: str) -> str:
+    """Exclusive upper bound for a case-folded prefix range scan.
+
+    Increments the last character's code point so ``[prefix, bound)`` covers
+    exactly the strings starting with ``prefix``. An explicit range uses the
+    expression's index; a plain ``LIKE 'prefix%'`` does not.
+    """
+    if not prefix:
+        return prefix
+    return prefix[:-1] + chr(ord(prefix[-1]) + 1)
+
+
 @api_view(["GET"])
 def institutions_autocomplete(request):
     """Return institution autocomplete results."""
@@ -377,8 +392,11 @@ def institutions_autocomplete(request):
 
     base = Professor.objects.exclude(institution="")
     if q:
+        q_lower = q.lower()
+        upper_bound = _prefix_range_upper_bound(q_lower)
         rows = list(
-            base.filter(institution__istartswith=q)
+            base.alias(institution_lower=Lower("institution"))
+            .filter(institution_lower__gte=q_lower, institution_lower__lt=upper_bound)
             .values("institution")
             .annotate(count=Count("id"))
             .order_by("-count", "institution")[:limit]
@@ -765,16 +783,17 @@ def platform_summary(request):
     institution = request.query_params.get("institution", "").strip()
 
     if institution:
-        total_profs = Professor.objects.filter(
-            institution__iexact=institution
-        ).count()
+        institution_profs = Professor.objects.alias(
+            institution_lower=Lower("institution")
+        ).filter(institution_lower=institution.lower())
+
+        total_profs = institution_profs.count()
         total_reviews = Review.objects.filter(
-            professor__institution__iexact=institution
+            professor__in=institution_profs
         ).count()
         top = (
-            Professor.objects.select_related("department", "stats")
+            institution_profs.select_related("department", "stats")
             .filter(
-                institution__iexact=institution,
                 stats__review_count__gte=3,
                 stats__updated_at__gte=LIVE_ANALYSIS_CUTOFF,
             )
@@ -785,11 +804,9 @@ def platform_summary(request):
         # institution's professors; annotate-then-filter(count__gt=0) drops the
         # empty departments and keeps the join free of duplicates.
         depts_with_counts = (
-            Department.objects.annotate(
-                count=Count(
-                    "professors",
-                    filter=Q(professors__institution__iexact=institution),
-                )
+            Department.objects.filter(professors__in=institution_profs)
+            .annotate(
+                count=Count("professors", filter=Q(professors__in=institution_profs))
             )
             .filter(count__gt=0)
             .order_by("-count")[:8]
