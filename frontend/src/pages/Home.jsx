@@ -79,7 +79,11 @@ export default function Home() {
         <div className="section-head">
           <div>
             <h2>Top recommended{institution ? ` at ${institution}` : ""}</h2>
-            <div className="sub">Ranked by aggregated sentiment score</div>
+            <div className="sub">
+              {summary
+                ? `Ranked by sentiment score · ${summary.analyzed_count.toLocaleString()} of ${summary.professor_count.toLocaleString()} professors analyzed so far`
+                : "Ranked by aggregated sentiment score"}
+            </div>
           </div>
         </div>
         {loading ? (
