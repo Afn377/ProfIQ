@@ -157,6 +157,11 @@ def _load_encoder(model_name: str | None = None):
         try:
             os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
             os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")
+            # The model is bundled into the deploy image (cache_dir below), so force
+            # offline mode — otherwise huggingface_hub does a network freshness check
+            # on every load that hangs for minutes on Cloud Run.
+            os.environ.setdefault("HF_HUB_OFFLINE", "1")
+            os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
             # Default to using the workspace cache shipped with the repo
             # so demo machines don't re-download the 80 MB model.
             cache_dir = ROOT / "data" / "ml" / "hf_cache"
