@@ -1,6 +1,14 @@
 """Database models for ProfIQ."""
+from datetime import datetime, timezone
+
 from django.db import models
 from django.db.models.functions import Lower
+
+# Professors whose ProfessorStats.updated_at predates this cutoff only have a
+# one-time bulk-imported seed-data row, not a genuine analysis — see
+# ProfessorListSerializer/ProfessorDetailSerializer.to_representation and the
+# views that filter/sort on this same boundary.
+LIVE_ANALYSIS_CUTOFF = datetime(2026, 5, 9, tzinfo=timezone.utc)
 
 
 class Source(models.Model):
