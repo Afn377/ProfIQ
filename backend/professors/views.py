@@ -137,9 +137,14 @@ def _enqueue_lazy_analyze(prof: Professor) -> bool:
     """Start a background stats job when needed."""
     if not prof.external_ref or not prof.external_ref.startswith("rmp:"):
         return False
-    # Score-only rows can still be replaced with full theme stats.
+    # theme_counts alone isn't enough to skip re-analysis — seed-batch rows
+    # have it populated too, so we'd never queue a real analysis for them.
     existing_stats = ProfessorStats.objects.filter(professor_id=prof.id).first()
-    if existing_stats is not None and existing_stats.theme_counts:
+    if (
+        existing_stats is not None
+        and existing_stats.theme_counts
+        and existing_stats.updated_at >= LIVE_ANALYSIS_CUTOFF
+    ):
         return False
     with _analyze_in_progress_lock:
         if prof.id in _analyze_in_progress:
