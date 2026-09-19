@@ -439,7 +439,7 @@ function SimilarProfessorsPanel({ professorId }) {
           {warming && (
             <div
               className="muted"
-              style={{ fontSize: 12, marginTop: 10, maxWidth: 280 }}
+              style={{ fontSize: 12, margin: "10px auto 0", maxWidth: 280 }}
             >
               Encoding this professor on the fly with MiniLM… this can take
               up to a minute if the server has been idle — hang tight.
