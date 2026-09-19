@@ -564,7 +564,7 @@ def similar_professors(request, pk: int):
         k = 5
 
     scope = (request.query_params.get("scope") or "department").lower()
-    if scope not in ("department", "institution", "global"):
+    if scope not in ("department", "institution"):
         scope = "department"
 
     if not ml_recommender.is_available():
@@ -627,23 +627,17 @@ def similar_professors(request, pk: int):
                 break
         return out
 
-    # Try the requested scope, then widen if needed.
+    # Try the requested scope, then widen to institution if needed — never
+    # cross into a different institution's professors.
     match_level = scope
     if scope == "department":
         filtered = _filter(want_inst=bool(same_inst), want_dept=bool(same_dept_id))
         if not filtered and same_inst:
             match_level = "institution"
             filtered = _filter(want_inst=True, want_dept=False)
-        if not filtered:
-            match_level = "global"
-            filtered = _filter(want_inst=False, want_dept=False)
-    elif scope == "institution":
+    else:  # institution
         filtered = _filter(want_inst=bool(same_inst), want_dept=False) if same_inst else []
-        if not filtered:
-            match_level = "global"
-            filtered = _filter(want_inst=False, want_dept=False)
-    else:
-        filtered = _filter(want_inst=False, want_dept=False)
+        match_level = "institution"
 
     out = []
     for n, p in filtered:
