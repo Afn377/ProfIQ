@@ -437,8 +437,12 @@ function SimilarProfessorsPanel({ professorId }) {
         <div className="empty" style={{ padding: 20, textAlign: "center" }}>
           <div className="spinner" />
           {warming && (
-            <div className="muted" style={{ fontSize: 12, marginTop: 10 }}>
-              Encoding this professor on the fly with MiniLM…
+            <div
+              className="muted"
+              style={{ fontSize: 12, marginTop: 10, maxWidth: 280 }}
+            >
+              Encoding this professor on the fly with MiniLM… this can take
+              up to a minute if the server has been idle — hang tight.
             </div>
           )}
         </div>
