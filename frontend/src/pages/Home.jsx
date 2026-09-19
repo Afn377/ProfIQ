@@ -67,10 +67,6 @@ export default function Home() {
               <div className="value">{summary.departments.length}</div>
               <div className="label">Departments</div>
             </div>
-            <div className="stat-chip">
-              <div className="value">1</div>
-              <div className="label">Data sources</div>
-            </div>
           </div>
         )}
       </section>
