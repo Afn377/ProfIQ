@@ -38,7 +38,7 @@ function AppShell() {
       <CompareBar />
       <footer className="footer">
         <div className="container">
-          ProfIQ · CS 210 — Multi-Source Sentiment Analysis MVP
+          ProfIQ · CS 210 — RateMyProfessors Sentiment Analysis MVP
         </div>
       </footer>
     </div>

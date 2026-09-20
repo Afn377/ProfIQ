@@ -19,6 +19,7 @@ backend/logs/
 # Generated ML artifacts / model caches
 backend/data/ml/*
 !backend/data/ml/.gitkeep
+!backend/data/ml/MANIFEST.md
 
 # Generated reports and local analysis output
 backend/reports/run.log

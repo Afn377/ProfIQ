@@ -28,9 +28,10 @@ TABLES = [
     (ProfessorStats, "ProfessorStats", True),
 ]
 
-# (model, timestamp field) pairs repaired by --fix-timestamps. Only
-# updated_at matters functionally (views.py compares it against
-# LIVE_ANALYSIS_CUTOFF); Professor.created_at is cosmetic and left alone.
+# (model, timestamp field) pairs repaired by --fix-timestamps. Both fields
+# are cosmetic (seed vs. live provenance is tracked by
+# ProfessorStats.analysis_source, not by timestamp), included for display
+# accuracy only.
 REPAIR_TARGETS = [
     (ProfessorStats, "updated_at"),
 ]

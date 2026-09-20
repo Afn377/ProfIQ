@@ -3,7 +3,6 @@ import re
 from rest_framework import serializers
 from .models import (
     Department, Professor, Course, Source, Review, SentimentResult, ProfessorStats,
-    LIVE_ANALYSIS_CUTOFF,
 )
 
 
@@ -75,7 +74,7 @@ class ProfessorListSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         stats = getattr(instance, "stats", None)
-        if stats is not None and stats.updated_at < LIVE_ANALYSIS_CUTOFF:
+        if stats is not None and stats.analysis_source == ProfessorStats.SEED:
             data["recommendation_score"] = 0.0
             data["review_count"] = 0
             data["avg_compound"] = 0.0
@@ -170,7 +169,7 @@ class ProfessorDetailSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         stats = getattr(instance, "stats", None)
-        if stats is not None and stats.updated_at < LIVE_ANALYSIS_CUTOFF:
+        if stats is not None and stats.analysis_source == ProfessorStats.SEED:
             data["stats"] = None
         return data
 

@@ -165,7 +165,7 @@ class Command(BaseCommand):
                     with transaction.atomic():
                         ProfessorStats.objects.update_or_create(
                             professor=prof,
-                            defaults=stats_dict,
+                            defaults={**stats_dict, "analysis_source": ProfessorStats.LIVE_RMP},
                         )
                     written += 1
 

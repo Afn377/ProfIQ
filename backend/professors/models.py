@@ -1,14 +1,6 @@
 """Database models for ProfIQ."""
-from datetime import datetime, timezone
-
 from django.db import models
 from django.db.models.functions import Lower
-
-# Professors whose ProfessorStats.updated_at predates this cutoff only have a
-# one-time bulk-imported seed-data row, not a genuine analysis — see
-# ProfessorListSerializer/ProfessorDetailSerializer.to_representation and the
-# views that filter/sort on this same boundary.
-LIVE_ANALYSIS_CUTOFF = datetime(2026, 5, 9, tzinfo=timezone.utc)
 
 
 class Source(models.Model):
@@ -150,6 +142,13 @@ class SentimentResult(models.Model):
 class ProfessorStats(models.Model):
     """Aggregated dashboard stats for one professor."""
 
+    SEED = "seed"
+    LIVE_RMP = "live_rmp"
+    ANALYSIS_SOURCE_CHOICES = [
+        (SEED, "Seed/demo data"),
+        (LIVE_RMP, "Live RateMyProfessors analysis"),
+    ]
+
     professor = models.OneToOneField(
         Professor, on_delete=models.CASCADE, related_name="stats"
     )
@@ -161,6 +160,12 @@ class ProfessorStats(models.Model):
     # Theme frequency map.
     theme_counts = models.JSONField(default=dict, blank=True)
     recommendation_score = models.FloatField(default=0.0)  # 0–100
+    # Explicit provenance instead of an updated_at cutoff: the seed loader and
+    # the live-analysis paths (lazy analyze, analyze_all_rmp) each set this
+    # directly, so a fresh re-seed can never be mistaken for real analysis.
+    analysis_source = models.CharField(
+        max_length=16, choices=ANALYSIS_SOURCE_CHOICES, default=LIVE_RMP,
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:

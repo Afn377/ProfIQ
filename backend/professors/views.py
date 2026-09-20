@@ -14,7 +14,7 @@ from rest_framework.response import Response
 
 from rest_framework.throttling import ScopedRateThrottle
 
-from .models import Professor, ProfessorStats, Review, Department, LIVE_ANALYSIS_CUTOFF
+from .models import Professor, ProfessorStats, Review, Department
 from .serializers import (
     ProfessorListSerializer,
     ProfessorCreateSerializer,
@@ -86,13 +86,13 @@ def _enqueue_lazy_analyze(prof: Professor) -> bool:
     """Start a background stats job when needed."""
     if not prof.external_ref or not prof.external_ref.startswith("rmp:"):
         return False
-    # theme_counts alone isn't enough to skip re-analysis — seed-batch rows
-    # have it populated too, so we'd never queue a real analysis for them.
+    # theme_counts alone isn't enough to skip re-analysis — seed rows have it
+    # populated too, so we'd never queue a real analysis for them.
     existing_stats = ProfessorStats.objects.filter(professor_id=prof.id).first()
     if (
         existing_stats is not None
         and existing_stats.theme_counts
-        and existing_stats.updated_at >= LIVE_ANALYSIS_CUTOFF
+        and existing_stats.analysis_source == ProfessorStats.LIVE_RMP
     ):
         return False
     with _analyze_in_progress_lock:
@@ -149,7 +149,7 @@ def _run_lazy_analyze(prof_id: int) -> None:
             stats_dict = aggregate_stats(sentiments)
             ProfessorStats.objects.update_or_create(
                 professor_id=prof_id,
-                defaults=stats_dict,
+                defaults={**stats_dict, "analysis_source": ProfessorStats.LIVE_RMP},
             )
             logger.info(
                 "Lazy analyze: prof=%d stored — %d reviews (rmp=%d), score=%.1f",
@@ -215,7 +215,7 @@ class ProfessorSearchView(generics.ListCreateAPIView):
         if not q:
             qs = qs.exclude(
                 stats__isnull=False,
-                stats__updated_at__lt=LIVE_ANALYSIS_CUTOFF,
+                stats__analysis_source=ProfessorStats.SEED,
             )
 
         if q:
@@ -242,13 +242,12 @@ class ProfessorSearchView(generics.ListCreateAPIView):
         elif sort == "reviews":
             qs = qs.order_by("-stats__review_count", "name")
         else:  # score (default)
-            # Rank genuinely-analyzed professors ahead of seed-batch rows
-            # (and professors with no stats row at all). The is_live_analysis
-            # flag is 1 only when stats.updated_at is at/after the cutoff.
+            # Rank genuinely-analyzed professors ahead of seed rows (and
+            # professors with no stats row at all).
             qs = qs.annotate(
                 is_live_analysis=Case(
                     When(
-                        stats__updated_at__gte=LIVE_ANALYSIS_CUTOFF,
+                        stats__analysis_source=ProfessorStats.LIVE_RMP,
                         then=Value(1),
                     ),
                     default=Value(0),
@@ -691,19 +690,19 @@ def platform_summary(request):
         total_profs = institution_profs.count()
         total_reviews = institution_profs.filter(
             stats__review_count__gte=3,
-            stats__updated_at__gte=LIVE_ANALYSIS_CUTOFF,
+            stats__analysis_source=ProfessorStats.LIVE_RMP,
         ).aggregate(total=Sum("stats__review_count"))["total"] or 0
         top = (
             institution_profs.select_related("department", "stats")
             .filter(
                 stats__review_count__gte=3,
-                stats__updated_at__gte=LIVE_ANALYSIS_CUTOFF,
+                stats__analysis_source=ProfessorStats.LIVE_RMP,
             )
             .order_by("-stats__recommendation_score")[:5]
         )
         analyzed_count = institution_profs.filter(
             stats__review_count__gte=3,
-            stats__updated_at__gte=LIVE_ANALYSIS_CUTOFF,
+            stats__analysis_source=ProfessorStats.LIVE_RMP,
         ).count()
         # Department.name is globally unique (not institution-scoped), so the
         # per-department count must be a filtered aggregate over just this
@@ -723,19 +722,19 @@ def platform_summary(request):
         total_profs = Professor.objects.count()
         total_reviews = Professor.objects.filter(
             stats__review_count__gte=3,
-            stats__updated_at__gte=LIVE_ANALYSIS_CUTOFF,
+            stats__analysis_source=ProfessorStats.LIVE_RMP,
         ).aggregate(total=Sum("stats__review_count"))["total"] or 0
         top = (
             Professor.objects.select_related("department", "stats")
             .filter(
                 stats__review_count__gte=3,
-                stats__updated_at__gte=LIVE_ANALYSIS_CUTOFF,
+                stats__analysis_source=ProfessorStats.LIVE_RMP,
             )
             .order_by("-stats__recommendation_score")[:5]
         )
         analyzed_count = Professor.objects.filter(
             stats__review_count__gte=3,
-            stats__updated_at__gte=LIVE_ANALYSIS_CUTOFF,
+            stats__analysis_source=ProfessorStats.LIVE_RMP,
         ).count()
         depts_with_counts = (
             Department.objects.annotate(count=Count("professors"))

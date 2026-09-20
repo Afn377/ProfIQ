@@ -147,6 +147,6 @@ class Command(BaseCommand):
                 })
             agg = aggregate_stats(sentiments)
             ProfessorStats.objects.update_or_create(
-                professor=prof, defaults=agg,
+                professor=prof, defaults={**agg, "analysis_source": ProfessorStats.SEED},
             )
         self.stdout.write(self.style.SUCCESS(f"Stats updated for {Professor.objects.count()} professors."))
