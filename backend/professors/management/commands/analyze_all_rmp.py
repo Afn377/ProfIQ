@@ -110,12 +110,24 @@ class Command(BaseCommand):
         )
         if not reset:
             qs = qs.filter(stats__isnull=True)
-        if done_ids:
-            qs = qs.exclude(id__in=done_ids)
+        # NOTE: already-done professors are filtered in Python (see `done_ids` /
+        # `total_to_process`) rather than via exclude(id__in=done_ids): SQLite
+        # caps bound variables per statement and done_ids can hold 100k+ ids, and
+        # chunked .exclude() calls don't help because Django ANDs them all into
+        # one statement anyway.
         if institutions_file:
             qs = qs.filter(institution__in=institutions)
 
-        total_to_process = qs.count()
+        if done_ids:
+            # `values_list("id", flat=True)` with no id-based WHERE clause is a
+            # cheap query (just selecting the id column of the candidate set),
+            # so counting in Python has no variable-limit problem.
+            total_to_process = sum(
+                1 for pid in qs.values_list("id", flat=True).iterator(chunk_size=2000)
+                if pid not in done_ids
+            )
+        else:
+            total_to_process = qs.count()
         if limit:
             total_to_process = min(total_to_process, limit)
 
@@ -146,6 +158,8 @@ class Command(BaseCommand):
 
         try:
             for prof in qs.iterator(chunk_size=200):
+                if prof.id in done_ids:
+                    continue
                 if limit and processed >= limit:
                     break
                 processed += 1
