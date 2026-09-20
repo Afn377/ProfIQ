@@ -68,6 +68,34 @@ cd backend
 python manage.py build_prof_embeddings
 ```
 
+## Rebuilding ML Artifacts
+
+Everything under `backend/data/ml/` (the review corpus, trained classifier, DistilBERT weights,
+MiniLM embeddings, and saved metrics) is generated data and is not tracked in git
+(`backend/data/ml/*` is gitignored except a `.gitkeep`). A fresh clone needs to regenerate
+whatever it wants to use, in this order:
+
+```bash
+cd backend
+
+# 1. Build the review corpus (parquet + jsonl) from the local database
+python -m sentiment.ml.build_corpus
+
+# 2. Train the TF-IDF + Logistic Regression classifier
+python -m sentiment.ml.train_classifier
+
+# 3. (Optional, slow) Fine-tune DistilBERT
+python -m sentiment.ml.train_bert
+
+# 4. Build per-professor MiniLM embeddings for the similar-professor recommender
+python manage.py build_prof_embeddings
+```
+
+Each script writes its output and a metrics JSON to `backend/data/ml/` using sensible defaults
+(see each script's `--help` for corpus size, model, and output-path overrides). The live app only
+needs steps 1, 2, and 4 to function; step 3 is only needed to reproduce the DistilBERT evaluation
+numbers in `Description.MD`.
+
 ## Frontend Setup
 
 Open a second terminal from the project root:

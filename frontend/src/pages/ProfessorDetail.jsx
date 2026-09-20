@@ -524,7 +524,7 @@ function SimilarProfessorsPanel({ professorId }) {
       </div>
       <div style={{ display: "grid", gap: 10 }}>
         {results.map((r) => {
-          const pct = Math.round(((r.score ?? 0) + 1) * 50); // -1..1 -> 0..100
+          const cosine = (r.score ?? 0).toFixed(2);
           return (
             <Link
               key={r.id}
@@ -561,10 +561,10 @@ function SimilarProfessorsPanel({ professorId }) {
                     color: "var(--accent, #7c5cff)",
                   }}
                 >
-                  {pct}%
+                  {cosine}
                 </div>
                 <div className="muted" style={{ fontSize: 11 }}>
-                  similarity
+                  cosine similarity
                 </div>
               </div>
             </Link>
