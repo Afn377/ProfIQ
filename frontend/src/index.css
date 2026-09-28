@@ -104,83 +104,76 @@ textarea {
   padding: 0 16px;
 }
 
+.app-main {
+  flex: 1;
+}
+
+/* Masthead: wordmark, section links, and the school this view covers. */
 .navbar {
   position: sticky;
   top: 0;
   z-index: 20;
   background: var(--bg);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--text);
 }
 
 .navbar-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 0;
+  gap: 24px;
+  padding: 16px 0;
+  flex-wrap: wrap;
 }
 
 .brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   font-family: var(--font-heading);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  font-size: 18px;
-}
-
-.brand-mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--accent);
-  display: grid;
-  place-items: center;
-  color: var(--accent-ink);
-  font-weight: 800;
-  font-size: 14px;
-}
-
-.nav-links {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.nav-link {
-  padding: 8px 14px;
-  border-radius: 999px;
-  font-size: 14px;
-  color: var(--text-dim);
-  transition: background 0.15s, color 0.15s;
-}
-
-.nav-link:hover {
-  color: var(--text);
-  background: var(--surface);
-}
-
-.nav-link.active {
-  color: var(--text);
-  background: var(--surface-2);
+  font-weight: 600;
+  font-size: 24px;
+  letter-spacing: -0.01em;
+  line-height: 1;
 }
 
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 28px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.nav-link {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  color: var(--text-dim);
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.nav-link:hover {
+  color: var(--text);
+}
+
+.nav-link.active {
+  color: var(--text);
+  border-bottom-color: var(--text);
 }
 
 .school-chip {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px 6px 12px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--surface);
-  font-size: 13px;
-  max-width: 220px;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .school-chip-name {
@@ -188,22 +181,55 @@ textarea {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 280px;
+}
+
+.school-chip-change,
+.school-switch input {
+  font-family: var(--font-ui);
+  font-size: 14px;
 }
 
 .school-chip-change {
   flex-shrink: 0;
-  background: none;
-  border: none;
   padding: 0;
-  font: inherit;
-  font-size: 12px;
-  color: var(--accent-2);
-  cursor: pointer;
-  transition: color 0.15s;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .school-chip-change:hover {
+  color: var(--accent-hover);
+}
+
+.school-switch input {
+  width: 260px;
+  max-width: 100%;
+  background: var(--surface);
   color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+}
+
+.school-switch input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+@media (max-width: 720px) {
+  .navbar-inner {
+    padding: 12px 0;
+    gap: 10px 16px;
+  }
+  .navbar-right {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px 16px;
+  }
+  .school-chip-name {
+    max-width: 180px;
+  }
 }
 
 /* ---------- Home ---------- */
@@ -971,7 +997,7 @@ textarea {
   }
 }
 
-/* ---------- Compare drawer ---------- */
+/* ---------- Compare bar (floats above the page) ---------- */
 
 .compare-bar {
   position: fixed;
@@ -982,26 +1008,39 @@ textarea {
   align-items: center;
   gap: 12px;
   background: var(--surface);
-  border: 1px solid var(--border-strong);
-  padding: 10px 12px 10px 18px;
-  border-radius: 999px;
+  border: 1px solid var(--text);
+  padding: 8px 8px 8px 16px;
+  border-radius: var(--radius-sm);
   box-shadow: var(--shadow);
   z-index: 30;
+  max-width: calc(100% - 32px);
 }
 
 .compare-bar .count {
-  font-weight: 600;
-  font-size: 13px;
+  font-family: var(--font-ui);
+  font-size: 14px;
   color: var(--text-dim);
+  white-space: nowrap;
 }
 
 .footer {
-  padding: 24px 0 36px;
+  padding: 28px 0 40px;
   color: var(--text-muted);
+  font-family: var(--font-ui);
   font-size: 13px;
-  text-align: center;
   border-top: 1px solid var(--border);
-  margin-top: 60px;
+  margin-top: 72px;
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px 24px;
+  flex-wrap: wrap;
+}
+
+.not-found {
+  padding: 80px 16px;
 }
 
 /* ---------- Reduced motion ---------- */

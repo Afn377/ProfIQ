@@ -19,7 +19,7 @@ export default function CompareBar() {
         className="btn btn-primary"
         onClick={() => navigate(`/compare?ids=${ids.join(",")}`)}
       >
-        Compare →
+        Compare selected
       </button>
     </div>
   );

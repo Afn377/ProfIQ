@@ -52,10 +52,7 @@ export default function Navbar() {
     <header className="navbar">
       <div className="container navbar-inner">
         <NavLink to="/" className="brand">
-          <span className="brand-mark">P</span>
-          <span>
-            Prof<span style={{ color: "var(--accent-2)" }}>IQ</span>
-          </span>
+          ProfIQ
         </NavLink>
         <div className="navbar-right">
           <nav className="nav-links">
@@ -81,21 +78,19 @@ export default function Navbar() {
           </nav>
           {institution && !switching && (
             <div className="school-chip" title={institution}>
-              <span className="school-chip-name">
-                {institution.length > 24 ? institution.slice(0, 21) + "…" : institution}
-              </span>
+              <span className="school-chip-name">{institution}</span>
               <button
                 type="button"
                 className="school-chip-change"
                 onClick={() => setSwitching(true)}
-                title="Change university"
               >
-                change
+                Change school
               </button>
             </div>
           )}
           {switching && (
             <form
+              className="school-switch"
               onSubmit={(e) => {
                 e.preventDefault();
                 commitSwitch();
@@ -105,7 +100,7 @@ export default function Navbar() {
                 ref={inputRef}
                 list={datalistId}
                 value={switchInput}
-                placeholder="Switch school…"
+                placeholder="Type a school name"
                 onChange={(e) => setSwitchInput(e.target.value)}
                 onBlur={commitSwitch}
                 onKeyDown={(e) => {
@@ -113,15 +108,6 @@ export default function Navbar() {
                     setSwitching(false);
                     setSwitchInput("");
                   }
-                }}
-                style={{
-                  background: "var(--surface-2)",
-                  color: "var(--text)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 999,
-                  padding: "6px 12px",
-                  fontSize: 13,
-                  width: 200,
                 }}
               />
               <datalist id={datalistId}>

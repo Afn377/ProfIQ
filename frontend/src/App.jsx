@@ -19,7 +19,7 @@ function AppShell() {
   return (
     <div className="app">
       <Navbar />
-      <main style={{ flex: 1 }}>
+      <main className="app-main">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<Search />} />
@@ -28,8 +28,8 @@ function AppShell() {
           <Route
             path="*"
             element={
-              <div className="container empty" style={{ padding: 80 }}>
-                Page not found.
+              <div className="container empty not-found">
+                That page does not exist. Try Browse to find a professor.
               </div>
             }
           />
@@ -37,8 +37,9 @@ function AppShell() {
       </main>
       <CompareBar />
       <footer className="footer">
-        <div className="container">
-          ProfIQ · CS 210 — RateMyProfessors Sentiment Analysis MVP
+        <div className="container footer-inner">
+          <span>ProfIQ, a CS 210 project.</span>
+          <span>Scores come from sentiment analysis of RateMyProfessors reviews.</span>
         </div>
       </footer>
     </div>
