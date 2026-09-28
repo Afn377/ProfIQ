@@ -468,6 +468,277 @@ textarea {
   }
 }
 
+/* ---------- Form fields ---------- */
+
+.field {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  min-width: 0;
+}
+
+.field::placeholder {
+  color: var(--text-muted);
+}
+
+.field:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+select.field {
+  appearance: none;
+  padding-right: 32px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-dim) 50%),
+    linear-gradient(135deg, var(--text-dim) 50%, transparent 50%);
+  background-position: calc(100% - 16px) 55%, calc(100% - 11px) 55%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 32px;
+}
+
+.field-grow {
+  flex: 1 1 260px;
+}
+
+.field-school {
+  flex: 1 1 200px;
+}
+
+/* Sort is a choice among a few words, so it reads as words. */
+.sort-row {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+}
+
+.sort-label {
+  color: var(--text-muted);
+}
+
+.sort-option {
+  padding: 4px 0;
+  color: var(--text-dim);
+  border-bottom: 2px solid transparent;
+}
+
+.sort-option:hover {
+  color: var(--text);
+}
+
+.sort-option.active {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+.notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+}
+
+.notice-text {
+  font-family: var(--font-ui);
+  font-size: 14px;
+}
+
+.notice-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  align-self: center;
+  margin-bottom: 8px;
+}
+
+.hero-coverage {
+  margin: 20px 0 0;
+  font-size: 17px;
+  color: var(--text-dim);
+}
+
+.hero-coverage .num {
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* The one page-load moment: the hero settles in, top to bottom. */
+.hero > * {
+  animation: settle 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.hero > :nth-child(2) {
+  animation-delay: 0.08s;
+}
+.hero > :nth-child(3) {
+  animation-delay: 0.16s;
+}
+.hero > :nth-child(4) {
+  animation-delay: 0.24s;
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Ranked list ---------- */
+
+.section-link {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rank-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--border);
+}
+
+.rank-row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  gap: 0 24px;
+  align-items: start;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.rank-num {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding-top: 8px;
+}
+
+.rank-main {
+  min-width: 0;
+}
+
+.rank-name {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.rank-name:hover {
+  color: var(--accent);
+}
+
+.rank-meta {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text-dim);
+  margin: 6px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.rank-sep {
+  width: 1px;
+  height: 12px;
+  background: var(--border-strong);
+}
+
+.rank-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.rank-score {
+  font-family: var(--font-ui);
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.rank-score.good {
+  color: var(--positive);
+}
+.rank-score.meh {
+  color: var(--neutral);
+}
+.rank-score.bad {
+  color: var(--negative);
+}
+
+.rank-compare {
+  font-size: 13px;
+  color: var(--text-dim);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 2px 0;
+}
+
+.rank-compare:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+.rank-compare.active {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.rank-compare:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 48px 0 36px;
+  }
+  .rank-row {
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    gap: 0 12px;
+  }
+  .rank-name {
+    font-size: 21px;
+  }
+  .rank-score {
+    font-size: 26px;
+  }
+}
+
 /* ---------- Search ---------- */
 
 .search-bar {
@@ -531,9 +802,9 @@ textarea {
 }
 
 .btn-ghost {
-  background: var(--surface-2);
+  background: var(--surface);
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
 }
 
 .btn-ghost:hover {
@@ -580,58 +851,90 @@ textarea {
   align-items: center;
 }
 
-/* ---------- Professor cards ---------- */
+/* ---------- Directory entries ---------- */
 
 .prof-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0 40px;
+  border-top: 1px solid var(--text);
 }
 
-.prof-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: var(--elev-shadow);
-  border-radius: var(--radius);
-  padding: 18px;
+.entry {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
-  position: relative;
+  padding: 18px 0 20px;
+  border-bottom: 1px solid var(--border);
 }
 
-.prof-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow);
-}
-
-.prof-card .row {
+.entry-head {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 12px;
+  gap: 16px;
 }
 
-.prof-card .name {
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: -0.01em;
+.entry-main {
+  min-width: 0;
 }
 
-.prof-card .meta {
-  color: var(--text-muted);
+.entry-name {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.entry-name:hover {
+  color: var(--accent);
+}
+
+.entry-meta {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.entry-score {
+  font-family: var(--font-ui);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+
+.entry-score small {
   font-size: 13px;
-  margin-top: 2px;
+  font-weight: 500;
+  margin-left: 1px;
 }
 
-/* Nudge the ring down so it clears the compare toggle in the top-right
-   corner — without this it overlaps and looks like a bite out of the
-   circle. Scoped to the card's own row so the bigger rings elsewhere
-   (detail page, Compare) aren't affected. */
-.prof-card .row > .score-ring {
-  margin-top: 30px;
+.entry-score.good {
+  color: var(--positive);
+}
+.entry-score.meh {
+  color: var(--neutral);
+}
+.entry-score.bad {
+  color: var(--negative);
+}
+.entry-score.unanalyzed {
+  color: var(--text-muted);
+}
+
+.entry-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: auto;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--text-dim);
 }
 
 /* ---------- Score ring (slim circular progress) ---------- */
@@ -703,12 +1006,6 @@ textarea {
   stroke: var(--text-muted);
 }
 
-.unanalyzed-footer {
-  color: var(--text-muted);
-  font-style: italic;
-  font-size: 12px;
-}
-
 .sentiment-bar {
   display: flex;
   height: 6px;
@@ -765,42 +1062,6 @@ textarea {
 .pill.bad {
   color: var(--negative);
   background: var(--negative-soft);
-}
-
-.prof-card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: var(--text-muted);
-  font-size: 12px;
-  margin-top: auto;
-}
-
-.compare-toggle {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  display: grid;
-  place-items: center;
-  color: var(--text-dim);
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
-  z-index: 2;
-}
-
-.compare-toggle:hover {
-  color: var(--text);
-  border-color: var(--border-strong);
-}
-
-.compare-toggle.active {
-  color: var(--accent-ink);
-  background: var(--accent);
-  border-color: transparent;
 }
 
 /* ---------- Detail page ---------- */
@@ -976,9 +1237,18 @@ textarea {
 /* ---------- Empty / loading ---------- */
 
 .empty {
-  text-align: center;
   padding: 48px 0;
   color: var(--text-dim);
+  max-width: 52ch;
+}
+
+.empty p {
+  margin: 0 0 12px;
+}
+
+.empty-title {
+  color: var(--text);
+  font-size: 22px;
 }
 
 .spinner {
@@ -1049,16 +1319,9 @@ textarea {
    (or near-instant) rather than removing feedback entirely. */
 @media (prefers-reduced-motion: reduce) {
   .nav-link,
-  .search-bar,
-  .btn,
-  .prof-card,
-  .compare-toggle,
-  .compare-bar {
+  .hero-search,
+  .btn {
     transition-duration: 0.01ms;
-  }
-
-  .prof-card:hover {
-    transform: none;
   }
 
   .btn:active {

@@ -119,69 +119,47 @@ export default function Search() {
     updateParam("institution", "");
   };
 
-  const fieldStyle = {
-    background: "var(--surface-2)",
-    color: "var(--text)",
-    border: "1px solid var(--border)",
-    borderRadius: 10,
-    padding: "8px 12px",
-  };
-
   return (
     <section className="section container">
       <div className="section-head">
         <div>
           <h2>Browse professors</h2>
           <div className="sub">
-            {loading ? "Searching…" : `${results.length} result${results.length === 1 ? "" : "s"}`}
-            {institution && (
-              <>
-                {" "}· at <strong style={{ color: "var(--text)" }}>{institution}</strong>
-              </>
-            )}
+            {loading
+              ? "Searching"
+              : `${results.length} result${results.length === 1 ? "" : "s"}`}
+            {institution && <> at {institution}</>}
           </div>
         </div>
-        <div className="filter-row">
+        <div className="sort-row" role="group" aria-label="Sort by">
+          <span className="sort-label">Sort by</span>
           <button
-            className={"btn btn-ghost" + (sort === "score" ? " active" : "")}
+            className={"sort-option" + (sort === "score" ? " active" : "")}
             onClick={() => updateParam("sort", "score")}
           >
             Top score
           </button>
           <button
-            className={"btn btn-ghost" + (sort === "reviews" ? " active" : "")}
+            className={"sort-option" + (sort === "reviews" ? " active" : "")}
             onClick={() => updateParam("sort", "reviews")}
           >
             Most reviews
           </button>
           <button
-            className={"btn btn-ghost" + (sort === "name" ? " active" : "")}
+            className={"sort-option" + (sort === "name" ? " active" : "")}
             onClick={() => updateParam("sort", "name")}
           >
-            A – Z
+            Name
           </button>
         </div>
       </div>
 
       {switchPrompt && (
-        <div
-          className="card"
-          style={{
-            marginBottom: 16,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: 10,
-            padding: "12px 16px",
-          }}
-        >
-          <div style={{ fontSize: 13, color: "var(--text-dim)" }}>
-            You switched to{" "}
-            <strong style={{ color: "var(--text)" }}>{switchPrompt}</strong>{" "}
-            — update this search to match?
+        <div className="notice">
+          <div className="notice-text">
+            You switched to {switchPrompt}. Update this search to match?
           </div>
-          <div style={{ display: "flex", gap: 8 }}>
+          <div className="notice-actions">
             <button
               type="button"
               className="btn btn-primary"
@@ -204,19 +182,17 @@ export default function Search() {
         </div>
       )}
 
-      <form
-        className="search-bar"
-        onSubmit={onSubmit}
-        style={{ margin: "0 0 20px", flexWrap: "wrap", gap: 8 }}
-      >
+      <form className="filters" onSubmit={onSubmit}>
         <input
-          placeholder="Search professor, course, or department…"
+          className="field field-grow"
+          placeholder="Professor, course, or department"
           value={input}
           onChange={(e) => setInput(e.target.value)}
         />
         <input
+          className="field field-school"
           list={datalistId}
-          placeholder="Filter by school…"
+          placeholder="School"
           value={schoolInput}
           onChange={(e) => setSchoolInput(e.target.value)}
           onBlur={() => {
@@ -229,7 +205,6 @@ export default function Search() {
               if (exact) updateParam("institution", exact.name);
             }
           }}
-          style={{ ...fieldStyle, minWidth: 240 }}
         />
         <datalist id={datalistId}>
           {schoolOptions.map((s) => (
@@ -243,15 +218,14 @@ export default function Search() {
             type="button"
             className="btn btn-ghost"
             onClick={clearSchool}
-            title="Clear school filter"
           >
-            ✕ {institution.length > 28 ? institution.slice(0, 25) + "…" : institution}
+            Clear school
           </button>
         )}
         <select
           value={department}
+          className="field"
           onChange={(e) => updateParam("department", e.target.value)}
-          style={fieldStyle}
         >
           <option value="">All departments</option>
           {departments.map((d) => (
@@ -300,27 +274,17 @@ export default function Search() {
 function EmptyResults({ query, institution, onAddClick }) {
   const target = query?.trim();
   return (
-    <div
-      className="empty"
-      style={{
-        display: "grid",
-        gap: 12,
-        textAlign: "center",
-        padding: "32px 20px",
-      }}
-    >
-      <div style={{ fontSize: 16, color: "var(--text)" }}>
-        No professors match your search.
-      </div>
-      <div style={{ color: "var(--text-dim)", fontSize: 14 }}>
+    <div className="empty empty-results">
+      <p className="empty-title">No professors match your search.</p>
+      <p>
         {target
-          ? `Don't see ${target}${institution ? ` at ${institution}` : ""}?`
-          : "Don't see who you're looking for?"}{" "}
-        Add them and we'll fetch their reviews.
-      </div>
+          ? `If ${target}${institution ? ` at ${institution}` : ""} is missing, add them`
+          : "If someone is missing, add them"}{" "}
+        and their reviews will be fetched.
+      </p>
       <div>
         <button type="button" className="btn btn-primary" onClick={onAddClick}>
-          + Add a professor
+          Add a professor
         </button>
       </div>
     </div>
