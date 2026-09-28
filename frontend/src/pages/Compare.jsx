@@ -1,27 +1,11 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import {
-  Radar,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  ResponsiveContainer,
-  Tooltip,
-  Legend,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-} from "recharts";
 import { api } from "../lib/api.js";
 import { useCompare } from "../lib/compareStore.jsx";
-import ScoreRing from "../components/ScoreRing.jsx";
 import { scoreBucket } from "../lib/format.js";
 
-const LINE_COLORS = ["var(--accent)", "var(--accent-2)", "#2ecc8f", "#f0c75e"];
-
+// Compare is one table: professors across the top, measures down the side.
+// The best value in each row is bold so the eye can scan for it.
 export default function Compare() {
   const [params] = useSearchParams();
   const { ids: ctxIds, toggle } = useCompare();
@@ -54,13 +38,14 @@ export default function Compare() {
   if (ids.length === 0) {
     return (
       <section className="section container">
-        <div className="empty" style={{ padding: 80 }}>
-          <h2 style={{ color: "var(--text)" }}>No professors selected</h2>
+        <div className="empty">
+          <p className="empty-title">Nothing to compare yet.</p>
           <p>
-            Pick 2–4 professors to compare.{" "}
-            <Link to="/search" style={{ color: "var(--accent-2)" }}>
-              Browse professors →
-            </Link>
+            Pick two to four professors from{" "}
+            <Link to="/search" className="section-link">
+              Browse
+            </Link>{" "}
+            and they will line up here.
           </p>
         </div>
       </section>
@@ -69,29 +54,23 @@ export default function Compare() {
 
   if (error) return <div className="container empty">{error}</div>;
 
-  // Build radar data: unify all themes across compared professors.
-  const themeSet = new Set();
-  profs.forEach((p) => {
-    Object.keys(p.theme_counts || {}).forEach((k) => themeSet.add(k));
-  });
-  const themes = Array.from(themeSet).sort();
+  const themes = Array.from(
+    new Set(profs.flatMap((p) => Object.keys(p.theme_counts || {}))),
+  ).sort();
 
-  const radarData = themes.map((theme) => {
-    const row = { theme };
-    profs.forEach((p) => {
-      const count = p.theme_counts?.[theme] || 0;
-      const reviews = p.review_count || 0;
-      row[p.name] = reviews > 0 ? Number(((count / reviews) * 100).toFixed(1)) : 0;
-      row[`${p.name}__count`] = count;
-    });
-    return row;
-  });
+  const share = (p, theme) => {
+    const count = p.theme_counts?.[theme] || 0;
+    const reviews = p.review_count || 0;
+    return reviews > 0 ? (count / reviews) * 100 : 0;
+  };
 
-  const scoreData = profs.map((p) => ({
-    name: p.name,
-    score: p.recommendation_score,
-    reviews: p.review_count,
-  }));
+  const maxOf = (values) => Math.max(...values);
+  const scores = profs.map((p) => p.recommendation_score || 0);
+  const reviews = profs.map((p) => p.review_count || 0);
+  const sentiments = profs.map((p) => p.avg_compound || 0);
+
+  const best = (value, values) =>
+    profs.length > 1 && value === maxOf(values) ? " best" : "";
 
   return (
     <section className="section container">
@@ -99,140 +78,115 @@ export default function Compare() {
         <div>
           <h2>Compare professors</h2>
           <div className="sub">
-            Side-by-side recommendation scores, review volume, and topic breakdown.
+            Scores, review volume and how often each theme comes up. Theme
+            figures are the share of that professor's reviews, so a professor
+            with more reviews does not dominate.
           </div>
         </div>
       </div>
 
-      <div className="prof-grid" style={{ marginBottom: 20 }}>
-        {profs.map((p) => {
-          const bucket = scoreBucket(p.recommendation_score || 0);
-          return (
-            <div key={p.id} className="card" style={{ padding: 18 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-                <div style={{ minWidth: 0 }}>
-                  <Link to={`/professors/${p.id}`} className="name" style={{ fontWeight: 700 }}>
+      <div className="compare-scroll">
+        <table className="compare">
+          <thead>
+            <tr>
+              <th scope="col" className="compare-label">
+                <span className="visually-hidden">Measure</span>
+              </th>
+              {profs.map((p) => (
+                <th scope="col" key={p.id} className="compare-prof">
+                  <Link to={`/professors/${p.id}`} className="compare-name">
                     {p.name}
                   </Link>
-                  <div className="meta" style={{ color: "var(--text-muted)", fontSize: 13 }}>
-                    {p.department || "—"}
+                  <div className="compare-meta">
+                    {p.department || "Department not listed"}
                   </div>
-                </div>
-                <ScoreRing
-                  value={p.recommendation_score}
-                  max={100}
-                  tier={bucket}
-                  label="/100"
-                  size={58}
-                />
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--text-dim)", marginTop: 12 }}>
-                <span>{p.review_count} reviews</span>
-                <span>avg {(p.avg_compound || 0).toFixed(2)}</span>
-              </div>
-              <button
-                className="btn btn-ghost"
-                style={{ marginTop: 12, width: "100%" }}
-                onClick={() => toggle(p.id)}
-              >
-                Remove
-              </button>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="grid-2">
-        <div className="card">
-          <h3>Recommendation score</h3>
-          <div style={{ width: "100%", height: 260 }}>
-            <ResponsiveContainer>
-              <BarChart data={scoreData} margin={{ top: 10, right: 16, left: -18, bottom: 20 }}>
-                <CartesianGrid stroke="var(--border)" vertical={false} />
-                <XAxis
-                  dataKey="name"
-                  tick={{ fill: "var(--text-dim)", fontSize: 11 }}
-                  axisLine={{ stroke: "var(--border)" }}
-                  tickLine={false}
-                  interval={0}
-                  angle={-15}
-                  textAnchor="end"
-                />
-                <YAxis
-                  domain={[0, 100]}
-                  tick={{ fill: "var(--text-dim)", fontSize: 12 }}
-                  axisLine={{ stroke: "var(--border)" }}
-                  tickLine={false}
-                />
-                <Tooltip
-                  cursor={{ fill: "rgba(124,92,255,0.08)" }}
-                  contentStyle={{
-                    background: "var(--surface-2)",
-                    border: "1px solid var(--border)",
-                    borderRadius: 8,
-                    color: "var(--text)",
-                  }}
-                />
-                <Bar dataKey="score" radius={[6, 6, 0, 0]} fill="url(#compareGrad)" />
-                <defs>
-                  <linearGradient id="compareGrad" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#7c5cff" />
-                    <stop offset="100%" stopColor="#00d4ff" />
-                  </linearGradient>
-                </defs>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="card">
-          <h3>Theme breakdown</h3>
-          {radarData.length > 0 && (
-            <div className="muted" style={{ fontSize: 12, marginBottom: 8 }}>
-              Normalized as percentage of analyzed reviews, so professors with
-              more reviews do not dominate the chart.
-            </div>
-          )}
-          {radarData.length === 0 ? (
-            <div className="empty" style={{ padding: 20 }}>No themes detected</div>
-          ) : (
-            <div style={{ width: "100%", height: 300 }}>
-              <ResponsiveContainer>
-                <RadarChart data={radarData} outerRadius="78%">
-                  <PolarGrid stroke="var(--border)" />
-                  <PolarAngleAxis
-                    dataKey="theme"
-                    tick={{ fill: "var(--text-dim)", fontSize: 11 }}
-                  />
-                  <PolarRadiusAxis tick={{ fill: "var(--text-muted)", fontSize: 10 }} />
+                  <button
+                    type="button"
+                    className="rank-compare"
+                    onClick={() => toggle(p.id)}
+                  >
+                    Remove
+                  </button>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="compare-score-row">
+              <th scope="row" className="compare-label">
+                Recommendation score
+              </th>
+              {profs.map((p, i) => (
+                <td
+                  key={p.id}
+                  className={
+                    "num compare-score " +
+                    scoreBucket(scores[i]) +
+                    best(scores[i], scores)
+                  }
+                >
+                  {Math.round(scores[i])}
+                </td>
+              ))}
+            </tr>
+            <tr>
+              <th scope="row" className="compare-label">
+                Reviews analyzed
+              </th>
+              {profs.map((p, i) => (
+                <td key={p.id} className={"num" + best(reviews[i], reviews)}>
+                  {reviews[i].toLocaleString()}
+                </td>
+              ))}
+            </tr>
+            <tr>
+              <th scope="row" className="compare-label">
+                Average sentiment
+              </th>
+              {profs.map((p, i) => (
+                <td
+                  key={p.id}
+                  className={"num" + best(sentiments[i], sentiments)}
+                >
+                  {sentiments[i] > 0 ? "+" : ""}
+                  {sentiments[i].toFixed(2)}
+                </td>
+              ))}
+            </tr>
+            {themes.length > 0 && (
+              <tr className="compare-group">
+                <th scope="row" colSpan={profs.length + 1}>
+                  Share of reviews mentioning
+                </th>
+              </tr>
+            )}
+            {themes.map((theme) => {
+              const shares = profs.map((p) => share(p, theme));
+              return (
+                <tr key={theme}>
+                  <th scope="row" className="compare-label compare-theme">
+                    {theme}
+                  </th>
                   {profs.map((p, i) => (
-                    <Radar
-                      key={p.id}
-                      name={p.name}
-                      dataKey={p.name}
-                      stroke={LINE_COLORS[i % LINE_COLORS.length]}
-                      fill={LINE_COLORS[i % LINE_COLORS.length]}
-                      fillOpacity={0.15}
-                    />
+                    <td key={p.id} className={"num" + best(shares[i], shares)}>
+                      <span className="share-bar" aria-hidden="true">
+                        <span
+                          className="share-bar-fill"
+                          style={{ width: `${shares[i]}%` }}
+                        />
+                      </span>
+                      {Math.round(shares[i])}%
+                      <span className="compare-count">
+                        {" "}
+                        ({p.theme_counts?.[theme] || 0})
+                      </span>
+                    </td>
                   ))}
-                  <Tooltip
-                    formatter={(value, name, item) => [
-                      `${value}% (${item.payload[`${name}__count`] || 0} mentions)`,
-                      name,
-                    ]}
-                    contentStyle={{
-                      background: "var(--surface-2)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 8,
-                      color: "var(--text)",
-                    }}
-                  />
-                  <Legend wrapperStyle={{ color: "var(--text-dim)", fontSize: 12 }} />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-        </div>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </section>
   );
