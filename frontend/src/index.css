@@ -1,32 +1,36 @@
+/* Editorial paper theme. Light ground, ink text, one cobalt accent.
+   Sentiment hues are the only other colors and always mean sentiment. */
 :root {
-  --bg: #0a0b10;
-  --bg-2: #0d0f19;
-  --surface: #12131c;
-  --surface-2: #171827;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
-  --text: #eceef6;
-  --text-dim: #a3a8c0;
-  --text-muted: #7d82a0;
-  --accent: #7c6bff;
-  /* Solid hover shade for accent fills (no gradient shift). */
-  --accent-hover: #8d7dff;
-  /* Muted secondary tone for sparing use (replaces the old cyan). */
-  --accent-2: #8e90bd;
-  --positive: #2ecc8f;
-  --negative: #ff5c7a;
-  --neutral: #f0c75e;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-  /* Quiet resting elevation for cards/surfaces (hover uses --shadow). */
-  --elev-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --radius: 14px;
-  --radius-sm: 8px;
-  --font-heading: "Space Grotesk", "DM Sans", -apple-system,
-    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-body: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas,
-    monospace;
+  --bg: #fbfaf7;
+  --bg-2: #f6f4ef;
+  --surface: #ffffff;
+  --surface-2: #f1efe9;
+  --border: #d8d5cc;
+  --border-strong: #b9b5aa;
+  --text: #17181c;
+  --text-dim: #5b5e6b;
+  --text-muted: #8a8c96;
+  --accent: #1f3fbf;
+  --accent-hover: #172f91;
+  --accent-ink: #ffffff;
+  --accent-soft: #e6eaf9;
+  --accent-2: #1f3fbf;
+  --positive: #2f7d4f;
+  --positive-soft: #e3f0e7;
+  --negative: #b3322e;
+  --negative-soft: #f6e3e1;
+  --neutral: #a8741a;
+  --neutral-soft: #f4ead7;
+  --shadow: 0 12px 32px rgba(23, 24, 28, 0.14);
+  --elev-shadow: none;
+  --radius: 0;
+  --radius-sm: 3px;
+  --font-heading: "Newsreader", "Iowan Old Style", "Palatino Linotype", Georgia,
+    serif;
+  --font-body: "Newsreader", "Iowan Old Style", "Palatino Linotype", Georgia,
+    serif;
+  --font-ui: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-ui);
 }
 
 * {
@@ -42,12 +46,9 @@ body,
 body {
   margin: 0;
   font-family: var(--font-body);
-  background: radial-gradient(
-      900px 520px at 50% -8%,
-      rgba(124, 107, 255, 0.08),
-      transparent 62%
-    ),
-    var(--bg);
+  font-size: 17px;
+  line-height: 1.5;
+  background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -68,15 +69,24 @@ a {
 }
 
 button {
-  font-family: inherit;
+  font-family: var(--font-ui);
   cursor: pointer;
   border: none;
   background: none;
   color: inherit;
 }
 
-input {
-  font-family: inherit;
+input,
+select,
+textarea {
+  font-family: var(--font-ui);
+}
+
+/* Numbers line up in lists and tables. */
+.num,
+.score-ring-num,
+.stat-chip .value {
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------- Layout ---------- */
@@ -98,8 +108,7 @@ input {
   position: sticky;
   top: 0;
   z-index: 20;
-  backdrop-filter: blur(18px) saturate(140%);
-  background: rgba(11, 15, 26, 0.72);
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
 
@@ -127,7 +136,7 @@ input {
   background: var(--accent);
   display: grid;
   place-items: center;
-  color: #0b0f1a;
+  color: var(--accent-ink);
   font-weight: 800;
   font-size: 14px;
 }
@@ -215,10 +224,7 @@ input {
 /* The single "signature" gradient in the app: a one-time hero moment.
    Every other former accent gradient below is now a solid color. */
 .hero h1 .grad {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--accent);
 }
 
 .hero p {
@@ -276,7 +282,7 @@ input {
 
 .search-bar:focus-within {
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(124, 107, 255, 0.15);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .search-bar input {
@@ -310,8 +316,8 @@ input {
 
 .btn-primary {
   background: var(--accent);
-  color: #0b0f1a;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  color: var(--accent-ink);
+  
 }
 
 .btn-primary:hover {
@@ -540,23 +546,23 @@ input {
 }
 
 .pill.accent {
-  color: #c9bffd;
-  background: rgba(124, 107, 255, 0.12);
+  color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .pill.good {
-  color: #7fe9bd;
-  background: rgba(46, 204, 143, 0.12);
+  color: var(--positive);
+  background: var(--positive-soft);
 }
 
 .pill.meh {
-  color: #ffdd8a;
-  background: rgba(240, 199, 94, 0.12);
+  color: var(--neutral);
+  background: var(--neutral-soft);
 }
 
 .pill.bad {
-  color: #ff96a9;
-  background: rgba(255, 92, 122, 0.12);
+  color: var(--negative);
+  background: var(--negative-soft);
 }
 
 .prof-card-footer {
@@ -590,7 +596,7 @@ input {
 }
 
 .compare-toggle.active {
-  color: #0b0f1a;
+  color: var(--accent-ink);
   background: var(--accent);
   border-color: transparent;
 }
@@ -712,7 +718,7 @@ input {
   padding: 3px 10px;
   border-radius: 999px;
   border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--surface-2);
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -720,8 +726,8 @@ input {
 }
 
 .source-chip.rmp {
-  color: #c5c6e0;
-  background: rgba(142, 144, 189, 0.12);
+  color: var(--text-dim);
+  background: var(--surface-2);
 }
 
 .sentiment-chip {
@@ -735,21 +741,21 @@ input {
 }
 
 .sentiment-chip.positive {
-  color: #7fe9bd;
-  background: rgba(46, 204, 143, 0.12);
-  border-color: rgba(46, 204, 143, 0.35);
+  color: var(--positive);
+  background: var(--positive-soft);
+  border-color: var(--positive);
 }
 
 .sentiment-chip.neutral {
-  color: #ffdd8a;
-  background: rgba(240, 199, 94, 0.12);
-  border-color: rgba(240, 199, 94, 0.35);
+  color: var(--neutral);
+  background: var(--neutral-soft);
+  border-color: var(--neutral);
 }
 
 .sentiment-chip.negative {
-  color: #ff96a9;
-  background: rgba(255, 92, 122, 0.12);
-  border-color: rgba(255, 92, 122, 0.35);
+  color: var(--negative);
+  background: var(--negative-soft);
+  border-color: var(--negative);
 }
 
 .review-body {
@@ -799,13 +805,12 @@ input {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(18, 19, 28, 0.78);
+  background: var(--surface);
   border: 1px solid var(--border-strong);
   padding: 10px 12px 10px 18px;
   border-radius: 999px;
   box-shadow: var(--shadow);
   z-index: 30;
-  backdrop-filter: blur(14px) saturate(140%);
 }
 
 .compare-bar .count {
