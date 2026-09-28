@@ -1,32 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-} from "recharts";
 import { api } from "../lib/api.js";
 import {
   formatScore,
   scoreBucket,
-  sourceChipClass,
   sentimentLabel,
 } from "../lib/format.js";
 import { useCompare } from "../lib/compareStore.jsx";
-import ScoreRing from "../components/ScoreRing.jsx";
-
-const COLORS = {
-  positive: "#2ecc8f",
-  neutral: "#f0c75e",
-  negative: "#ff5c7a",
-};
+import SentimentBar from "../components/SentimentBar.jsx";
 
 // Poll long enough for the background stats job to finish on slow RMP calls.
 const POLL_INTERVAL_MS = 4000;
@@ -118,9 +99,9 @@ export default function ProfessorDetail() {
   const sentimentData = !analyzed
     ? []
     : [
-        { name: "Positive", value: stats.positive_count || 0, color: COLORS.positive },
-        { name: "Neutral", value: stats.neutral_count || 0, color: COLORS.neutral },
-        { name: "Negative", value: stats.negative_count || 0, color: COLORS.negative },
+        { key: "positive", name: "Positive", value: stats.positive_count || 0 },
+        { key: "neutral", name: "Neutral", value: stats.neutral_count || 0 },
+        { key: "negative", name: "Negative", value: stats.negative_count || 0 },
       ].filter((d) => d.value > 0);
 
   const themeData = !analyzed
@@ -128,254 +109,157 @@ export default function ProfessorDetail() {
     : Object.entries(stats.theme_counts || {})
         .sort((a, b) => b[1] - a[1])
         .map(([name, count]) => ({ name, count }));
+  const themeMax = themeData.reduce((m, t) => Math.max(m, t.count), 0);
+
+  const verdict = analyzed
+    ? bucket === "good"
+      ? "Highly recommended"
+      : bucket === "meh"
+        ? "Mixed reviews"
+        : "Not recommended"
+    : sourceCount > 0
+      ? `Based on ${sourceCount.toLocaleString()} RMP rating${sourceCount === 1 ? "" : "s"}`
+      : lazyEligible
+        ? "Profile rating unavailable"
+        : "No reviews on RMP";
 
   return (
-    <section className="container">
-      <div className="detail-hero">
-        <div>
-          <Link
-            to="/search"
-            className="pill"
-            style={{ display: "inline-block", marginBottom: 8 }}
-          >
-            ← Back to search
+    <section className="container report">
+      <header className="report-head">
+        <div className="report-title">
+          <Link to="/search" className="back-link">
+            Back to browse
           </Link>
           <h1>{prof.name}</h1>
-          <div className="muted">
-            {prof.department?.name || "—"}
-            {prof.institution ? ` · ${prof.institution}` : ""}
-          </div>
-          {prof.bio && (
-            <p style={{ color: "var(--text-dim)", maxWidth: 620, marginTop: 14 }}>
-              {prof.bio}
+          <p className="report-meta">
+            {prof.department?.name || "Department not listed"}
+            {prof.institution ? `, ${prof.institution}` : ""}
+          </p>
+          {prof.bio && <p className="report-bio">{prof.bio}</p>}
+          {prof.courses?.length > 0 && (
+            <p className="report-courses">
+              Teaches {prof.courses.map((c) => c.code).join(", ")}
             </p>
           )}
-          {prof.courses?.length > 0 && (
-            <div className="pill-row" style={{ marginTop: 14 }}>
-              {prof.courses.map((c) => (
-                <span key={c.id} className="pill">
-                  {c.code}
-                </span>
-              ))}
-            </div>
-          )}
-          <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
-            <button
-              className={"btn " + (selected ? "btn-ghost active" : "btn-primary")}
-              disabled={!selected && full}
-              onClick={() => toggle(prof.id)}
-            >
-              {selected ? "✓ Added to compare" : full ? "Compare limit reached" : "+ Add to compare"}
-            </button>
-          </div>
-        </div>
-        <div className={"big-score"}>
-          <ScoreRing
-            value={score}
-            max={100}
-            tier={bucket}
-            label={analyzed ? "/100" : "RMP"}
-            size={128}
-          />
-          <div className="lbl">
-            {analyzed ? "Recommendation" : "RMP rating"}
-          </div>
-          <div
-            className={"pill " + bucket}
-            style={{ marginTop: 10, fontSize: 10 }}
+          <button
+            className={"btn " + (selected ? "btn-ghost" : "btn-primary")}
+            disabled={!selected && full}
+            onClick={() => toggle(prof.id)}
           >
-            {analyzed
-              ? bucket === "good"
-                ? "Highly recommended"
-                : bucket === "meh"
-                  ? "Mixed reviews"
-                  : "Not recommended"
-              : sourceCount > 0
-                ? `Based on ${sourceCount} RMP rating${sourceCount === 1 ? "" : "s"}`
-                : lazyEligible
-                  ? "Profile rating unavailable"
-                  : "No reviews on RMP"}
-          </div>
+            {selected
+              ? "Remove from compare"
+              : full
+                ? "Compare is full"
+                : "Add to compare"}
+          </button>
         </div>
-      </div>
+        <div className={"verdict " + (analyzed ? bucket : "unanalyzed")}>
+          <div className="verdict-num num">
+            {analyzed ? Math.round(score) : typeof sourceRating === "number" ? sourceRating.toFixed(1) : "\u2013"}
+            <span className="verdict-max">
+              {analyzed ? "out of 100" : "out of 5 on RMP"}
+            </span>
+          </div>
+          <div className="verdict-label">{verdict}</div>
+        </div>
+      </header>
 
       {!analyzed && (
-        <div
-          className="card"
-          style={{
-            marginTop: 12,
-            background: "var(--surface-2)",
-            borderLeft: "3px solid var(--accent, #7c5cff)",
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-          }}
-        >
-          {lazyEligible && !pollGaveUp && (
-            <div
-              className="spinner"
-              style={{ width: 18, height: 18, flexShrink: 0 }}
-            />
-          )}
-          <div style={{ fontSize: 13, color: "var(--text-dim)" }}>
-            {lazyEligible && !pollGaveUp ? (
-              <>
-                <strong style={{ color: "var(--text)" }}>
-                  Computing aggregate dashboard…
-                </strong>{" "}
-                First visit to this professor — we&apos;re pulling their
-                RateMyProfessors reviews, running
-                VADER sentiment on each, and aggregating in the
-                background. The charts and recommendation score will
-                appear here automatically when it&apos;s done (usually
-                10–30 seconds). Individual reviews below already include
-                per-review sentiment.
-              </>
-            ) : lazyEligible && pollGaveUp ? (
-              <>
-                <strong style={{ color: "var(--text)" }}>
-                  Analysis is taking longer than expected.
-                </strong>{" "}
-                The background job hasn&apos;t finished yet — RateMyProfessors
-                may be rate-limiting us. Reload the page in a minute, or
-                browse the live reviews below in the meantime.
-              </>
-            ) : (
-              <>
-                <strong style={{ color: "var(--text)" }}>
-                  Aggregate dashboard unavailable.
-                </strong>{" "}
-                This professor has no RateMyProfessors reference to analyze.
-                Showing the available profile information above.
-              </>
-            )}
+        <div className="notice">
+          {lazyEligible && !pollGaveUp && <div className="spinner spinner-sm" />}
+          <div className="notice-text">
+            {lazyEligible && !pollGaveUp
+              ? "First visit to this professor. Their RateMyProfessors reviews are being fetched and scored in the background. The score and charts appear here on their own, usually within 30 seconds. The reviews below already carry per-review sentiment."
+              : lazyEligible && pollGaveUp
+                ? "The analysis has not finished. RateMyProfessors may be rate limiting requests. Reload in a minute, or read the reviews below meanwhile."
+                : "Nothing to analyze. This professor has no RateMyProfessors reference, so only the profile above is available."}
           </div>
         </div>
       )}
 
-      <div className="grid-2" style={{ marginTop: 12 }}>
-        <div className="card">
-          <h3>Overview</h3>
-          {analyzed ? (
-            <>
-              <div className="kv"><span className="k">Reviews analyzed</span><span className="v">{stats.review_count || 0}</span></div>
-              <div className="kv"><span className="k">Average sentiment (VADER)</span><span className="v">{(stats.avg_compound ?? 0).toFixed(3)}</span></div>
-              <div className="kv"><span className="k">Positive</span><span className="v" style={{ color: COLORS.positive }}>{stats.positive_count || 0}</span></div>
-              <div className="kv"><span className="k">Neutral</span><span className="v" style={{ color: COLORS.neutral }}>{stats.neutral_count || 0}</span></div>
-              <div className="kv"><span className="k">Negative</span><span className="v" style={{ color: COLORS.negative }}>{stats.negative_count || 0}</span></div>
-            </>
-          ) : (
-            <>
-              <div className="kv"><span className="k">RMP average rating</span><span className="v">{typeof sourceRating === "number" ? `${sourceRating.toFixed(2)} / 5` : "—"}</span></div>
-              <div className="kv"><span className="k">RMP rating count</span><span className="v">{sourceCount}</span></div>
-              <div className="kv"><span className="k">Recommendation score</span><span className="v">{formatScore(score)}</span></div>
-              <div className="kv"><span className="k">Sentiment analysis</span><span className="v" style={{ color: "var(--text-dim)" }}>not yet computed</span></div>
-            </>
-          )}
-        </div>
+      <div className="report-grid">
+        <section className="report-section">
+          <h2>Overview</h2>
+          <dl className="facts">
+            {analyzed ? (
+              <>
+                <div className="fact"><dt>Reviews analyzed</dt><dd className="num">{(stats.review_count || 0).toLocaleString()}</dd></div>
+                <div className="fact"><dt>Average sentiment</dt><dd className="num">{(stats.avg_compound ?? 0).toFixed(3)}</dd></div>
+                <div className="fact"><dt>Positive</dt><dd className="num positive">{stats.positive_count || 0}</dd></div>
+                <div className="fact"><dt>Neutral</dt><dd className="num neutral">{stats.neutral_count || 0}</dd></div>
+                <div className="fact"><dt>Negative</dt><dd className="num negative">{stats.negative_count || 0}</dd></div>
+              </>
+            ) : (
+              <>
+                <div className="fact"><dt>RMP average rating</dt><dd className="num">{typeof sourceRating === "number" ? `${sourceRating.toFixed(2)} / 5` : "\u2013"}</dd></div>
+                <div className="fact"><dt>RMP ratings</dt><dd className="num">{sourceCount.toLocaleString()}</dd></div>
+                <div className="fact"><dt>Recommendation score</dt><dd className="num">{formatScore(score)}</dd></div>
+                <div className="fact"><dt>Sentiment analysis</dt><dd>Not yet run</dd></div>
+              </>
+            )}
+          </dl>
+          <p className="report-note">
+            Sentiment comes from VADER with a lexicon tuned to professor reviews.
+          </p>
+        </section>
 
-        <div className="card">
-          <h3>Sentiment distribution</h3>
+        <section className="report-section">
+          <h2>Sentiment</h2>
           {sentimentData.length === 0 ? (
-            <div className="empty" style={{ padding: 20 }}>
+            <p className="report-note">
               {analyzed
-                ? "No review data"
-                : "Awaiting analysis pass — scroll down for live reviews."}
-            </div>
+                ? "No review data."
+                : "Appears after the analysis pass. The reviews below are live."}
+            </p>
           ) : (
-            <div style={{ width: "100%", height: 220 }}>
-              <ResponsiveContainer>
-                <PieChart>
-                  <Pie isAnimationActive={false}
-                    data={sentimentData}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={55}
-                    outerRadius={85}
-                    paddingAngle={2}
-                  >
-                    {sentimentData.map((d) => (
-                      <Cell key={d.name} fill={d.color} stroke="transparent" />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      background: "var(--surface-2)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 8,
-                      color: "var(--text)",
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+            <>
+              <SentimentBar
+                positive={stats.positive_count || 0}
+                neutral={stats.neutral_count || 0}
+                negative={stats.negative_count || 0}
+                tall
+              />
+              <ul className="legend">
+                {sentimentData.map((d) => (
+                  <li key={d.key} className={"legend-item " + d.key}>
+                    <span className="legend-swatch" aria-hidden="true" />
+                    {d.name}
+                    <span className="num">
+                      {d.value} ({Math.round((d.value / (stats.review_count || 1)) * 100)}%)
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
-          <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap", marginTop: 8 }}>
-            {sentimentData.map((d) => (
-              <span
-                key={d.name}
-                style={{
-                  fontSize: 12,
-                  color: "var(--text-dim)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                }}
-              >
-                <span style={{ width: 10, height: 10, borderRadius: 3, background: d.color, display: "inline-block" }} />
-                {d.name} ({d.value})
-              </span>
-            ))}
-          </div>
-        </div>
+        </section>
       </div>
 
-      <div className="card" style={{ marginTop: 16 }}>
-        <h3>Theme mentions</h3>
+      <section className="report-section">
+        <h2>Themes mentioned</h2>
         {themeData.length === 0 ? (
-          <div className="empty" style={{ padding: 20 }}>
+          <p className="report-note">
             {analyzed
-              ? "No themes detected yet"
-              : "Themes appear after the analyze pass runs on this professor."}
-          </div>
+              ? "No themes detected yet."
+              : "Themes appear after the analysis pass runs on this professor."}
+          </p>
         ) : (
-          <div style={{ width: "100%", height: 260 }}>
-            <ResponsiveContainer>
-              <BarChart data={themeData} margin={{ top: 10, right: 16, left: -18, bottom: 0 }}>
-                <CartesianGrid stroke="var(--border)" vertical={false} />
-                <XAxis
-                  dataKey="name"
-                  tick={{ fill: "var(--text-dim)", fontSize: 12 }}
-                  axisLine={{ stroke: "var(--border)" }}
-                  tickLine={false}
-                />
-                <YAxis
-                  allowDecimals={false}
-                  tick={{ fill: "var(--text-dim)", fontSize: 12 }}
-                  axisLine={{ stroke: "var(--border)" }}
-                  tickLine={false}
-                />
-                <Tooltip
-                  cursor={{ fill: "rgba(124,92,255,0.08)" }}
-                  contentStyle={{
-                    background: "var(--surface-2)",
-                    border: "1px solid var(--border)",
-                    borderRadius: 8,
-                    color: "var(--text)",
-                  }}
-                />
-                <Bar dataKey="count" radius={[6, 6, 0, 0]} fill="url(#grad)" />
-                <defs>
-                  <linearGradient id="grad" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#7c5cff" />
-                    <stop offset="100%" stopColor="#00d4ff" />
-                  </linearGradient>
-                </defs>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <ol className="theme-bars">
+            {themeData.map((t) => (
+              <li key={t.name} className="theme-row">
+                <span className="theme-name">{t.name}</span>
+                <span className="theme-track">
+                  <span
+                    className="theme-fill"
+                    style={{ width: `${(t.count / themeMax) * 100}%` }}
+                  />
+                </span>
+                <span className="theme-count num">{t.count}</span>
+              </li>
+            ))}
+          </ol>
         )}
-      </div>
+      </section>
 
       <SimilarProfessorsPanel professorId={prof.id} />
 
@@ -432,21 +316,16 @@ function SimilarProfessorsPanel({ professorId }) {
 
   if (loading) {
     return (
-      <div className="card" style={{ marginTop: 16 }}>
-        <h3>Similar professors</h3>
-        <div className="empty" style={{ padding: 20, textAlign: "center" }}>
-          <div className="spinner" />
-          {warming && (
-            <div
-              className="muted"
-              style={{ fontSize: 12, margin: "10px auto 0", maxWidth: 280 }}
-            >
-              Encoding this professor on the fly with MiniLM… this can take
-              up to a minute if the server has been idle — hang tight.
-            </div>
-          )}
-        </div>
-      </div>
+      <section className="report-section">
+        <h2>Similar professors</h2>
+        <div className="spinner" />
+        {warming && (
+          <p className="report-note">
+            Encoding this professor with MiniLM. This can take up to a minute
+            if the server has been idle.
+          </p>
+        )}
+      </section>
     );
   }
 
@@ -456,121 +335,59 @@ function SimilarProfessorsPanel({ professorId }) {
   const results = data.results || [];
   if (results.length === 0) {
     return (
-      <div className="card" style={{ marginTop: 16 }}>
-        <h3>Similar professors</h3>
-        <div className="muted" style={{ fontSize: 12, marginBottom: 8 }}>
-          Powered by MiniLM sentence embeddings + cosine KNN.
-        </div>
-        <div className="empty" style={{ padding: 20 }}>
+      <section className="report-section">
+        <h2>Similar professors</h2>
+        <p className="report-note">
           No other similar professors have been analyzed at this university
           yet.
-        </div>
-      </div>
+        </p>
+      </section>
     );
   }
 
   const matchLevel = data?.match_level || "department";
   const src = data?.source || {};
-  const scopeLine = (() => {
-    if (matchLevel === "department" && src.institution && src.department) {
-      return `In ${src.department} at ${src.institution}.`;
-    }
-    if (matchLevel === "institution" && src.institution) {
-      return `At ${src.institution}.`;
-    }
-    if (matchLevel === "global") {
-      return src.institution
-        ? `No matches at ${src.institution} yet — showing closest globally.`
-        : "Closest globally.";
-    }
-    return null;
-  })();
-  const badgeStyle = {
-    department: { bg: "rgba(46, 204, 143, 0.15)", color: "#2ecc8f" },
-    institution: { bg: "rgba(240, 199, 94, 0.18)", color: "#f0c75e" },
-    global: { bg: "rgba(124, 92, 255, 0.18)", color: "#a18bff" },
-  }[matchLevel] || { bg: "rgba(255,255,255,0.08)", color: "var(--muted)" };
-  const badgeLabel = {
-    department: "Same dept",
-    institution: "Same university",
-    global: "Global",
-  }[matchLevel] || matchLevel;
+  const scopeLine =
+    matchLevel === "department" && src.institution && src.department
+      ? `Closest by review content in ${src.department} at ${src.institution}.`
+      : matchLevel === "institution" && src.institution
+        ? `Closest by review content at ${src.institution}.`
+        : matchLevel === "global"
+          ? src.institution
+            ? `No matches at ${src.institution} yet, so these are the closest anywhere.`
+            : "Closest by review content anywhere."
+          : "Closest by review content.";
 
   return (
-    <div className="card" style={{ marginTop: 16 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-        <h3 style={{ margin: 0 }}>Similar professors</h3>
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            padding: "2px 8px",
-            borderRadius: 999,
-            background: badgeStyle.bg,
-            color: badgeStyle.color,
-            textTransform: "uppercase",
-            letterSpacing: 0.4,
-          }}
-        >
-          {badgeLabel}
-        </span>
-      </div>
-      <div className="muted" style={{ fontSize: 12, marginBottom: 12 }}>
-        {scopeLine && <div style={{ marginBottom: 4 }}>{scopeLine}</div>}
-        Top {results.length} by review-content similarity. Powered by
-        MiniLM sentence embeddings + cosine KNN
-        {data.model ? ` (${data.model})` : ""}.
-      </div>
-      <div style={{ display: "grid", gap: 10 }}>
-        {results.map((r) => {
-          const cosine = (r.score ?? 0).toFixed(2);
-          return (
-            <Link
-              key={r.id}
-              to={`/professors/${r.id}`}
-              className="card"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr auto",
-                alignItems: "center",
-                gap: 12,
-                margin: 0,
-                padding: 12,
-                background: "var(--surface-2)",
-                textDecoration: "none",
-              }}
-            >
-              <div>
-                <div style={{ fontWeight: 600, color: "var(--text)" }}>
-                  {r.name}
-                </div>
-                <div className="muted" style={{ fontSize: 12 }}>
-                  {r.department || "—"}
-                  {r.institution ? ` · ${r.institution}` : ""}
-                  {typeof r.review_count === "number" && r.review_count > 0
-                    ? ` · ${r.review_count} reviews`
-                    : ""}
-                </div>
+    <section className="report-section">
+      <h2>Similar professors</h2>
+      <p className="report-note">
+        {scopeLine} Similarity is the cosine between MiniLM sentence embeddings
+        of their reviews.
+      </p>
+      <ol className="similar-list">
+        {results.map((r) => (
+          <li key={r.id} className="similar-row">
+            <div className="similar-main">
+              <Link to={`/professors/${r.id}`} className="similar-name">
+                {r.name}
+              </Link>
+              <div className="similar-meta">
+                {r.department || "Department not listed"}
+                {r.institution ? `, ${r.institution}` : ""}
+                {typeof r.review_count === "number" && r.review_count > 0
+                  ? `, ${r.review_count} reviews`
+                  : ""}
               </div>
-              <div style={{ textAlign: "right" }}>
-                <div
-                  style={{
-                    fontSize: 18,
-                    fontWeight: 700,
-                    color: "var(--accent, #7c5cff)",
-                  }}
-                >
-                  {cosine}
-                </div>
-                <div className="muted" style={{ fontSize: 11 }}>
-                  cosine similarity
-                </div>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-    </div>
+            </div>
+            <div className="similar-score">
+              <span className="num">{(r.score ?? 0).toFixed(2)}</span>
+              <span className="similar-score-label">similarity</span>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }
 
@@ -646,10 +463,12 @@ function ReviewsSection({ professor }) {
 
   if (!liveCapable) {
     return (
-      <div className="card" style={{ marginTop: 16 }}>
-        <h3>Reviews ({fallbackReviews.length})</h3>
+      <section className="report-section">
+        <h2>
+          Reviews <span className="count num">{fallbackReviews.length}</span>
+        </h2>
         {fallbackReviews.length === 0 && (
-          <div className="empty">No reviews yet.</div>
+          <p className="report-note">No reviews yet.</p>
         )}
         {fallbackReviews.map((r) => (
           <ReviewItem
@@ -661,23 +480,23 @@ function ReviewsSection({ professor }) {
             sentiment={r.sentiment}
           />
         ))}
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="card" style={{ marginTop: 16 }}>
-      <h3>
+    <section className="report-section">
+      <h2>
         Reviews{" "}
-        <span style={{ color: "var(--text-dim)", fontWeight: 400, fontSize: 13 }}>
-          ({reviews.length}
-          {headingCount > reviews.length ? ` of ${headingCount}` : ""} loaded)
+        <span className="count num">
+          {reviews.length}
+          {headingCount > reviews.length ? ` of ${headingCount}` : ""}
         </span>
-      </h3>
-      <div className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
-        Live from RateMyProfessors, analyzed on the fly. Scroll for
-        more reviews — nothing is persisted.
-      </div>
+      </h2>
+      <p className="report-note">
+        Fetched live from RateMyProfessors and scored as they load. Nothing
+        is stored. Scroll for more.
+      </p>
 
       {reviews.map((r, idx) => (
         <ReviewItem
@@ -691,100 +510,75 @@ function ReviewsSection({ professor }) {
         />
       ))}
 
-      {loading && (
-        <div style={{ padding: "14px 0", textAlign: "center" }}>
-          <div className="spinner" />
-        </div>
-      )}
+      {loading && <div className="spinner" />}
 
       {!loading && !hasMore && reviews.length > 0 && (
-        <div
-          className="muted"
-          style={{ textAlign: "center", padding: "14px 0", fontSize: 12 }}
-        >
-          End of reviews.
-        </div>
+        <p className="report-note">That is every review.</p>
       )}
 
       {!loading && reviews.length === 0 && initialized && !error && (
-        <div className="empty">No reviews available.</div>
+        <p className="report-note">No reviews available.</p>
       )}
 
       {error && (
-        <div
-          className="empty"
-          style={{ color: "var(--neg)", padding: 16 }}
-        >
-          {error}
+        <div className="notice notice-error">
+          <div className="notice-text">Reviews stopped loading: {error}</div>
           {hasMore && (
-            <button
-              className="btn btn-ghost"
-              style={{ marginLeft: 10 }}
-              onClick={fetchNext}
-            >
-              Retry
+            <button className="btn btn-ghost" onClick={fetchNext}>
+              Try again
             </button>
           )}
         </div>
       )}
 
-      {hasMore && !error && <div ref={sentinelRef} style={{ height: 1 }} />}
-    </div>
+      {hasMore && !error && <div ref={sentinelRef} className="sentinel" />}
+    </section>
   );
 }
 
 function ReviewItem({ source, rating, course, text, sentiment, sourceUrl }) {
+  const label = sentimentLabel(sentiment?.label);
   return (
-    <div className="review">
-      <div className="review-head">
-        <span className={"source-chip " + sourceChipClass(source)}>
-          {source}
-        </span>
-        {course && <span className="pill">{course}</span>}
-        {rating != null && (
-          <span className="pill">★ {Number(rating).toFixed(1)}</span>
-        )}
-        <span
-          className={"sentiment-chip " + sentimentLabel(sentiment?.label)}
-          title="Rule-based VADER sentiment (compound score)"
-        >
-          VADER · {sentiment?.label || "neutral"} ·{" "}
-          {(sentiment?.compound ?? 0).toFixed(2)}
+    <article className="review">
+      <p className="review-body">{text}</p>
+      <div className="review-foot">
+        <span className={"review-sentiment " + label}>
+          <span className="legend-swatch" aria-hidden="true" />
+          <span className="word">{label}</span>
+          <span className="num">{(sentiment?.compound ?? 0).toFixed(2)}</span>
         </span>
         {sentiment?.ml_label && (
           <span
-            className={"sentiment-chip " + sentimentLabel(sentiment.ml_label)}
-            title={`Trained ${sentiment.ml_model || "ML"} classifier prediction`}
-            style={{ opacity: 0.9, borderStyle: "dashed" }}
+            className={"review-sentiment " + sentimentLabel(sentiment.ml_label)}
+            title={`Prediction from the trained ${sentiment.ml_model || "ML"} classifier`}
           >
-            ML · {sentiment.ml_label}
-            {typeof sentiment.ml_confidence === "number"
-              ? ` · ${(sentiment.ml_confidence * 100).toFixed(0)}%`
-              : ""}
+            classifier says {sentiment.ml_label}
+            {typeof sentiment.ml_confidence === "number" && (
+              <span className="num">{(sentiment.ml_confidence * 100).toFixed(0)}%</span>
+            )}
           </span>
+        )}
+        {course && <span>{course}</span>}
+        {rating != null && (
+          <span>
+            Rated <span className="num">{Number(rating).toFixed(1)}</span>
+          </span>
+        )}
+        {sentiment?.themes?.length > 0 && (
+          <span>Themes: {sentiment.themes.join(", ")}</span>
         )}
         {sourceUrl && (
           <a
             href={sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="pill"
-            style={{ marginLeft: "auto" }}
+            className="review-source"
           >
-            source ↗
+            Source
+            {source && source !== "rmp" ? ` (${source})` : ""}
           </a>
         )}
       </div>
-      <div className="review-body">{text}</div>
-      {sentiment?.themes?.length > 0 && (
-        <div className="review-themes">
-          {sentiment.themes.map((t) => (
-            <span key={t} className="pill accent">
-              {t}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
+    </article>
   );
 }
