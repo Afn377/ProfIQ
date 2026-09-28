@@ -104,68 +104,34 @@ export default function AddProfessorModal({
 
   return (
     <div
+      className="modal-backdrop"
       onClick={(e) => e.target === e.currentTarget && onClose?.()}
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 50,
-        display: "grid",
-        placeItems: "center",
-        padding: 20,
-        background: "rgba(7, 11, 22, 0.66)",
-        backdropFilter: "blur(8px)",
-      }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="add-prof-title"
     >
-      <form
-        onSubmit={onSubmit}
-        style={{
-          width: "min(520px, 100%)",
-          background: "var(--surface)",
-          border: "1px solid var(--border-strong)",
-          borderRadius: 16,
-          padding: 24,
-          boxShadow: "0 30px 60px rgba(0,0,0,0.55)",
-          display: "grid",
-          gap: 16,
-        }}
-      >
-        <header style={{ display: "flex", alignItems: "start", justifyContent: "space-between", gap: 12 }}>
+      <form onSubmit={onSubmit} className="modal">
+        <header className="modal-head">
           <div>
-            <h3 id="add-prof-title" style={{ margin: 0, color: "var(--text)" }}>
-              Add a professor
-            </h3>
-            <div style={{ marginTop: 4, color: "var(--text-dim)", fontSize: 13 }}>
-              We'll fetch their reviews and run sentiment analysis as soon as
-              their detail page opens.
-            </div>
+            <h3 id="add-prof-title">Add a professor</h3>
+            <p className="report-note">
+              Their reviews are fetched and scored the first time their page
+              opens.
+            </p>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="btn btn-ghost"
-            style={{ padding: "4px 10px", fontSize: 18, lineHeight: 1 }}
+            className="modal-close"
           >
-            ×
+            &times;
           </button>
         </header>
 
         {topError && (
-          <div
-            role="alert"
-            style={{
-              background: "rgba(255, 80, 80, 0.08)",
-              border: "1px solid rgba(255, 120, 120, 0.35)",
-              color: "#ffb3b3",
-              borderRadius: 10,
-              padding: "10px 12px",
-              fontSize: 14,
-            }}
-          >
-            {topError}
+          <div role="alert" className="notice notice-error">
+            <div className="notice-text">{topError}</div>
           </div>
         )}
 
@@ -175,30 +141,30 @@ export default function AddProfessorModal({
           input={
             <input
               ref={nameRef}
+              className={"field" + (fieldError("name") ? " field-error" : "")}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Jane Doolittle"
+              placeholder="Jane Doolittle"
               maxLength={128}
               autoComplete="off"
-              style={inputStyle(fieldError("name"))}
             />
           }
         />
 
         <Field
           label="School"
-          hint="Start typing to autocomplete from existing schools."
+          hint="Start typing to pick from schools already indexed."
           error={fieldError("institution")}
           input={
             <>
               <input
+                className={"field" + (fieldError("institution") ? " field-error" : "")}
                 list={datalistId}
                 value={institution}
                 onChange={(e) => handleSchoolChange(e.target.value)}
-                placeholder="e.g., Stanford University"
+                placeholder="Stanford University"
                 maxLength={128}
                 autoComplete="off"
-                style={inputStyle(fieldError("institution"))}
               />
               <datalist id={datalistId}>
                 {schoolOptions.map((s) => (
@@ -216,11 +182,11 @@ export default function AddProfessorModal({
           error={fieldError("department")}
           input={
             <select
+              className={"field" + (fieldError("department") ? " field-error" : "")}
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
-              style={inputStyle(fieldError("department"))}
             >
-              <option value="">— Not sure —</option>
+              <option value="">Not sure</option>
               {departments.map((d) => (
                 <option key={d.id} value={d.id}>{d.name}</option>
               ))}
@@ -228,12 +194,12 @@ export default function AddProfessorModal({
           }
         />
 
-        <footer style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
+        <footer className="modal-foot">
           <button type="button" className="btn btn-ghost" onClick={onClose} disabled={submitting}>
             Cancel
           </button>
           <button type="submit" className="btn btn-primary" disabled={submitting}>
-            {submitting ? "Adding…" : "Add professor"}
+            {submitting ? "Adding" : "Add professor"}
           </button>
         </footer>
       </form>
@@ -243,30 +209,11 @@ export default function AddProfessorModal({
 
 function Field({ label, hint, error, input }) {
   return (
-    <label style={{ display: "grid", gap: 6 }}>
-      <span style={{ color: "var(--text)", fontSize: 13, fontWeight: 600 }}>
-        {label}
-      </span>
+    <label className="form-field">
+      <span className="form-label">{label}</span>
       {input}
-      {hint && !error && (
-        <span style={{ color: "var(--text-muted)", fontSize: 12 }}>{hint}</span>
-      )}
-      {error && (
-        <span style={{ color: "#ff9aa2", fontSize: 12 }}>{error}</span>
-      )}
+      {hint && !error && <span className="form-hint">{hint}</span>}
+      {error && <span className="form-error">{error}</span>}
     </label>
   );
-}
-
-function inputStyle(hasError) {
-  return {
-    background: "var(--surface-2)",
-    color: "var(--text)",
-    border: `1px solid ${hasError ? "rgba(255, 120, 120, 0.55)" : "var(--border)"}`,
-    borderRadius: 10,
-    padding: "10px 12px",
-    fontSize: 14,
-    width: "100%",
-    boxSizing: "border-box",
-  };
 }

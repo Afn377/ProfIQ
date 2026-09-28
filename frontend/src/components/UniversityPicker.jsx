@@ -90,62 +90,17 @@ export default function UniversityPicker() {
   const showList = open && options.length > 0;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "grid",
-        placeItems: "center",
-        padding: "48px 24px",
-      }}
-    >
-      <div style={{ width: "100%", maxWidth: 560 }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            fontFamily: "var(--font-heading)",
-            fontWeight: 700,
-            letterSpacing: "-0.02em",
-            fontSize: 18,
-            marginBottom: 26,
-            justifyContent: "center",
-          }}
-        >
-          <span className="brand-mark">P</span>
-          <span>ProfIQ</span>
-        </div>
+    <div className="picker">
+      <div className="picker-inner">
+        <div className="brand picker-brand">ProfIQ</div>
 
-        <h1
-          style={{
-            fontFamily: "var(--font-heading)",
-            fontSize: "clamp(28px, 4vw, 38px)",
-            letterSpacing: "-0.03em",
-            lineHeight: 1.1,
-            textAlign: "center",
-            margin: "0 0 14px",
-          }}
-        >
-          Which university are you at?
-        </h1>
-        <p
-          style={{
-            color: "var(--text-dim)",
-            fontSize: 15,
-            lineHeight: 1.55,
-            textAlign: "center",
-            margin: "0 0 28px",
-          }}
-        >
-          ProfIQ scopes its recommendations and sentiment scores to your school so
-          every professor you see is directly comparable.
+        <h1 className="picker-title">Which university are you at?</h1>
+        <p className="picker-lede">
+          Scores and recommendations are scoped to one school, so every
+          professor you see is directly comparable.
         </p>
 
-        <form
-          className="search-bar"
-          onSubmit={onSubmit}
-          style={{ maxWidth: "none", margin: 0 }}
-        >
+        <form className="hero-search" onSubmit={onSubmit}>
           <input
             autoFocus
             role="combobox"
@@ -155,7 +110,7 @@ export default function UniversityPicker() {
             aria-activedescendant={
               activeIndex >= 0 ? `${listId}-option-${activeIndex}` : undefined
             }
-            placeholder="Start typing your school name…"
+            placeholder="Start typing your school"
             value={input}
             onChange={(e) => {
               setInput(e.target.value);
@@ -170,76 +125,43 @@ export default function UniversityPicker() {
             type="submit"
             className="btn btn-primary"
             aria-disabled={!resolved}
-            style={{
-              opacity: resolved ? 1 : 0.5,
-            }}
           >
             Continue
           </button>
         </form>
 
         {hint && !resolved && (
-          <div
-            className="empty"
-            style={{ padding: "16px 0 0", fontSize: 14 }}
-          >
+          <p className="form-error picker-hint">
             Pick your school from the list to continue.
-          </div>
+          </p>
         )}
 
         {showList && (
-          <div
-            id={listId}
-            role="listbox"
-            style={{
-              marginTop: 10,
-              background: "var(--surface)",
-              border: "1px solid var(--border)",
-              borderRadius: 14,
-              boxShadow: "var(--shadow)",
-              overflowX: "hidden",
-              maxHeight: 340,
-              overflowY: "auto",
-            }}
-          >
+          <ul id={listId} role="listbox" className="picker-list">
             {options.map((s, i) => (
-              <div
+              <li
                 key={s.name}
                 id={`${listId}-option-${i}`}
                 role="option"
                 aria-selected={i === activeIndex}
+                className={"picker-option" + (i === activeIndex ? " active" : "")}
                 onMouseDown={(e) => e.preventDefault()}
                 onMouseEnter={() => setActiveIndex(i)}
                 onClick={() => choose(s.name)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 12,
-                  padding: "12px 16px",
-                  cursor: "pointer",
-                  background: i === activeIndex ? "var(--surface-2)" : "transparent",
-                  borderBottom: i === options.length - 1 ? "none" : "1px solid var(--border)",
-                }}
               >
-                <span style={{ fontSize: 15 }}>{s.name}</span>
-                <span
-                  className="pill"
-                  style={{ flexShrink: 0, whiteSpace: "nowrap" }}
-                >
-                  {s.professor_count.toLocaleString()} profs
+                <span>{s.name}</span>
+                <span className="picker-count num">
+                  {s.professor_count.toLocaleString()} professors
                 </span>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
 
         {!showList && loading && <div className="spinner" />}
 
         {!showList && !loading && input.trim() && options.length === 0 && (
-          <div className="empty" style={{ padding: "24px 0", fontSize: 14 }}>
-            No schools match “{input.trim()}”.
-          </div>
+          <p className="report-note">No schools match "{input.trim()}".</p>
         )}
       </div>
     </div>
