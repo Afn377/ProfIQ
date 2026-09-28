@@ -1,8 +1,63 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { api } from "../lib/api.js";
 import { useUniversity } from "../lib/universityStore.jsx";
-import ProfessorCard from "../components/ProfessorCard.jsx";
+import { useCompare } from "../lib/compareStore.jsx";
+import { scoreBucket } from "../lib/format.js";
+
+const fmt = (n) => (n ?? 0).toLocaleString();
+
+// One row of the ranked list. The rank is a real sequence, so it gets a
+// number. Everything else in the row stays quiet so the score reads first.
+function RankRow({ prof, rank }) {
+  const { has, toggle, full } = useCompare();
+  const selected = has(prof.id);
+  const score = prof.recommendation_score ?? 0;
+
+  const onToggle = (e) => {
+    e.preventDefault();
+    if (!selected && full) return;
+    toggle(prof.id);
+  };
+
+  return (
+    <li className="rank-row">
+      <span className="rank-num num">{rank}</span>
+      <div className="rank-main">
+        <Link to={`/professors/${prof.id}`} className="rank-name">
+          {prof.name}
+        </Link>
+        <div className="rank-meta">
+          {prof.department || "Department not listed"}
+          <span className="rank-sep" aria-hidden="true" />
+          {fmt(prof.review_count)} reviews
+          {prof.avg_compound != null && (
+            <>
+              <span className="rank-sep" aria-hidden="true" />
+              <span title="Average sentiment, from -1 to 1">
+                Sentiment {prof.avg_compound > 0 ? "+" : ""}
+                {prof.avg_compound.toFixed(2)}
+              </span>
+            </>
+          )}
+        </div>
+      </div>
+      <div className="rank-side">
+        <span className={"rank-score num " + scoreBucket(score)}>
+          {Math.round(score)}
+        </span>
+        <button
+          type="button"
+          className={"rank-compare" + (selected ? " active" : "")}
+          onClick={onToggle}
+          disabled={!selected && full}
+        >
+          {selected ? "In compare" : "Compare"}
+        </button>
+      </div>
+    </li>
+  );
+}
 
 export default function Home() {
   const { institution } = useUniversity();
@@ -31,19 +86,20 @@ export default function Home() {
   return (
     <>
       <section className="hero container">
-        <h1>
-          Find the right professor,
-          <br />
-          <span className="grad">powered by real feedback.</span>
+        <h1 className="hero-title">
+          Pick a professor by what students said about them.
         </h1>
-        <p>
-          ProfIQ aggregates reviews from RateMyProfessors, runs NLP
-          sentiment analysis on every comment, and ranks instructors by an
-          evidence-based recommendation score.
+        <p className="hero-lede">
+          ProfIQ reads every RateMyProfessors review for your school, scores
+          each one for sentiment, and ranks instructors from that evidence.
         </p>
-        <form className="search-bar" onSubmit={onSearch}>
+        <form className="hero-search" onSubmit={onSearch}>
+          <label htmlFor="home-q" className="visually-hidden">
+            Search professors
+          </label>
           <input
-            placeholder="Search by professor, course, or department…"
+            id="home-q"
+            placeholder="Professor, course, or department"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             autoFocus
@@ -52,46 +108,45 @@ export default function Home() {
             Search
           </button>
         </form>
-
         {summary && (
-          <div className="hero-stats">
-            <div className="stat-chip">
-              <div className="value">{summary.professor_count}</div>
-              <div className="label">Professors</div>
-            </div>
-            <div className="stat-chip">
-              <div className="value">{summary.review_count}</div>
-              <div className="label">Reviews analyzed</div>
-            </div>
-            <div className="stat-chip">
-              <div className="value">{summary.department_count}</div>
-              <div className="label">Departments</div>
-            </div>
-          </div>
+          <p className="hero-coverage">
+            Covering <span className="num">{fmt(summary.professor_count)}</span>{" "}
+            professors in <span className="num">{fmt(summary.department_count)}</span>{" "}
+            departments, from{" "}
+            <span className="num">{fmt(summary.review_count)}</span> reviews.
+          </p>
         )}
       </section>
 
       <section className="section container">
         <div className="section-head">
           <div>
-            <h2>Top recommended{institution ? ` at ${institution}` : ""}</h2>
+            <h2>Top recommended</h2>
             <div className="sub">
               {summary
-                ? `Ranked by sentiment score · ${summary.analyzed_count.toLocaleString()} of ${summary.professor_count.toLocaleString()} professors analyzed so far`
-                : "Ranked by aggregated sentiment score"}
+                ? `Ranked by sentiment score. ${fmt(summary.analyzed_count)} of ${fmt(summary.professor_count)} professors analyzed so far.`
+                : "Ranked by sentiment score."}
             </div>
           </div>
+          <Link to="/search" className="section-link">
+            Browse everyone
+          </Link>
         </div>
         {loading ? (
           <div className="spinner" />
         ) : error ? (
           <div className="empty">{error}</div>
-        ) : (
-          <div className="prof-grid">
-            {summary.top_professors.map((p) => (
-              <ProfessorCard key={p.id} prof={p} />
-            ))}
+        ) : summary.top_professors.length === 0 ? (
+          <div className="empty">
+            No one has been analyzed at this school yet. Open a professor from
+            Browse to start.
           </div>
+        ) : (
+          <ol className="rank-list">
+            {summary.top_professors.map((p, i) => (
+              <RankRow key={p.id} prof={p} rank={i + 1} />
+            ))}
+          </ol>
         )}
       </section>
     </>
